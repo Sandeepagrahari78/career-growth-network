@@ -1,0 +1,12 @@
+import fs from 'node:fs';
+const args=process.argv.slice(2);
+const get=(n,d='')=>{const i=args.indexOf(n);return i>=0&&args[i+1]?args[i+1]:d};
+const ticket=get('--ticket','UNKNOWN');
+const summary=get('--summary','No summary provided');
+const modules=get('--modules','unspecified');
+const contracts=get('--contracts','none');
+const risks=get('--risks','none');
+const file='docs/engineering-memory/05-current-state.md';
+const entry=`\n\n## ${new Date().toISOString()} - ${ticket}\n- Summary: ${summary}\n- Modules: ${modules}\n- Contracts: ${contracts}\n- Risks/follow-up: ${risks}\n`;
+fs.appendFileSync(file,entry);
+console.log(`Logged ${ticket} to ${file}`);

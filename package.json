@@ -1,0 +1,16 @@
+{
+  "name": "career-growth-network",
+  "private": true,
+  "version": "0.0.0",
+  "packageManager": "pnpm@11.25.0",
+  "type": "module",
+  "scripts": {
+    "agent:context": "node scripts/agent-context.mjs",
+    "memory:log": "node scripts/memory-log.mjs",
+    "memory:check": "node scripts/memory-check.mjs",
+    "demo:module-a": "node demo/module-a/index.mjs",
+    "demo:module-b": "node demo/module-b/index.mjs",
+    "demo:handoff": "node scripts/demo-handoff.mjs",
+    "demo:sync": "node scripts/run-sync-demo.mjs"
+  }
+}
