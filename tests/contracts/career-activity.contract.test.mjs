@@ -30,6 +30,9 @@ test("career.activity.v1 keeps canonical integration fields", async () => {
     "visibility",
     "summary",
   ]) {
-    assert.ok(schema.required.includes(field), `Missing required field: ${field}`);
+    assert.ok(
+      schema.required.includes(field),
+      `Missing required field: ${field}`,
+    );
   }
 });
