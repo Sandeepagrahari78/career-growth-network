@@ -39,10 +39,7 @@ test("Terraform bootstrap whitelists only local environments and mode", () => {
     variables,
     /contains\(\["local-dev", "local-staging"\], var\.environment\)/,
   );
-  assert.match(
-    variables,
-    /var\.execution_mode == "zero-budget-local"/,
-  );
+  assert.match(variables, /var\.execution_mode == "zero-budget-local"/);
 });
 
 test("committed Terraform variable files do not contain obvious secrets", () => {
