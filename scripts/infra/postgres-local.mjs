@@ -15,11 +15,6 @@ const configPath = resolve(
   repoRoot,
   "config/infra/postgres-databases.v1.json",
 );
-const migrationSmokePath = resolve(
-  repoRoot,
-  "tests/fixtures/postgres/migration-smoke.sql",
-);
-
 function safeIdentifier(value) {
   assert.match(value, /^[a-z][a-z0-9_]*$/);
   return value;
