@@ -1,0 +1,150 @@
+{
+  "contract": "cgn.bounded-contexts.v1",
+  "ticket": "CGN-32",
+  "dataRule": "No service reads another service database directly.",
+  "contexts": [
+    {
+      "id": "gateway",
+      "name": "Gateway/BFF",
+      "owns": ["edge request composition", "request routing"],
+      "mustNotOwn": ["business-domain source truth"]
+    },
+    {
+      "id": "identity",
+      "name": "Identity & Access",
+      "owns": ["account", "auth", "roles", "consent"],
+      "mustNotOwn": ["career scoring"]
+    },
+    {
+      "id": "career",
+      "name": "Career Intelligence",
+      "owns": ["career goals", "tracks", "diagnostics", "skills"],
+      "mustNotOwn": ["social graph"]
+    },
+    {
+      "id": "roadmap",
+      "name": "Roadmap & Daily Missions",
+      "owns": ["plans", "milestones", "daily missions"],
+      "mustNotOwn": ["evidence truth"]
+    },
+    {
+      "id": "evidence",
+      "name": "Evidence & Validation",
+      "owns": ["proof", "provenance", "confidence"],
+      "mustNotOwn": ["public feed ranking"]
+    },
+    {
+      "id": "growth",
+      "name": "Growth Identity / Growth Graph",
+      "owns": ["longitudinal skill state", "readiness state"],
+      "mustNotOwn": ["raw auth data"]
+    },
+    {
+      "id": "ai",
+      "name": "AI Career Intelligence / Orchestration",
+      "owns": ["AI provider orchestration", "AI-assisted recommendation orchestration"],
+      "mustNotOwn": ["canonical business-domain source truth"]
+    },
+    {
+      "id": "feed",
+      "name": "Social Feed & Growth Stories",
+      "owns": ["feed projections", "growth-story projections", "ranking"],
+      "mustNotOwn": ["source-domain truth"]
+    },
+    {
+      "id": "social-graph",
+      "name": "Social Graph / Connections / Peer Matching",
+      "owns": ["follow", "connection", "block"],
+      "mustNotOwn": ["message contents"]
+    },
+    {
+      "id": "communities",
+      "name": "Communities & Discussions",
+      "owns": ["community membership", "discussions", "moderation metadata"],
+      "mustNotOwn": ["identity source truth"]
+    },
+    {
+      "id": "messaging",
+      "name": "Messaging & Conversations",
+      "owns": ["conversations", "messages", "read state"],
+      "mustNotOwn": ["connection or block policy source truth"]
+    },
+    {
+      "id": "cohorts",
+      "name": "Cohorts & Squads",
+      "owns": ["cohort and squad coordination state"],
+      "mustNotOwn": ["identity or career source truth"]
+    },
+    {
+      "id": "experts",
+      "name": "Experts & Validation",
+      "owns": ["expert profile", "expert sessions", "expert validation workflow"],
+      "mustNotOwn": ["raw evidence truth"]
+    },
+    {
+      "id": "opportunities",
+      "name": "Opportunities & Matching",
+      "owns": ["opportunity catalog", "match results"],
+      "mustNotOwn": ["recruiter consent source truth"]
+    },
+    {
+      "id": "recruiter",
+      "name": "Recruiter Discovery",
+      "owns": ["organization approval", "candidate search", "saved candidates"],
+      "mustNotOwn": ["private profile source truth"]
+    },
+    {
+      "id": "notifications",
+      "name": "Notifications",
+      "owns": ["notification delivery projections"],
+      "mustNotOwn": ["upstream business-domain source truth"]
+    },
+    {
+      "id": "analytics",
+      "name": "Analytics & Engagement",
+      "owns": ["metrics", "events", "aggregates"],
+      "mustNotOwn": ["business-domain source truth"]
+    },
+    {
+      "id": "admin",
+      "name": "Admin & Operations / Audit Activity Projection",
+      "owns": ["privacy-safe operational projections", "audit activity projections"],
+      "mustNotOwn": ["private message bodies", "private evidence files", "credentials or tokens", "AI conversation history"]
+    }
+  ],
+  "boundaries": {
+    "synchronous": {
+      "rule": "Immediate cross-domain reads or commands use versioned HTTP/API contracts through the owning service boundary.",
+      "edgeRule": "Client-facing composition belongs at Gateway/BFF; Gateway/BFF does not become a business source of truth.",
+      "errorContract": "http.error-envelope.v1"
+    },
+    "asynchronous": {
+      "rule": "Cross-domain eventual propagation uses versioned domain events wrapped by domain.event.envelope.v1.",
+      "envelopeContract": "domain.event.envelope.v1",
+      "canonicalCareerActivity": {
+        "contract": "career.activity.v1",
+        "eligibleProducers": ["career", "roadmap", "evidence", "experts", "opportunities"],
+        "consumers": ["growth", "feed", "notifications", "opportunities"]
+      }
+    }
+  },
+  "socialPrivacy": {
+    "followConnectionBlockOwner": "social-graph",
+    "communityMembershipOwner": "communities",
+    "conversationStateOwner": "messaging",
+    "consentOwner": "identity",
+    "rules": [
+      "Blocked relationships must be enforced consistently before social projection or interaction is exposed.",
+      "Private or deleted source content must not remain visible through feed, story, notification or admin projections.",
+      "Messaging must consume connection/block eligibility from the Social Graph boundary instead of owning a duplicate policy.",
+      "Admin projections are allow-listed and privacy-safe by default."
+    ]
+  },
+  "platformRules": [
+    "AI remains an internal intelligence layer rather than a top-level product source of truth.",
+    "Cross-domain database reads are forbidden.",
+    "Breaking API or event changes require a new contract version.",
+    "Services must remain horizontally scalable for the initial 5,000-account beta target.",
+    "Local-first infrastructure must remain future-migratable to managed cloud services."
+  ]
+}
