@@ -7,3 +7,11 @@ coverage/
 !.env.example
 .cgn/context-*.md
 .cgn/demo/
+
+# Terraform local state and working data
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+crash.*.log
