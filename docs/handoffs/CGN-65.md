@@ -55,6 +55,10 @@ PR CI must validate:
 - Container vulnerability/SBOM policy hardening belongs to CGN-91; this ticket only enables build/publish plumbing.
 - Kubernetes runtime validation remains owned by CGN-41 and is currently blocked by its Jira dependency chain.
 
+## Base synchronization note
+
+CGN-283 capacity/SLO contract was merged to `main` as `b55dbc018162fa5f28b1b2732daf063af81ccc45` while this PR was open. This handoff update intentionally retriggers PR CI so the Docker/registry changes are validated against that newer main state before merge.
+
 ## Exact next step for next agent
 
 After merge, start CGN-91 container/dependency security hardening and CGN-41 only when its infrastructure dependency is satisfied. Deployment consumers must use immutable SHA image tags.
