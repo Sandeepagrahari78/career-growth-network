@@ -8,8 +8,14 @@ if (!releaseSha || !/^[0-9a-f]{40}$/i.test(releaseSha)) {
 }
 
 try {
-  execFileSync("git", ["cat-file", "-e", `${releaseSha}^{commit}`], { stdio: "ignore" });
-  execFileSync("git", ["merge-base", "--is-ancestor", releaseSha, "origin/main"], { stdio: "ignore" });
+  execFileSync("git", ["cat-file", "-e", `${releaseSha}^{commit}`], {
+    stdio: "ignore",
+  });
+  execFileSync(
+    "git",
+    ["merge-base", "--is-ancestor", releaseSha, "origin/main"],
+    { stdio: "ignore" },
+  );
 } catch {
   console.error("Release SHA is not an approved commit on main history.");
   process.exit(1);
