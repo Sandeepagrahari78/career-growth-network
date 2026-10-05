@@ -1,0 +1,71 @@
+name: Local PostgreSQL Validation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "infra/docker/docker-compose.postgres.yml"
+      - "infra/postgres/**"
+      - "config/infra/postgres-databases.v1.json"
+      - "scripts/infra/postgres-*.mjs"
+      - "tests/contracts/postgres-database-boundaries.contract.test.mjs"
+      - "tests/fixtures/postgres/**"
+      - ".github/workflows/local-postgres.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: local-postgres-main
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: PostgreSQL init migrate backup restore
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22
+
+      - name: Generate ephemeral database password
+        shell: bash
+        run: |
+          password="$(openssl rand -hex 24)"
+          echo "::add-mask::$password"
+          echo "CGN_POSTGRES_PASSWORD=$password" >> "$GITHUB_ENV"
+
+      - name: Start local PostgreSQL
+        run: node scripts/infra/postgres-local.mjs up
+
+      - name: Verify service database ownership
+        run: node scripts/infra/postgres-local.mjs verify
+
+      - name: Reject unknown service migration
+        shell: bash
+        run: |
+          if node scripts/infra/postgres-local.mjs migrate unknown-service tests/fixtures/postgres/migration-smoke.sql; then
+            echo "Unknown service migration unexpectedly succeeded."
+            exit 1
+          fi
+          echo "Unknown service migration rejected as expected."
+
+      - name: Run owner-scoped migration smoke
+        run: node scripts/infra/postgres-local.mjs migration-smoke
+
+      - name: Prove backup command
+        shell: bash
+        run: |
+          node scripts/infra/postgres-local.mjs backup identity .local/backups/cgn_identity.dump
+          test -s .local/backups/cgn_identity.dump
+
+      - name: Prove backup and restore
+        run: node scripts/infra/postgres-local.mjs backup-restore-smoke
+
+      - name: Destroy local PostgreSQL and volume
+        if: always()
+        run: node scripts/infra/postgres-local.mjs reset
