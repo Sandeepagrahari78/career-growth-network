@@ -43,6 +43,20 @@ jobs:
       - name: Quality gates
         run: pnpm ci:quick
 
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3
+        with:
+          terraform_version: 1.16.5
+          terraform_wrapper: false
+
+      - name: Revalidate zero-budget Terraform
+        shell: bash
+        run: |
+          terraform fmt -check -recursive infra/terraform
+          terraform -chdir=infra/terraform/environments/local init -backend=false -input=false
+          terraform -chdir=infra/terraform/environments/local validate
+          terraform -chdir=infra/terraform/environments/local plan -input=false -lock=false -refresh=false -var-file=staging.tfvars
+
       - name: Build immutable candidate image
         run: docker build -f services/health-demo/Dockerfile -t cgn-health-demo:${{ github.sha }} .
 
