@@ -28,6 +28,7 @@ jobs:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           fetch-depth: 0
+
       - id: detect
         name: Detect changed paths
         run: node scripts/ci/detect-changes.mjs
@@ -104,7 +105,7 @@ jobs:
         run: pnpm ci:quick
 
   security:
-    name: Secret SAST vulnerability scans
+    name: Dependency secret SAST vulnerability scans
     needs: [context]
     runs-on: ubuntu-latest
     steps:
@@ -112,21 +113,38 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Gitleaks
+      - id: gitleaks
+        name: Gitleaks secret scan
+        continue-on-error: true
         uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: osv
+        name: OSV dependency vulnerability scan
+        continue-on-error: true
+        uses: google/osv-scanner-action/osv-scanner-action@a345acffa64b0eaede81a3d9aae6141214d9c8fc # v2.6.0
+        with:
+          scan-args: |-
+            --format=json
+            --output=osv-results.json
+            --recursive
+            ./
 
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.13"
 
-      - name: Semgrep CE
+      - id: semgrep
+        name: Semgrep CE
+        continue-on-error: true
         run: |
           python -m pip install --disable-pip-version-check semgrep
           semgrep --config=auto --config=config/semgrep/cgn.yml --error
 
-      - name: Trivy filesystem scan
+      - id: trivy_fs
+        name: Trivy filesystem scan
+        continue-on-error: true
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           scan-type: fs
@@ -135,8 +153,36 @@ jobs:
           ignore-unfixed: true
           exit-code: "1"
 
+      - name: Upload OSV scan evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: osv-pr-${{ github.event.pull_request.number }}
+          path: osv-results.json
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Enforce aggregate source security gate
+        if: always()
+        shell: bash
+        env:
+          GITLEAKS_OUTCOME: ${{ steps.gitleaks.outcome }}
+          OSV_OUTCOME: ${{ steps.osv.outcome }}
+          SEMGREP_OUTCOME: ${{ steps.semgrep.outcome }}
+          TRIVY_FS_OUTCOME: ${{ steps.trivy_fs.outcome }}
+        run: |
+          status=0
+          for check in GITLEAKS_OUTCOME OSV_OUTCOME SEMGREP_OUTCOME TRIVY_FS_OUTCOME; do
+            value="${!check}"
+            echo "$check=$value"
+            if [ "$value" != "success" ]; then
+              status=1
+            fi
+          done
+          exit "$status"
+
   docker:
-    name: Docker build ${{ matrix.service }}
+    name: Docker build and security ${{ matrix.service }}
     needs: [changes, quality, security]
     if: needs.changes.outputs.dockerCount != '0'
     runs-on: ubuntu-latest
@@ -160,6 +206,34 @@ jobs:
           cache-from: type=gha,scope=pr-${{ matrix.service }}
           cache-to: type=gha,mode=max,scope=pr-${{ matrix.service }}
 
+      - id: trivy_image
+        name: Trivy container image vulnerability gate
+        continue-on-error: true
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: image
+          image-ref: cgn-${{ matrix.service }}:${{ github.sha }}
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+
+      - name: Generate CycloneDX SBOM
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: image
+          image-ref: cgn-${{ matrix.service }}:${{ github.sha }}
+          format: cyclonedx
+          output: sbom-${{ matrix.service }}.cdx.json
+          exit-code: "0"
+
+      - name: Upload container SBOM
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: sbom-${{ matrix.service }}-${{ github.sha }}
+          path: sbom-${{ matrix.service }}.cdx.json
+          if-no-files-found: error
+          retention-days: 14
+
       - name: Run health-demo container smoke
         if: matrix.service == 'health-demo'
         shell: bash
@@ -175,6 +249,15 @@ jobs:
           done
           docker logs cgn-health-demo
           exit 1
+
+      - name: Enforce container security gate
+        if: always()
+        shell: bash
+        env:
+          TRIVY_IMAGE_OUTCOME: ${{ steps.trivy_image.outcome }}
+        run: |
+          echo "TRIVY_IMAGE_OUTCOME=$TRIVY_IMAGE_OUTCOME"
+          test "$TRIVY_IMAGE_OUTCOME" = "success"
 
   gate:
     name: PR quality gate summary

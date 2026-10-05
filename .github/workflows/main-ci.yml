@@ -46,6 +46,42 @@ jobs:
       - name: Build immutable candidate image
         run: docker build -f services/health-demo/Dockerfile -t cgn-health-demo:${{ github.sha }} .
 
+      - id: trivy_image
+        name: Trivy candidate image vulnerability gate
+        continue-on-error: true
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: image
+          image-ref: cgn-health-demo:${{ github.sha }}
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+
+      - name: Generate candidate CycloneDX SBOM
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: image
+          image-ref: cgn-health-demo:${{ github.sha }}
+          format: cyclonedx
+          output: sbom-health-demo.cdx.json
+          exit-code: "0"
+
+      - name: Upload candidate SBOM
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: sbom-main-health-demo-${{ github.sha }}
+          path: sbom-health-demo.cdx.json
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Enforce candidate container security gate
+        shell: bash
+        env:
+          TRIVY_IMAGE_OUTCOME: ${{ steps.trivy_image.outcome }}
+        run: |
+          echo "TRIVY_IMAGE_OUTCOME=$TRIVY_IMAGE_OUTCOME"
+          test "$TRIVY_IMAGE_OUTCOME" = "success"
+
       - name: Smoke candidate image
         shell: bash
         run: |

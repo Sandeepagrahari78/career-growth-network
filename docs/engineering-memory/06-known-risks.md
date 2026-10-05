@@ -7,3 +7,7 @@
 - Scale assumptions: 5,000 registered users is not the same as 5,000 concurrent users. Mitigation: versioned capacity model, separate load profiles and explicit SLOs.
 - Performance-target drift: initial 5K thresholds are engineering targets before real beta telemetry exists. Mitigation: keep them machine-readable, require Jira-reviewed changes, and never weaken thresholds only to make CI green.
 - Premature infrastructure complexity: pipeline/infra can become the project. Mitigation: phase gates and local-first tools.
+- Dependency vulnerability drift: a package can become vulnerable after merge even when code does not change. Mitigation: OSV + Trivy PR gates and scheduled weekly rescans.
+- Container/base-image vulnerability drift: newly disclosed OS/library CVEs can affect previously clean images. Mitigation: Trivy image gate, scheduled rebuild/rescan and immutable SHA image promotion.
+- Security-gate bypass pressure: teams may be tempted to weaken thresholds to unblock delivery. Mitigation: machine-readable fail-closed policy, Jira-reviewed exceptions, Sandeep review and expiry dates.
+- SBOM provenance gap: generated SBOMs are CI artifacts but are not yet cryptographically signed/attached to registry artifacts. Mitigation: retain CycloneDX evidence now and add signing/attestation only in an explicitly approved supply-chain ticket.
