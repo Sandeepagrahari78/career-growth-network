@@ -1,0 +1,11 @@
+services:
+  registry:
+    image: registry:2.8.3
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    volumes:
+      - cgn-registry-data:/var/lib/registry
+
+volumes:
+  cgn-registry-data:
