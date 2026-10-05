@@ -1,0 +1,8 @@
+rules:
+  - id: cgn-no-eval
+    message: Do not use eval in CGN production code.
+    severity: ERROR
+    languages:
+      - javascript
+      - typescript
+    pattern: eval(...)
