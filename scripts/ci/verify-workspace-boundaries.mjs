@@ -129,12 +129,11 @@ export function validateWorkspaceGraph(
   }
 
   for (const workspacePackage of packages) {
-    const allowed = allowedCategoriesFor(
-      workspacePackage.category,
-      boundaries,
-    );
+    const allowed = allowedCategoriesFor(workspacePackage.category, boundaries);
 
-    for (const dependencyName of allDependencyNames(workspacePackage.manifest)) {
+    for (const dependencyName of allDependencyNames(
+      workspacePackage.manifest,
+    )) {
       const target = byName.get(dependencyName);
 
       if (!target) {
