@@ -253,8 +253,9 @@ jobs:
           curl --fail --location --silent --show-error \
             -o /tmp/checksums.txt \
             https://github.com/k3d-io/k3d/releases/download/v5.9.0/checksums.txt
-          grep 'k3d-linux-amd64$' /tmp/checksums.txt > /tmp/k3d.sha256
-          (cd /tmp && sha256sum --check k3d.sha256)
+          expected_sha="$(awk '$2 ~ /k3d-linux-amd64$/ {print $1}' /tmp/checksums.txt)"
+          test -n "$expected_sha"
+          echo "$expected_sha  /tmp/k3d-linux-amd64" | sha256sum --check -
           sudo install -m 0755 /tmp/k3d-linux-amd64 /usr/local/bin/k3d
           k3d version
 
@@ -266,7 +267,13 @@ jobs:
 
       - name: Destroy CGN local cluster
         if: always()
-        run: bash scripts/infra/k3d-down.sh
+        shell: bash
+        run: |
+          if command -v k3d >/dev/null 2>&1; then
+            bash scripts/infra/k3d-down.sh
+          else
+            echo "k3d is unavailable; no local cluster can exist."
+          fi
 
   docker:
     name: Docker build and security ${{ matrix.service }}
