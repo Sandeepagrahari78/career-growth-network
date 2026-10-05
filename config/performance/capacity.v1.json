@@ -1,0 +1,128 @@
+{
+  "contract": "cgn.capacity.v1",
+  "ticket": "CGN-283",
+  "status": "approved-engineering-target",
+  "population": {
+    "registeredBetaUsers": 5000,
+    "dailyActiveUsersTestAssumption": 1250,
+    "weeklyActiveUsersTestAssumption": 3000,
+    "peakConcurrentSessions": 250,
+    "stressConcurrentSessions": 500,
+    "note": "DAU, WAU and concurrency values are engineering test assumptions, not business forecasts or SLAs."
+  },
+  "traffic": {
+    "steadyRequestsPerSecond": 25,
+    "peakRequestsPerSecond": 75,
+    "spikeRequestsPerSecond": 150,
+    "writeTrafficRatio": 0.25
+  },
+  "availability": {
+    "betaMonthlyTargetPercent": 99.5,
+    "serverErrorRatePercentMax": 0.5,
+    "spikeServerErrorRatePercentMax": 1.0,
+    "timeoutRatePercentMax": 0.25
+  },
+  "performanceClasses": {
+    "interactive": {
+      "p50Ms": 150,
+      "p95Ms": 400,
+      "p99Ms": 800
+    },
+    "aggregated": {
+      "p50Ms": 300,
+      "p95Ms": 800,
+      "p99Ms": 1500
+    },
+    "asyncCommand": {
+      "p50Ms": 200,
+      "p95Ms": 600,
+      "p99Ms": 1200
+    }
+  },
+  "journeys": {
+    "authentication": "interactive",
+    "socialHomeFeed": "aggregated",
+    "todaysMission": "interactive",
+    "proofUploadInitialization": "asyncCommand",
+    "growthIdentity": "aggregated",
+    "communitiesMetadata": "interactive",
+    "messagingMetadata": "interactive",
+    "opportunities": "aggregated",
+    "adminOperations": "aggregated"
+  },
+  "dependencyBudgets": {
+    "databasePoolUtilizationSteadyPercentMax": 70,
+    "databasePoolUtilizationPeakPercentMax": 85,
+    "databaseQueryP95MsMax": 100,
+    "cacheHitRatePercentMinAfterWarmup": 80,
+    "eventLagP95SecondsMax": 5,
+    "eventLagP99SecondsMax": 15,
+    "workerOldestJobAgeSecondsMax": 15,
+    "signedUrlIssueP95MsMax": 500
+  },
+  "resourceBudgets": {
+    "cpuSustainedPercentScaleTrigger": 70,
+    "memorySustainedPercentScaleTrigger": 75,
+    "observationWindowMinutes": 5,
+    "consecutiveWindowsToTrigger": 2
+  },
+  "loadProfiles": {
+    "smoke": {
+      "syntheticUsers": 5000,
+      "virtualUsers": 10,
+      "targetRequestsPerSecond": 10,
+      "durationMinutes": 2
+    },
+    "baseline": {
+      "syntheticUsers": 5000,
+      "virtualUsers": 100,
+      "targetRequestsPerSecond": 25,
+      "durationMinutes": 10
+    },
+    "peak": {
+      "syntheticUsers": 5000,
+      "virtualUsers": 250,
+      "targetRequestsPerSecond": 75,
+      "durationMinutes": 15
+    },
+    "spike": {
+      "syntheticUsers": 5000,
+      "virtualUsers": 500,
+      "targetRequestsPerSecond": 150,
+      "durationMinutes": 5
+    },
+    "soak": {
+      "syntheticUsers": 5000,
+      "virtualUsers": 200,
+      "targetRequestsPerSecond": 50,
+      "durationMinutes": 60
+    }
+  },
+  "scaleTriggers": {
+    "gateway": [
+      "cpu sustained above 70% for two consecutive five-minute windows",
+      "memory sustained above 75% for two consecutive five-minute windows",
+      "p95 latency exceeds the journey performance class budget for two consecutive windows"
+    ],
+    "database": [
+      "connection pool above 85% during peak profile",
+      "query p95 exceeds 100ms for two consecutive windows",
+      "storage or IOPS headroom falls below 30%"
+    ],
+    "cache": [
+      "post-warmup hit rate falls below 80%",
+      "memory headroom falls below 25%"
+    ],
+    "events": [
+      "event lag p99 exceeds 15 seconds",
+      "oldest worker job exceeds 15 seconds"
+    ]
+  },
+  "architectureConstraints": [
+    "No production service may require sticky in-process session state for correctness.",
+    "Services must remain horizontally scalable behind the gateway/load balancer.",
+    "Database ownership remains per domain; no direct cross-service database access.",
+    "Large file payloads should bypass application servers via signed object-storage URLs when implemented.",
+    "Paid managed capacity must not be enabled without explicit Sandeep approval."
+  ]
+}
