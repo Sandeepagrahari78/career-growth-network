@@ -33,7 +33,7 @@ jobs:
           CGN_ALL_DOCKER_SERVICES: ${{ github.event_name == 'workflow_dispatch' && 'true' || 'false' }}
 
   build:
-    name: Build ${{ matrix.service }}
+    name: Build scan and publish ${{ matrix.service }}
     needs: detect
     if: needs.detect.outputs.count != '0'
     runs-on: ubuntu-latest
@@ -47,16 +47,7 @@ jobs:
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
 
-      - name: Login to GHCR when explicitly enabled
-        if: github.event_name == 'push' && vars.CGN_ENABLE_GHCR == 'true'
-        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Verify image build without registry publish
-        if: github.event_name != 'push' || vars.CGN_ENABLE_GHCR != 'true'
+      - name: Build immutable local image
         uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
         with:
           context: ${{ matrix.context }}
@@ -67,17 +58,65 @@ jobs:
           cache-from: type=gha,scope=${{ matrix.service }}
           cache-to: type=gha,mode=max,scope=${{ matrix.service }}
 
-      - name: Build and publish immutable GHCR image
-        if: github.event_name == 'push' && vars.CGN_ENABLE_GHCR == 'true'
-        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+      - id: trivy_image
+        name: Trivy container image vulnerability gate
+        continue-on-error: true
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
-          context: ${{ matrix.context }}
-          file: ${{ matrix.dockerfile }}
-          push: true
-          provenance: mode=max
-          sbom: true
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/cgn-${{ matrix.service }}:sha-${{ github.sha }}
-            ghcr.io/${{ github.repository_owner }}/cgn-${{ matrix.service }}:main
-          cache-from: type=gha,scope=${{ matrix.service }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.service }}
+          scan-type: image
+          image-ref: cgn-${{ matrix.service }}:sha-${{ github.sha }}
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+
+      - name: Generate CycloneDX SBOM
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: image
+          image-ref: cgn-${{ matrix.service }}:sha-${{ github.sha }}
+          format: cyclonedx
+          output: sbom-${{ matrix.service }}.cdx.json
+          exit-code: "0"
+
+      - name: Upload container SBOM
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: sbom-main-${{ matrix.service }}-${{ github.sha }}
+          path: sbom-${{ matrix.service }}.cdx.json
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Enforce container security gate before publish
+        shell: bash
+        env:
+          TRIVY_IMAGE_OUTCOME: ${{ steps.trivy_image.outcome }}
+        run: |
+          echo "TRIVY_IMAGE_OUTCOME=$TRIVY_IMAGE_OUTCOME"
+          test "$TRIVY_IMAGE_OUTCOME" = "success"
+
+      - name: Login to GHCR when explicitly enabled
+        if: github.event_name == 'push' && vars.CGN_ENABLE_GHCR == 'true'
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish the exact scanned image to GHCR
+        if: github.event_name == 'push' && vars.CGN_ENABLE_GHCR == 'true'
+        shell: bash
+        env:
+          CGN_SERVICE: ${{ matrix.service }}
+          CGN_SHA: ${{ github.sha }}
+          GHCR_OWNER: ${{ github.repository_owner }}
+        run: |
+          owner="$(printf '%s' "$GHCR_OWNER" | tr '[:upper:]' '[:lower:]')"
+          source_image="cgn-$CGN_SERVICE:sha-$CGN_SHA"
+          sha_image="ghcr.io/$owner/cgn-$CGN_SERVICE:sha-$CGN_SHA"
+          main_image="ghcr.io/$owner/cgn-$CGN_SERVICE:main"
+
+          docker tag "$source_image" "$sha_image"
+          docker push "$sha_image"
+
+          docker tag "$source_image" "$main_image"
+          docker push "$main_image"
