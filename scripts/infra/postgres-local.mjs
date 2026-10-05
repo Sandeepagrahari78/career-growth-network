@@ -15,6 +15,7 @@ const configPath = resolve(
   repoRoot,
   "config/infra/postgres-databases.v1.json",
 );
+
 function safeIdentifier(value) {
   assert.match(value, /^[a-z][a-z0-9_]*$/);
   return value;
@@ -26,7 +27,9 @@ export function loadDatabaseConfig() {
 
 export function getServiceConfig(serviceName) {
   const config = loadDatabaseConfig();
-  const service = config.services.find((entry) => entry.service === serviceName);
+  const service = config.services.find(
+    (entry) => entry.service === serviceName,
+  );
 
   if (!service) {
     throw new Error(`Unknown CGN database service: ${serviceName}`);
@@ -139,7 +142,9 @@ function runSql(database, sql, ownerRole = null) {
 }
 
 function sleep(milliseconds) {
-  return new Promise((resolveSleep) => setTimeout(resolveSleep, milliseconds));
+  return new Promise((resolveSleep) =>
+    setTimeout(resolveSleep, milliseconds),
+  );
 }
 
 export async function up() {
@@ -168,7 +173,9 @@ export async function up() {
     await sleep(1000);
   }
 
-  throw new Error("CGN local PostgreSQL did not become ready within 60 seconds.");
+  throw new Error(
+    "CGN local PostgreSQL did not become ready within 60 seconds.",
+  );
 }
 
 export function verify() {
