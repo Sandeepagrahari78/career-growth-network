@@ -182,12 +182,16 @@ jobs:
           exit "$status"
 
   terraform:
-    name: Terraform zero-budget validation
+    name: Infrastructure zero-budget validation
     needs: [changes, context]
     if: needs.changes.outputs.infra == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3
@@ -203,6 +207,9 @@ jobs:
 
       - name: Terraform validate
         run: terraform -chdir=infra/terraform/environments/local validate
+
+      - name: Validate local network/security baseline
+        run: node scripts/ci/validate-local-network.mjs
 
       - name: Plan local-dev
         run: terraform -chdir=infra/terraform/environments/local plan -input=false -lock=false -refresh=false -var-file=dev.tfvars
