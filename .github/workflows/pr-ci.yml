@@ -253,103 +253,7 @@ jobs:
           curl --fail --location --silent --show-error \
             -o /tmp/checksums.txt \
             https://github.com/k3d-io/k3d/releases/download/v5.9.0/checksums.txt
-          grep 'k3d-linux-amd64    name: Docker build and security ${{ matrix.service }}
-    needs: [changes, quality, security]
-    if: needs.changes.outputs.dockerCount != '0'
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJson(needs.changes.outputs.dockerMatrix) }}
-    steps:
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
-
-      - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
-
-      - name: Build changed service image
-        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
-        with:
-          context: ${{ matrix.context }}
-          file: ${{ matrix.dockerfile }}
-          load: true
-          push: false
-          tags: cgn-${{ matrix.service }}:${{ github.sha }}
-          cache-from: type=gha,scope=pr-${{ matrix.service }}
-          cache-to: type=gha,mode=max,scope=pr-${{ matrix.service }}
-
-      - id: trivy_image
-        name: Trivy container image vulnerability gate
-        continue-on-error: true
-        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
-        with:
-          scan-type: image
-          image-ref: cgn-${{ matrix.service }}:${{ github.sha }}
-          severity: HIGH,CRITICAL
-          ignore-unfixed: true
-          exit-code: "1"
-
-      - name: Generate CycloneDX SBOM
-        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
-        with:
-          scan-type: image
-          image-ref: cgn-${{ matrix.service }}:${{ github.sha }}
-          format: cyclonedx
-          output: sbom-${{ matrix.service }}.cdx.json
-          exit-code: "0"
-
-      - name: Upload container SBOM
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: sbom-${{ matrix.service }}-${{ github.sha }}
-          path: sbom-${{ matrix.service }}.cdx.json
-          if-no-files-found: error
-          retention-days: 14
-
-      - name: Run health-demo container smoke
-        if: matrix.service == 'health-demo'
-        shell: bash
-        run: |
-          docker run -d --name cgn-health-demo -p 3001:3001 cgn-health-demo:${{ github.sha }}
-          trap 'docker rm -f cgn-health-demo >/dev/null 2>&1 || true' EXIT
-          for attempt in {1..30}; do
-            if curl --fail --silent http://127.0.0.1:3001/health | grep -q '"status":"ok"'; then
-              echo "Container health smoke passed."
-              exit 0
-            fi
-            sleep 1
-          done
-          docker logs cgn-health-demo
-          exit 1
-
-      - name: Enforce container security gate
-        if: always()
-        shell: bash
-        env:
-          TRIVY_IMAGE_OUTCOME: ${{ steps.trivy_image.outcome }}
-        run: |
-          echo "TRIVY_IMAGE_OUTCOME=$TRIVY_IMAGE_OUTCOME"
-          test "$TRIVY_IMAGE_OUTCOME" = "success"
-
-  gate:
-    name: PR quality gate summary
-    if: always()
-    needs: [changes, context, quality, security, terraform, local-k8s, docker]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Require all relevant gates green
-        shell: bash
-        run: |
-          echo "context=${{ needs.context.result }}"
-          echo "quality=${{ needs.quality.result }}"
-          echo "security=${{ needs.security.result }}"
-          echo "terraform=${{ needs.terraform.result }}"
-          echo "docker=${{ needs.docker.result }}"
-          test "${{ needs.context.result }}" = "success"
-          test "${{ needs.quality.result }}" = "success"
-          test "${{ needs.security.result }}" = "success"
-          test "${{ needs.terraform.result }}" = "success" -o "${{ needs.terraform.result }}" = "skipped"
-          test "${{ needs.docker.result }}" = "success" -o "${{ needs.docker.result }}" = "skipped"
- /tmp/checksums.txt > /tmp/k3d.sha256
+          grep 'k3d-linux-amd64$' /tmp/checksums.txt > /tmp/k3d.sha256
           (cd /tmp && sha256sum --check k3d.sha256)
           sudo install -m 0755 /tmp/k3d-linux-amd64 /usr/local/bin/k3d
           k3d version
@@ -445,7 +349,7 @@ jobs:
   gate:
     name: PR quality gate summary
     if: always()
-    needs: [changes, context, quality, security, terraform, docker]
+    needs: [changes, context, quality, security, terraform, local-k8s, docker]
     runs-on: ubuntu-latest
     steps:
       - name: Require all relevant gates green
@@ -455,9 +359,11 @@ jobs:
           echo "quality=${{ needs.quality.result }}"
           echo "security=${{ needs.security.result }}"
           echo "terraform=${{ needs.terraform.result }}"
+          echo "local-k8s=${{ needs.local-k8s.result }}"
           echo "docker=${{ needs.docker.result }}"
           test "${{ needs.context.result }}" = "success"
           test "${{ needs.quality.result }}" = "success"
           test "${{ needs.security.result }}" = "success"
           test "${{ needs.terraform.result }}" = "success" -o "${{ needs.terraform.result }}" = "skipped"
+          test "${{ needs.local-k8s.result }}" = "success" -o "${{ needs.local-k8s.result }}" = "skipped"
           test "${{ needs.docker.result }}" = "success" -o "${{ needs.docker.result }}" = "skipped"
