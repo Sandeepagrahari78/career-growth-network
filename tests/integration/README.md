@@ -3,6 +3,7 @@
 Integration suites run against ephemeral dependencies from `infra/docker/docker-compose.test.yml`.
 
 Initial dependency targets:
+
 - PostgreSQL
 - Valkey
 - Redpanda
