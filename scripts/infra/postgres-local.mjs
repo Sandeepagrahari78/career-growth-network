@@ -137,6 +137,34 @@ function sleep(milliseconds) {
   return new Promise((resolveSleep) => setTimeout(resolveSleep, milliseconds));
 }
 
+function postgresHealthStatus() {
+  let containerId;
+
+  try {
+    containerId = compose(["ps", "-q", "postgres"]).trim();
+  } catch {
+    return "missing";
+  }
+
+  if (!containerId) {
+    return "missing";
+  }
+
+  try {
+    return execFileSync(
+      "docker",
+      ["inspect", "--format", "{{.State.Health.Status}}", containerId],
+      {
+        cwd: repoRoot,
+        env: process.env,
+        encoding: "utf8",
+      },
+    ).trim();
+  } catch {
+    return "starting";
+  }
+}
+
 export async function up() {
   requirePassword();
   validateDatabaseConfig();
@@ -144,8 +172,8 @@ export async function up() {
   compose(["up", "-d"], { inherit: true });
 
   for (let attempt = 1; attempt <= 60; attempt += 1) {
-    if (
-      composeSucceeds([
+    if (postgresHealthStatus() === "healthy") {
+      const acceptsConnections = composeSucceeds([
         "exec",
         "-T",
         "postgres",
@@ -154,17 +182,19 @@ export async function up() {
         "cgn_admin",
         "-d",
         "postgres",
-      ])
-    ) {
-      console.log("CGN local PostgreSQL is ready.");
-      return;
+      ]);
+
+      if (acceptsConnections) {
+        console.log("CGN local PostgreSQL is healthy and initialization is complete.");
+        return;
+      }
     }
 
     await sleep(1000);
   }
 
   throw new Error(
-    "CGN local PostgreSQL did not become ready within 60 seconds.",
+    "CGN local PostgreSQL did not become healthy within 60 seconds.",
   );
 }
 
