@@ -1,0 +1,61 @@
+name: Local Kubernetes Validation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "infra/k8s/**"
+      - "config/infra/**"
+      - "scripts/infra/**"
+      - "scripts/ci/validate-local-network.mjs"
+      - "tests/contracts/local-k3d-cluster.contract.test.mjs"
+      - ".github/workflows/local-k8s.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: local-k8s-main
+  cancel-in-progress: false
+
+jobs:
+  smoke:
+    name: k3d create smoke destroy
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22
+
+      - name: Setup kubectl
+        uses: Azure/setup-kubectl@829323503d1be3d00ca8346e5391ca0b07a9ab0d # v5.1.0
+        with:
+          version: "v1.35.9"
+
+      - name: Install pinned k3d
+        shell: bash
+        run: |
+          curl --fail --location --silent --show-error \
+            -o /tmp/k3d-linux-amd64 \
+            https://github.com/k3d-io/k3d/releases/download/v5.9.0/k3d-linux-amd64
+          curl --fail --location --silent --show-error \
+            -o /tmp/checksums.txt \
+            https://github.com/k3d-io/k3d/releases/download/v5.9.0/checksums.txt
+          grep 'k3d-linux-amd64$' /tmp/checksums.txt > /tmp/k3d.sha256
+          (cd /tmp && sha256sum --check k3d.sha256)
+          sudo install -m 0755 /tmp/k3d-linux-amd64 /usr/local/bin/k3d
+          k3d version
+
+      - name: Create CGN local cluster
+        run: bash scripts/infra/k3d-up.sh
+
+      - name: Prove service discovery and NetworkPolicy enforcement
+        run: bash scripts/infra/k3d-smoke.sh
+
+      - name: Destroy CGN local cluster
+        if: always()
+        run: bash scripts/infra/k3d-down.sh
