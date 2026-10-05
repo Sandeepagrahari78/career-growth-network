@@ -44,10 +44,7 @@ test("Compose keeps PostgreSQL loopback-only and secret-free", () => {
     compose,
     /127\.0\.0\.1:\$\{CGN_POSTGRES_PORT:-5432\}:5432/,
   );
-  assert.match(
-    compose,
-    /POSTGRES_PASSWORD: \$\{CGN_POSTGRES_PASSWORD:-\}/,
-  );
+  assert.match(compose, /POSTGRES_PASSWORD: \$\{CGN_POSTGRES_PASSWORD:-\}/);
   assert.doesNotMatch(compose, /0\.0\.0\.0/);
 });
 
