@@ -409,7 +409,15 @@ jobs:
   gate:
     name: PR quality gate summary
     if: always()
-    needs: [changes, context, quality, security, terraform, local-k8s, local-postgres, docker]
+    needs:
+      - changes
+      - context
+      - quality
+      - security
+      - terraform
+      - local-k8s
+      - local-postgres
+      - docker
     runs-on: ubuntu-latest
     steps:
       - name: Require all relevant gates green
