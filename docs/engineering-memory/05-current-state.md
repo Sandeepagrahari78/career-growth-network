@@ -1,6 +1,6 @@
 # 05 - Current Merged State
 
-Last updated: 2026-10-05 for the CGN-42 delivery.
+Last updated: 2026-10-05 for the CGN-32 architecture-boundary delivery.
 
 ## Repository
 - Shared Engineering Memory and agent synchronization: established.
@@ -8,7 +8,8 @@ Last updated: 2026-10-05 for the CGN-42 delivery.
 - CGN-39: zero-budget Terraform bootstrap merged via PR #6 / `e9fe0cb945eabe9f4bf86eefd144642455641089`.
 - CGN-40: local network/security baseline merged via PR #7 / `42499116c5e2d81552bf206585e3cae04f31ecf9`.
 - CGN-41: local k3d/K3s cluster merged via PR #8 / `797fbaf4144cf86919817dc61177870480ead5d9`; PR and post-merge local Kubernetes validation are green.
-- CGN-42: local PostgreSQL service-database ownership, migration and backup/restore foundation are delivered by this change.
+- CGN-42: local PostgreSQL service-database ownership, migration and backup/restore foundation merged via PR #9 / `f686e47be8209b5c834354383d2212c6f2390094`; post-merge validation is green.
+- CGN-32: complete bounded-context ownership and integration-boundary contract is delivered by this change.
 - Real cloud provisioning and production deployment remain intentionally disabled.
 
 ## Infrastructure state
@@ -25,7 +26,7 @@ Last updated: 2026-10-05 for the CGN-42 delivery.
 - Product tables and runtime DB roles are not created by infrastructure bootstrap tickets.
 
 ## Product state
-Jira is the work source of truth. Figma defines the approved product flow for user-facing work. Infrastructure work must not invent product schemas, APIs or flows.
+Jira is the work source of truth. Figma defines the approved product flow for user-facing work. Infrastructure work must not invent product schemas, APIs or flows. Cross-domain ownership is frozen by `cgn.bounded-contexts.v1`; detailed APIs/events still require the owning Jira ticket.
 
 ## Operational evidence expected for CGN-42
 - PR CI: green.
