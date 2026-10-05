@@ -185,7 +185,9 @@ export async function up() {
       ]);
 
       if (acceptsConnections) {
-        console.log("CGN local PostgreSQL is healthy and initialization is complete.");
+        console.log(
+          "CGN local PostgreSQL is healthy and initialization is complete.",
+        );
         return;
       }
     }
