@@ -1,0 +1,68 @@
+{
+  "contract": "cgn.postgres-databases.v1",
+  "ticket": "CGN-42",
+  "engine": "postgresql",
+  "majorVersion": 16,
+  "admin": {
+    "user": "cgn_admin",
+    "passwordEnv": "CGN_POSTGRES_PASSWORD",
+    "hostEnv": "CGN_POSTGRES_HOST",
+    "portEnv": "CGN_POSTGRES_PORT"
+  },
+  "services": [
+    {
+      "service": "identity",
+      "database": "cgn_identity",
+      "ownerRole": "cgn_identity_owner",
+      "connectionEnv": "CGN_IDENTITY_DATABASE_URL"
+    },
+    {
+      "service": "career",
+      "database": "cgn_career",
+      "ownerRole": "cgn_career_owner",
+      "connectionEnv": "CGN_CAREER_DATABASE_URL"
+    },
+    {
+      "service": "roadmap",
+      "database": "cgn_roadmap",
+      "ownerRole": "cgn_roadmap_owner",
+      "connectionEnv": "CGN_ROADMAP_DATABASE_URL"
+    },
+    {
+      "service": "evidence",
+      "database": "cgn_evidence",
+      "ownerRole": "cgn_evidence_owner",
+      "connectionEnv": "CGN_EVIDENCE_DATABASE_URL"
+    },
+    {
+      "service": "growth",
+      "database": "cgn_growth",
+      "ownerRole": "cgn_growth_owner",
+      "connectionEnv": "CGN_GROWTH_DATABASE_URL"
+    },
+    {
+      "service": "feed",
+      "database": "cgn_feed",
+      "ownerRole": "cgn_feed_owner",
+      "connectionEnv": "CGN_FEED_DATABASE_URL"
+    },
+    {
+      "service": "network",
+      "database": "cgn_network",
+      "ownerRole": "cgn_network_owner",
+      "connectionEnv": "CGN_NETWORK_DATABASE_URL"
+    },
+    {
+      "service": "community",
+      "database": "cgn_community",
+      "ownerRole": "cgn_community_owner",
+      "connectionEnv": "CGN_COMMUNITY_DATABASE_URL"
+    },
+    {
+      "service": "messaging",
+      "database": "cgn_messaging",
+      "ownerRole": "cgn_messaging_owner",
+      "connectionEnv": "CGN_MESSAGING_DATABASE_URL"
+    }
+  ]
+}
