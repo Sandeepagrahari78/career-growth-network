@@ -70,10 +70,7 @@ export function validateBaseline(baseline) {
   assert.ok(isPrivateCidr(baseline.cluster.podSubnet));
   assert.ok(isPrivateCidr(baseline.cluster.serviceSubnet));
   assert.equal(
-    cidrsOverlap(
-      baseline.cluster.podSubnet,
-      baseline.cluster.serviceSubnet,
-    ),
+    cidrsOverlap(baseline.cluster.podSubnet, baseline.cluster.serviceSubnet),
     false,
     "pod and service CIDRs must not overlap",
   );
@@ -82,10 +79,11 @@ export function validateBaseline(baseline) {
   assert.equal(baseline.ingress.bindAddress, "127.0.0.1");
   assert.equal(baseline.ingress.publicByDefault, false);
 
-  assert.deepEqual(
-    [...baseline.namespaces].sort(),
-    ["cgn-apps", "cgn-data", "cgn-system"],
-  );
+  assert.deepEqual([...baseline.namespaces].sort(), [
+    "cgn-apps",
+    "cgn-data",
+    "cgn-system",
+  ]);
 
   for (const service of Object.values(baseline.dataServices)) {
     assert.equal(service.namespace, "cgn-data");
@@ -104,7 +102,10 @@ export function validateManifests(manifestRootPath = manifestRoot) {
     .filter((file) => file.endsWith(".yaml"))
     .sort();
 
-  assert.ok(files.length >= 3, "expected Kubernetes security baseline manifests");
+  assert.ok(
+    files.length >= 3,
+    "expected Kubernetes security baseline manifests",
+  );
 
   const source = files
     .map((file) => readFileSync(join(manifestRootPath, file), "utf8"))
