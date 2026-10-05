@@ -57,6 +57,9 @@ jobs:
           terraform -chdir=infra/terraform/environments/local validate
           terraform -chdir=infra/terraform/environments/local plan -input=false -lock=false -refresh=false -var-file=staging.tfvars
 
+      - name: Revalidate local network/security baseline
+        run: node scripts/ci/validate-local-network.mjs
+
       - name: Build immutable candidate image
         run: docker build -f services/health-demo/Dockerfile -t cgn-health-demo:${{ github.sha }} .
 
