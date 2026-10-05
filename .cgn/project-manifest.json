@@ -1,0 +1,23 @@
+{
+  "project": "CGN",
+  "name": "Career Growth Network",
+  "productIdentity": "Career Growth Social Network",
+  "initialCapacityTarget": {
+    "registeredUsers": 5000,
+    "note": "5000 registered users does not imply 5000 simultaneous requests. Concurrency and request rate are measured separately."
+  },
+  "productLoop": [
+    "Career Goal",
+    "Diagnostic",
+    "180-Day Career Plan",
+    "Daily Mission",
+    "Proof/Validation",
+    "Growth Identity",
+    "Feed/Stories",
+    "Connect/Communities/Messaging",
+    "Experts",
+    "Opportunities",
+    "Next Best Action"
+  ],
+  "navigation": ["Home","Explore","My Career","Network","Communities","Messages","Opportunities","Profile"]
+}

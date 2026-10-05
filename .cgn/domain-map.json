@@ -1,0 +1,23 @@
+{
+  "domains": [
+    "Gateway/BFF",
+    "Identity & Access",
+    "Career Intelligence",
+    "Roadmap & Daily Missions",
+    "Evidence & Validation",
+    "Growth Identity / Growth Graph",
+    "AI Career Intelligence / Orchestration",
+    "Social Feed & Growth Stories",
+    "Social Graph / Connections / Peer Matching",
+    "Communities & Discussions",
+    "Messaging & Conversations",
+    "Cohorts & Squads",
+    "Experts & Validation",
+    "Opportunities & Matching",
+    "Recruiter Discovery",
+    "Notifications",
+    "Admin & Operations",
+    "Analytics & Engagement"
+  ],
+  "rule": "Each domain owns its data. Cross-domain reads go through contracts, APIs, events or approved projections."
+}

@@ -1,0 +1,15 @@
+import fs from 'node:fs';
+const context=fs.readFileSync('.cgn/context-DEMO-001.md','utf8');
+const handoff=fs.readFileSync('docs/handoffs/DEMO-001.md','utf8');
+const event=JSON.parse(fs.readFileSync('.cgn/demo/module-a-event.json','utf8'));
+const assertions=[];
+assertions.push(['context contains no-cross-service-db rule',/No direct cross-service database access/i.test(context)]);
+assertions.push(['context preserves social-first Home',/Home is social-first/i.test(context)]);
+assertions.push(['handoff tells next agent not to invent schema',/without inventing a new schema/i.test(handoff)]);
+assertions.push(['event is version 1',event.eventVersion===1]);
+assertions.push(['career activity visibility preserved',['private','connections','public'].includes(event.payload.visibility)]);
+const failed=assertions.filter(([,ok])=>!ok);
+for(const [name,ok] of assertions) console.log(`${ok?'PASS':'FAIL'} - ${name}`);
+if(failed.length) process.exit(1);
+fs.writeFileSync('.cgn/demo/module-b-result.json',JSON.stringify({consumedEventId:event.eventId,contextSurvived:true,assertions:Object.fromEntries(assertions)},null,2));
+console.log('Module B consumed Agent A output with Engineering Memory intact.');

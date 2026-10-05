@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cgn.local/schemas/career.activity.v1.schema.json",
+  "title": "CareerActivityV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["activityId","userId","kind","occurredAt","sourceDomain","sourceEntityId","visibility","summary"],
+  "properties": {
+    "activityId": {"type":"string","minLength":1},
+    "userId": {"type":"string","minLength":1},
+    "kind": {"enum":["learned","built","milestone","proof_added","proof_validated","mission_completed","expert_validated","opportunity_action"]},
+    "occurredAt": {"type":"string","format":"date-time"},
+    "sourceDomain": {"type":"string","minLength":1},
+    "sourceEntityId": {"type":"string","minLength":1},
+    "visibility": {"enum":["private","connections","public"]},
+    "summary": {"type":"string","minLength":1,"maxLength":500},
+    "metadata": {"type":"object","additionalProperties":{"type":["string","number","boolean","null"]}}
+  }
+}
