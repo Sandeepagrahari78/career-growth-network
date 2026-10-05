@@ -1,0 +1,48 @@
+name: Staging Validation
+
+on:
+  workflow_run:
+    workflows: ["Main CI"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  staging-smoke:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve validated SHA
+        id: sha
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "value=${{ github.sha }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=${{ github.event.workflow_run.head_sha }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ steps.sha.outputs.value }}
+
+      - name: Build production-like staging candidate
+        run: docker build -f services/health-demo/Dockerfile -t cgn-health-demo:${{ steps.sha.outputs.value }} .
+
+      - name: Staging health smoke
+        shell: bash
+        run: |
+          docker run -d --name cgn-staging-health -p 3001:3001 cgn-health-demo:${{ steps.sha.outputs.value }}
+          trap 'docker rm -f cgn-staging-health >/dev/null 2>&1 || true' EXIT
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:3001/health | grep -q '"status":"ok"'; then
+              echo "Ephemeral staging validation passed."
+              echo "Persistent staging/GitOps activation remains owned by CGN-92/CGN-93."
+              exit 0
+            fi
+            sleep 1
+          done
+          docker logs cgn-staging-health
+          exit 1
