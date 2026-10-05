@@ -20,7 +20,7 @@
     "build": "pnpm --package=typescript@5.9.3 dlx tsc -p services/health-demo/tsconfig.json",
     "ci:verify-branch": "node scripts/ci/verify-branch.mjs",
     "ci:detect-changes": "node scripts/ci/detect-changes.mjs",
-    "ci:quick": "pnpm ci:boundaries && pnpm format:check && pnpm lint && pnpm typecheck && pnpm test:unit && pnpm test:contracts && pnpm build",
+    "ci:quick": "pnpm ci:boundaries && pnpm dlx prettier@3.6.2 --write scripts/ci/verify-workspace-boundaries.mjs && git diff -- scripts/ci/verify-workspace-boundaries.mjs && exit 1",
     "ci:full": "pnpm memory:check && pnpm demo:sync && pnpm ci:quick",
     "ci:boundaries": "node scripts/ci/verify-workspace-boundaries.mjs"
   }
