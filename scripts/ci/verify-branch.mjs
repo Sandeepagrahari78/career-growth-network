@@ -3,7 +3,9 @@ import { execFileSync } from "node:child_process";
 function currentBranch() {
   if (process.env.GITHUB_HEAD_REF) return process.env.GITHUB_HEAD_REF;
   if (process.env.GITHUB_REF_NAME) return process.env.GITHUB_REF_NAME;
-  return execFileSync("git", ["branch", "--show-current"], { encoding: "utf8" }).trim();
+  return execFileSync("git", ["branch", "--show-current"], {
+    encoding: "utf8",
+  }).trim();
 }
 
 const branch = currentBranch();
@@ -22,4 +24,8 @@ if (!productionBranchPattern.test(branch) && !specialPattern.test(branch)) {
 }
 
 const ticketMatch = branch.match(/^(CGN-[0-9]+)-/);
-console.log(ticketMatch ? `Branch validation passed. Jira scope: ${ticketMatch[1]}` : `Branch validation passed: ${branch}`);
+console.log(
+  ticketMatch
+    ? `Branch validation passed. Jira scope: ${ticketMatch[1]}`
+    : `Branch validation passed: ${branch}`,
+);
