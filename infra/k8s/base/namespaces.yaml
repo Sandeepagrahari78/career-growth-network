@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cgn-system
+  labels:
+    cgn.network/zone: system
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cgn-apps
+  labels:
+    cgn.network/zone: apps
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cgn-data
+  labels:
+    cgn.network/zone: data
