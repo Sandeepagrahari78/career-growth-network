@@ -1,20 +1,12 @@
 import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
-import {
-  existsSync,
-  mkdirSync,
-  readFileSync,
-  writeFileSync,
-} from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const composeFile = "infra/docker/docker-compose.postgres.yml";
-const configPath = resolve(
-  repoRoot,
-  "config/infra/postgres-databases.v1.json",
-);
+const configPath = resolve(repoRoot, "config/infra/postgres-databases.v1.json");
 
 function safeIdentifier(value) {
   assert.match(value, /^[a-z][a-z0-9_]*$/);
@@ -142,9 +134,7 @@ function runSql(database, sql, ownerRole = null) {
 }
 
 function sleep(milliseconds) {
-  return new Promise((resolveSleep) =>
-    setTimeout(resolveSleep, milliseconds),
-  );
+  return new Promise((resolveSleep) => setTimeout(resolveSleep, milliseconds));
 }
 
 export async function up() {
