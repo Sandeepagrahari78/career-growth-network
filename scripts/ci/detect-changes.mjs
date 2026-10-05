@@ -29,6 +29,21 @@ const flags = {
       file.startsWith(".github/") ||
       file.startsWith("config/"),
   ),
+  k8s: changed.some(
+    (file) =>
+      file.startsWith("infra/k8s/") ||
+      file.startsWith("scripts/infra/k3d-") ||
+      file === "config/infra/local-network.v1.json" ||
+      file === ".github/workflows/local-k8s.yml",
+  ),
+  postgres: changed.some(
+    (file) =>
+      file === "infra/docker/docker-compose.postgres.yml" ||
+      file.startsWith("infra/postgres/") ||
+      file.startsWith("scripts/infra/postgres-") ||
+      file === "config/infra/postgres-databases.v1.json" ||
+      file === ".github/workflows/local-postgres.yml",
+  ),
   docker: changed.some(
     (file) =>
       file.startsWith("services/") ||
