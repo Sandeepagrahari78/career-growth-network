@@ -4,5 +4,6 @@
 - Contract drift: producer and consumer may evolve independently. Mitigation: shared contracts + contract tests.
 - Memory drift: docs can become stale. Mitigation: memory check in PR/CI and required handoff update.
 - Privacy drift: social/admin features may expose more than intended. Mitigation: server-side consent/block/RBAC and explicit safe projections.
-- Scale assumptions: 5,000 registered users is not the same as 5,000 concurrent users. Mitigation: separate load profiles and SLOs.
+- Scale assumptions: 5,000 registered users is not the same as 5,000 concurrent users. Mitigation: versioned capacity model, separate load profiles and explicit SLOs.
+- Performance-target drift: initial 5K thresholds are engineering targets before real beta telemetry exists. Mitigation: keep them machine-readable, require Jira-reviewed changes, and never weaken thresholds only to make CI green.
 - Premature infrastructure complexity: pipeline/infra can become the project. Mitigation: phase gates and local-first tools.
