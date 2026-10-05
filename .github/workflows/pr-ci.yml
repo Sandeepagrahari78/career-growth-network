@@ -106,13 +106,6 @@ jobs:
       - name: Quality gates
         run: pnpm ci:quick
 
-      - name: Print Prettier diff on formatting failure
-        if: failure()
-        shell: bash
-        run: |
-          pnpm dlx prettier@3.6.2 --write scripts/infra/postgres-local.mjs tests/contracts/postgres-database-boundaries.contract.test.mjs
-          git diff -- scripts/infra/postgres-local.mjs tests/contracts/postgres-database-boundaries.contract.test.mjs
-
   security:
     name: Dependency secret SAST vulnerability scans
     needs: [context]
