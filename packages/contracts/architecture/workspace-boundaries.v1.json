@@ -1,0 +1,26 @@
+{
+  "contract": "cgn.workspace-boundaries.v1",
+  "ticket": "CGN-33",
+  "packagePrefix": "@cgn/",
+  "roots": {
+    "apps": "apps",
+    "services": "services",
+    "sharedPackages": "packages"
+  },
+  "rules": {
+    "appsMayDependOn": ["sharedPackages"],
+    "servicesMayDependOn": ["sharedPackages"],
+    "sharedPackagesMayDependOn": ["sharedPackages"],
+    "forbidDirectAppToServiceDependencies": true,
+    "forbidDirectServiceToServiceDependencies": true,
+    "forbidSharedPackageToAppOrServiceDependencies": true
+  },
+  "sharedContractPackage": "@cgn/contracts",
+  "principles": [
+    "Cross-domain communication uses versioned contracts rather than direct service package coupling.",
+    "Shared packages contain reusable cross-cutting code or contracts and must not become a hidden business-domain source of truth.",
+    "Apps compose product surfaces but do not import service internals.",
+    "Services own their runtime implementation and may consume shared packages only.",
+    "No workspace boundary may enable direct cross-service database access."
+  ]
+}
