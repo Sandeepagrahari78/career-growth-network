@@ -1,0 +1,31 @@
+\set ON_ERROR_STOP on
+
+CREATE ROLE cgn_identity_owner NOLOGIN;
+CREATE ROLE cgn_career_owner NOLOGIN;
+CREATE ROLE cgn_roadmap_owner NOLOGIN;
+CREATE ROLE cgn_evidence_owner NOLOGIN;
+CREATE ROLE cgn_growth_owner NOLOGIN;
+CREATE ROLE cgn_feed_owner NOLOGIN;
+CREATE ROLE cgn_network_owner NOLOGIN;
+CREATE ROLE cgn_community_owner NOLOGIN;
+CREATE ROLE cgn_messaging_owner NOLOGIN;
+
+CREATE DATABASE cgn_identity OWNER cgn_identity_owner;
+CREATE DATABASE cgn_career OWNER cgn_career_owner;
+CREATE DATABASE cgn_roadmap OWNER cgn_roadmap_owner;
+CREATE DATABASE cgn_evidence OWNER cgn_evidence_owner;
+CREATE DATABASE cgn_growth OWNER cgn_growth_owner;
+CREATE DATABASE cgn_feed OWNER cgn_feed_owner;
+CREATE DATABASE cgn_network OWNER cgn_network_owner;
+CREATE DATABASE cgn_community OWNER cgn_community_owner;
+CREATE DATABASE cgn_messaging OWNER cgn_messaging_owner;
+
+REVOKE CONNECT, TEMPORARY ON DATABASE cgn_identity FROM PUBLIC;
+REVOKE CONNECT, TEMPORARY ON DATABASE cgn_career FROM PUBLIC;
+REVOKE CONNECT, TEMPORARY ON DATABASE cgn_roadmap FROM PUBLIC;
+REVOKE CONNECT, TEMPORARY ON DATABASE cgn_evidence FROM PUBLIC;
+REVOKE CONNECT, TEMPORARY ON DATABASE cgn_growth FROM PUBLIC;
+REVOKE CONNECT, TEMPORARY ON DATABASE cgn_feed FROM PUBLIC;
+REVOKE CONNECT, TEMPORARY ON DATABASE cgn_network FROM PUBLIC;
+REVOKE CONNECT, TEMPORARY ON DATABASE cgn_community FROM PUBLIC;
+REVOKE CONNECT, TEMPORARY ON DATABASE cgn_messaging FROM PUBLIC;

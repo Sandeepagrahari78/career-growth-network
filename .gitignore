@@ -15,3 +15,4 @@ coverage/
 *.tfplan
 crash.log
 crash.*.log
+.local/

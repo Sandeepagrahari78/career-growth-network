@@ -2,6 +2,7 @@ export default [
   {
     files: [
       "scripts/ci/**/*.mjs",
+      "scripts/infra/**/*.mjs",
       "services/health-demo/**/*.mjs",
       "eslint.config.js",
     ],
