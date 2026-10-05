@@ -1,0 +1,10 @@
+{
+  "name": "@cgn/health-demo",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "pnpm dlx typescript@5.9.3 tsc -p tsconfig.json",
+    "start": "node server.mjs"
+  }
+}
