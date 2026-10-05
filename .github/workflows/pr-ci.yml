@@ -1,0 +1,169 @@
+name: PR CI
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  changes:
+    name: Detect affected code
+    runs-on: ubuntu-latest
+    outputs:
+      docker: ${{ steps.detect.outputs.docker }}
+      backend: ${{ steps.detect.outputs.backend }}
+      contracts: ${{ steps.detect.outputs.contracts }}
+      infra: ${{ steps.detect.outputs.infra }}
+      docsOnly: ${{ steps.detect.outputs.docsOnly }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - id: detect
+        name: Detect changed paths
+        run: node scripts/ci/detect-changes.mjs
+        env:
+          CGN_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+
+  context:
+    name: Context and Engineering Memory
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Enable pinned pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@11.25.0 --activate
+
+      - name: Install frozen workspace
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify Jira-scoped branch
+        run: pnpm ci:verify-branch
+
+      - name: Generate CI agent context
+        shell: bash
+        run: |
+          TICKET="$(echo "${GITHUB_HEAD_REF}" | grep -oE '^CGN-[0-9]+' || true)"
+          if [ -n "$TICKET" ]; then
+            pnpm agent:context --ticket "$TICKET" --domain cicd
+          else
+            echo "Special ci/hotfix branch: context ticket generation skipped."
+          fi
+
+      - name: Engineering Memory gate
+        run: pnpm memory:check
+        env:
+          CGN_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+
+  quality:
+    name: Format lint types unit contract build
+    needs: [context]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Enable pinned pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@11.25.0 --activate
+
+      - name: Install frozen workspace
+        run: pnpm install --frozen-lockfile
+
+      - name: Synchronization regression proof
+        run: pnpm demo:sync
+
+      - name: Quality gates
+        run: pnpm ci:quick
+
+  security:
+    name: Secret SAST vulnerability scans
+    needs: [context]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Gitleaks
+        uses: gitleaks/gitleaks-action@v3
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Semgrep CE
+        run: |
+          python -m pip install --disable-pip-version-check semgrep
+          semgrep --config=auto --config=config/semgrep/cgn.yml --error
+
+      - name: Trivy filesystem scan
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+
+  docker:
+    name: Docker build and health smoke
+    needs: [changes, quality, security]
+    if: needs.changes.outputs.docker == 'true' || needs.changes.outputs.infra == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Build SHA-tagged health image
+        run: docker build -f services/health-demo/Dockerfile -t cgn-health-demo:${{ github.sha }} .
+
+      - name: Run container health smoke
+        shell: bash
+        run: |
+          docker run -d --name cgn-health-demo -p 3001:3001 cgn-health-demo:${{ github.sha }}
+          trap 'docker rm -f cgn-health-demo >/dev/null 2>&1 || true' EXIT
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:3001/health | grep -q '"status":"ok"'; then
+              echo "Container health smoke passed."
+              exit 0
+            fi
+            sleep 1
+          done
+          docker logs cgn-health-demo
+          exit 1
+
+  gate:
+    name: PR quality gate summary
+    if: always()
+    needs: [changes, context, quality, security, docker]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require all relevant gates green
+        shell: bash
+        run: |
+          echo "context=${{ needs.context.result }}"
+          echo "quality=${{ needs.quality.result }}"
+          echo "security=${{ needs.security.result }}"
+          echo "docker=${{ needs.docker.result }}"
+          test "${{ needs.context.result }}" = "success"
+          test "${{ needs.quality.result }}" = "success"
+          test "${{ needs.security.result }}" = "success"
+          test "${{ needs.docker.result }}" = "success" -o "${{ needs.docker.result }}" = "skipped"
