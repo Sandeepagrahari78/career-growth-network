@@ -4,10 +4,9 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
-const boundaryPath = join(
-  repoRoot,
-  "packages/contracts/architecture/workspace-boundaries.v1.json",
-);
+const contractFile =
+  "packages/contracts/architecture/workspace-boundaries.v1.json";
+const boundaryPath = join(repoRoot, contractFile);
 
 export function loadWorkspaceBoundaries() {
   return JSON.parse(readFileSync(boundaryPath, "utf8"));
@@ -15,18 +14,23 @@ export function loadWorkspaceBoundaries() {
 
 function categoryForPath(packagePath, boundaries) {
   const normalized = packagePath.replaceAll("\\", "/");
+  const roots = boundaries.roots;
 
-  if (normalized.startsWith(`${boundaries.roots.apps}/`)) {
+  if (normalized.startsWith(`${roots.apps}/`)) {
     return "apps";
   }
-  if (normalized.startsWith(`${boundaries.roots.services}/`)) {
+
+  if (normalized.startsWith(`${roots.services}/`)) {
     return "services";
   }
-  if (normalized.startsWith(`${boundaries.roots.sharedPackages}/`)) {
+
+  if (normalized.startsWith(`${roots.sharedPackages}/`)) {
     return "sharedPackages";
   }
 
-  throw new Error(`Package is outside approved workspace roots: ${packagePath}`);
+  throw new Error(
+    `Package is outside approved workspace roots: ${packagePath}`,
+  );
 }
 
 export function discoverWorkspacePackages(
@@ -37,8 +41,9 @@ export function discoverWorkspacePackages(
 
   for (const rootName of Object.values(boundaries.roots)) {
     const rootPath = join(root, rootName);
+    const entries = readdirSync(rootPath, { withFileTypes: true });
 
-    for (const entry of readdirSync(rootPath, { withFileTypes: true })) {
+    for (const entry of entries) {
       if (!entry.isDirectory()) {
         continue;
       }
@@ -67,14 +72,30 @@ export function discoverWorkspacePackages(
 }
 
 function allDependencyNames(manifest) {
-  return new Set(
-    Object.keys({
-      ...(manifest.dependencies ?? {}),
-      ...(manifest.devDependencies ?? {}),
-      ...(manifest.peerDependencies ?? {}),
-      ...(manifest.optionalDependencies ?? {}),
-    }),
-  );
+  const dependencies = {
+    ...(manifest.dependencies ?? {}),
+    ...(manifest.devDependencies ?? {}),
+    ...(manifest.peerDependencies ?? {}),
+    ...(manifest.optionalDependencies ?? {}),
+  };
+
+  return new Set(Object.keys(dependencies));
+}
+
+function allowedCategoriesFor(category, boundaries) {
+  if (category === "apps") {
+    return boundaries.rules.appsMayDependOn;
+  }
+
+  if (category === "services") {
+    return boundaries.rules.servicesMayDependOn;
+  }
+
+  if (category === "sharedPackages") {
+    return boundaries.rules.sharedPackagesMayDependOn;
+  }
+
+  throw new Error(`Unknown workspace category: ${category}`);
 }
 
 export function validateWorkspaceGraph(
@@ -87,34 +108,31 @@ export function validateWorkspaceGraph(
 
   for (const workspacePackage of packages) {
     const { manifest, path, category } = workspacePackage;
+    const escapedPrefix = boundaries.packagePrefix.replace("/", "\\/");
 
     assert.match(
       manifest.name,
-      new RegExp(`^${boundaries.packagePrefix.replace("/", "\\/")}`),
+      new RegExp(`^${escapedPrefix}`),
       `${path} must use the ${boundaries.packagePrefix} package namespace`,
     );
     assert.equal(manifest.private, true, `${path} must remain private`);
 
     if (byName.has(manifest.name)) {
+      const firstPath = byName.get(manifest.name).path;
       throw new Error(
-        `Duplicate workspace package name ${manifest.name}: ${byName.get(manifest.name).path} and ${path}`,
+        `Duplicate workspace package name ${manifest.name}: ${firstPath} and ${path}`,
       );
     }
 
+    allowedCategoriesFor(category, boundaries);
     byName.set(manifest.name, workspacePackage);
-
-    if (!["apps", "services", "sharedPackages"].includes(category)) {
-      throw new Error(`Unknown workspace category for ${path}: ${category}`);
-    }
   }
 
   for (const workspacePackage of packages) {
-    const allowedCategories =
-      workspacePackage.category === "apps"
-        ? boundaries.rules.appsMayDependOn
-        : workspacePackage.category === "services"
-          ? boundaries.rules.servicesMayDependOn
-          : boundaries.rules.sharedPackagesMayDependOn;
+    const allowed = allowedCategoriesFor(
+      workspacePackage.category,
+      boundaries,
+    );
 
     for (const dependencyName of allDependencyNames(workspacePackage.manifest)) {
       const target = byName.get(dependencyName);
@@ -123,10 +141,12 @@ export function validateWorkspaceGraph(
         continue;
       }
 
-      assert.ok(
-        allowedCategories.includes(target.category),
-        `${workspacePackage.manifest.name} (${workspacePackage.category}) must not depend directly on ${target.manifest.name} (${target.category})`,
-      );
+      const message =
+        `${workspacePackage.manifest.name} (${workspacePackage.category}) ` +
+        `must not depend directly on ${target.manifest.name} ` +
+        `(${target.category})`;
+
+      assert.ok(allowed.includes(target.category), message);
     }
   }
 
@@ -137,12 +157,16 @@ export function validateWorkspaceFile(
   root = repoRoot,
   boundaries = loadWorkspaceBoundaries(),
 ) {
-  const workspace = readFileSync(join(root, "pnpm-workspace.yaml"), "utf8");
+  const workspacePath = join(root, "pnpm-workspace.yaml");
+  const workspace = readFileSync(workspacePath, "utf8");
 
   for (const rootName of Object.values(boundaries.roots)) {
+    const escapedRoot = rootName.replace("/", "\\/");
+    const pattern = new RegExp(`["']${escapedRoot}\\/\\*["']`);
+
     assert.match(
       workspace,
-      new RegExp(`["']${rootName.replace("/", "\\/")}\\/\\*["']`),
+      pattern,
       `pnpm-workspace.yaml must include ${rootName}/*`,
     );
   }
@@ -151,11 +175,14 @@ export function validateWorkspaceFile(
 }
 
 const invokedPath = process.argv[1] ? resolve(process.argv[1]) : "";
+
 if (invokedPath === fileURLToPath(import.meta.url)) {
   const boundaries = loadWorkspaceBoundaries();
   const packages = discoverWorkspacePackages(repoRoot, boundaries);
+
   validateWorkspaceFile(repoRoot, boundaries);
   validateWorkspaceGraph(packages, boundaries);
+
   console.log(
     `Workspace boundary validation passed for ${packages.length} packages.`,
   );
