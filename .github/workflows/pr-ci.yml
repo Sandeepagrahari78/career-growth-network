@@ -23,6 +23,8 @@ jobs:
       backend: ${{ steps.detect.outputs.backend }}
       contracts: ${{ steps.detect.outputs.contracts }}
       infra: ${{ steps.detect.outputs.infra }}
+      k8s: ${{ steps.detect.outputs.k8s }}
+      postgres: ${{ steps.detect.outputs.postgres }}
       docsOnly: ${{ steps.detect.outputs.docsOnly }}
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -229,7 +231,7 @@ jobs:
   local-k8s:
     name: Local Kubernetes create smoke destroy
     needs: [changes, quality, terraform]
-    if: needs.changes.outputs.infra == 'true'
+    if: needs.changes.outputs.k8s == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -274,6 +276,57 @@ jobs:
           else
             echo "k3d is unavailable; no local cluster can exist."
           fi
+
+  local-postgres:
+    name: PostgreSQL init migrate backup restore
+    needs: [changes, quality]
+    if: needs.changes.outputs.postgres == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22
+
+      - name: Generate ephemeral database password
+        shell: bash
+        run: |
+          password="$(openssl rand -hex 24)"
+          echo "::add-mask::$password"
+          echo "CGN_POSTGRES_PASSWORD=$password" >> "$GITHUB_ENV"
+
+      - name: Start local PostgreSQL
+        run: node scripts/infra/postgres-local.mjs up
+
+      - name: Verify service database ownership
+        run: node scripts/infra/postgres-local.mjs verify
+
+      - name: Reject unknown service migration
+        shell: bash
+        run: |
+          if node scripts/infra/postgres-local.mjs migrate unknown-service tests/fixtures/postgres/migration-smoke.sql; then
+            echo "Unknown service migration unexpectedly succeeded."
+            exit 1
+          fi
+          echo "Unknown service migration rejected as expected."
+
+      - name: Run owner-scoped migration smoke
+        run: node scripts/infra/postgres-local.mjs migration-smoke
+
+      - name: Prove backup command
+        shell: bash
+        run: |
+          node scripts/infra/postgres-local.mjs backup identity .local/backups/cgn_identity.dump
+          test -s .local/backups/cgn_identity.dump
+
+      - name: Prove backup and restore
+        run: node scripts/infra/postgres-local.mjs backup-restore-smoke
+
+      - name: Destroy local PostgreSQL and volume
+        if: always()
+        run: node scripts/infra/postgres-local.mjs reset
 
   docker:
     name: Docker build and security ${{ matrix.service }}
@@ -356,7 +409,7 @@ jobs:
   gate:
     name: PR quality gate summary
     if: always()
-    needs: [changes, context, quality, security, terraform, local-k8s, docker]
+    needs: [changes, context, quality, security, terraform, local-k8s, local-postgres, docker]
     runs-on: ubuntu-latest
     steps:
       - name: Require all relevant gates green
@@ -367,10 +420,12 @@ jobs:
           echo "security=${{ needs.security.result }}"
           echo "terraform=${{ needs.terraform.result }}"
           echo "local-k8s=${{ needs.local-k8s.result }}"
+          echo "local-postgres=${{ needs.local-postgres.result }}"
           echo "docker=${{ needs.docker.result }}"
           test "${{ needs.context.result }}" = "success"
           test "${{ needs.quality.result }}" = "success"
           test "${{ needs.security.result }}" = "success"
           test "${{ needs.terraform.result }}" = "success" -o "${{ needs.terraform.result }}" = "skipped"
           test "${{ needs.local-k8s.result }}" = "success" -o "${{ needs.local-k8s.result }}" = "skipped"
+          test "${{ needs.local-postgres.result }}" = "success" -o "${{ needs.local-postgres.result }}" = "skipped"
           test "${{ needs.docker.result }}" = "success" -o "${{ needs.docker.result }}" = "skipped"
