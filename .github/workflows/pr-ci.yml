@@ -18,6 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       docker: ${{ steps.detect.outputs.docker }}
+      dockerCount: ${{ steps.docker_services.outputs.count }}
+      dockerMatrix: ${{ steps.docker_services.outputs.matrix }}
       backend: ${{ steps.detect.outputs.backend }}
       contracts: ${{ steps.detect.outputs.contracts }}
       infra: ${{ steps.detect.outputs.infra }}
@@ -29,6 +31,12 @@ jobs:
       - id: detect
         name: Detect changed paths
         run: node scripts/ci/detect-changes.mjs
+        env:
+          CGN_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+
+      - id: docker_services
+        name: Detect changed Docker services
+        run: node scripts/ci/changed-docker-services.mjs
         env:
           CGN_BASE_SHA: ${{ github.event.pull_request.base.sha }}
 
@@ -128,17 +136,32 @@ jobs:
           exit-code: "1"
 
   docker:
-    name: Docker build and health smoke
+    name: Docker build ${{ matrix.service }}
     needs: [changes, quality, security]
-    if: needs.changes.outputs.docker == 'true' || needs.changes.outputs.infra == 'true'
+    if: needs.changes.outputs.dockerCount != '0'
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.changes.outputs.dockerMatrix) }}
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 
-      - name: Build SHA-tagged health image
-        run: docker build -f services/health-demo/Dockerfile -t cgn-health-demo:${{ github.sha }} .
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
 
-      - name: Run container health smoke
+      - name: Build changed service image
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
+          load: true
+          push: false
+          tags: cgn-${{ matrix.service }}:${{ github.sha }}
+          cache-from: type=gha,scope=pr-${{ matrix.service }}
+          cache-to: type=gha,mode=max,scope=pr-${{ matrix.service }}
+
+      - name: Run health-demo container smoke
+        if: matrix.service == 'health-demo'
         shell: bash
         run: |
           docker run -d --name cgn-health-demo -p 3001:3001 cgn-health-demo:${{ github.sha }}
