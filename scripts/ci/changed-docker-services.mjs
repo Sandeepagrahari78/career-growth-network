@@ -1,4 +1,4 @@
-import { appendFileSync, readdirSync } from "node:fs";
+import { appendFileSync, existsSync, readdirSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { pathToFileURL } from "node:url";
 
@@ -54,20 +54,7 @@ function discoverDockerServices() {
   return readdirSync("services", { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
     .map((entry) => entry.name)
-    .filter((service) => {
-      try {
-        execFileSync(
-          process.platform === "win32" ? "cmd" : "test",
-          process.platform === "win32"
-            ? ["/c", "if", "exist", `services\\${service}\\Dockerfile`, "(exit 0)", "else", "(exit 1)"]
-            : ["-f", `services/${service}/Dockerfile`],
-          { stdio: "ignore" },
-        );
-        return true;
-      } catch {
-        return false;
-      }
-    });
+    .filter((service) => existsSync(`services/${service}/Dockerfile`));
 }
 
 function run() {
@@ -79,7 +66,9 @@ function run() {
 
   if (!forceAll) {
     if (!baseSha) {
-      console.error("CGN_BASE_SHA is required unless CGN_ALL_DOCKER_SERVICES=true.");
+      console.error(
+        "CGN_BASE_SHA is required unless CGN_ALL_DOCKER_SERVICES=true.",
+      );
       process.exit(1);
     }
 
@@ -100,7 +89,10 @@ function run() {
     })),
   };
 
-  console.log("Available Docker services:", availableServices.join(", ") || "none");
+  console.log(
+    "Available Docker services:",
+    availableServices.join(", ") || "none",
+  );
   console.log("Selected Docker services:", services.join(", ") || "none");
 
   const output = process.env.GITHUB_OUTPUT;
@@ -112,6 +104,9 @@ function run() {
   }
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(process.argv[1]).href
+) {
   run();
 }
