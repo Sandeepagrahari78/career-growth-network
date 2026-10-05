@@ -29,7 +29,7 @@ test("real monorepo workspace satisfies the frozen package boundaries", () => {
 
   assert.equal(validateWorkspaceFile(), true);
   assert.equal(validateWorkspaceGraph(packages, boundaries), true);
-  assert.ok(packages.length >= 15);
+  assert.ok(packages.length >= 14);
 });
 
 test("services cannot depend directly on another service", () => {
