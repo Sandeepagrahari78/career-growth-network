@@ -3,10 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 test("security gate policy remains fail-closed", () => {
-  const raw = readFileSync(
-    "config/security/security-policy.v1.json",
-    "utf8",
-  );
+  const raw = readFileSync("config/security/security-policy.v1.json", "utf8");
   const policy = JSON.parse(raw);
 
   assert.equal(policy.contract, "cgn.security-gates.v1");
@@ -16,10 +13,7 @@ test("security gate policy remains fail-closed", () => {
   assert.equal(policy.filesystemScan.failOnMatch, true);
   assert.equal(policy.containerScan.failOnMatch, true);
 
-  assert.deepEqual(policy.containerScan.severities, [
-    "HIGH",
-    "CRITICAL",
-  ]);
+  assert.deepEqual(policy.containerScan.severities, ["HIGH", "CRITICAL"]);
   assert.equal(policy.sbom.format, "cyclonedx-json");
   assert.ok(policy.sbom.artifactRetentionDays >= 7);
 
