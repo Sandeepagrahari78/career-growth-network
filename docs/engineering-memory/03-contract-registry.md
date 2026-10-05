@@ -4,6 +4,7 @@ All cross-domain contracts live under `packages/contracts`.
 
 ## Canonical contracts
 - `cgn.bounded-contexts.v1` — cross-domain ownership and integration-boundary contract.
+- `cgn.workspace-boundaries.v1` — monorepo package roots and allowed workspace dependency direction.
 - `career.activity.v1` — canonical eligible career-growth activity.
 - `domain.event.envelope.v1` — common versioned event envelope.
 - `http.error-envelope.v1` — common synchronous error shape.
