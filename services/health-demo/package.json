@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "build": "pnpm dlx typescript@5.9.3 tsc -p tsconfig.json",
+    "build": "pnpm --package=typescript@5.9.3 dlx tsc -p tsconfig.json",
     "start": "node server.mjs"
   }
 }
