@@ -1,0 +1,61 @@
+name: Main CI
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: main-ci
+  cancel-in-progress: false
+
+jobs:
+  revalidate:
+    name: Main revalidation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22
+
+      - name: Enable pinned pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@11.25.0 --activate
+
+      - name: Install frozen workspace
+        run: pnpm install --frozen-lockfile
+
+      - name: Engineering Memory gate
+        run: pnpm memory:check
+        env:
+          CGN_BEFORE_SHA: ${{ github.event.before }}
+
+      - name: Synchronization regression proof
+        run: pnpm demo:sync
+
+      - name: Quality gates
+        run: pnpm ci:quick
+
+      - name: Build immutable candidate image
+        run: docker build -f services/health-demo/Dockerfile -t cgn-health-demo:${{ github.sha }} .
+
+      - name: Smoke candidate image
+        shell: bash
+        run: |
+          docker run -d --name cgn-health-demo -p 3001:3001 cgn-health-demo:${{ github.sha }}
+          trap 'docker rm -f cgn-health-demo >/dev/null 2>&1 || true' EXIT
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:3001/health | grep -q '"status":"ok"'; then
+              exit 0
+            fi
+            sleep 1
+          done
+          docker logs cgn-health-demo
+          exit 1

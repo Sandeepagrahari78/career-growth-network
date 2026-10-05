@@ -1,0 +1,68 @@
+name: Deploy Production Dry Run
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_sha:
+        description: Exact approved main commit SHA
+        required: true
+        type: string
+      confirmation:
+        description: Type DEPLOY-PRODUCTION
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  authorize:
+    name: Owner-only release gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify owner and confirmation
+        shell: bash
+        env:
+          CGN_ACTOR: ${{ github.actor }}
+          CGN_CONFIRMATION: ${{ inputs.confirmation }}
+        run: |
+          test "$CGN_ACTOR" = "Sandeepagrahari78"
+          test "$CGN_CONFIRMATION" = "DEPLOY-PRODUCTION"
+
+  dry-run:
+    name: Production deployment dry run
+    needs: authorize
+    runs-on: ubuntu-latest
+    env:
+      CGN_RELEASE_SHA: ${{ inputs.release_sha }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+
+      - name: Fetch main history
+        run: git fetch origin main --no-tags
+
+      - name: Verify approved main SHA
+        run: node scripts/ci/verify-release-sha.mjs "$CGN_RELEASE_SHA"
+
+      - name: Checkout exact release SHA
+        run: git checkout --detach "$CGN_RELEASE_SHA"
+
+      - name: Build exact SHA artifact
+        run: docker build -f services/health-demo/Dockerfile -t "cgn-health-demo:$CGN_RELEASE_SHA" .
+
+      - name: Dry-run post-deploy smoke
+        shell: bash
+        run: |
+          docker run -d --name cgn-production-dry-run -p 3001:3001 "cgn-health-demo:$CGN_RELEASE_SHA"
+          trap 'docker rm -f cgn-production-dry-run >/dev/null 2>&1 || true' EXIT
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:3001/health | grep -q '"status":"ok"'; then
+              echo "Production gate dry run passed. No real production deployment occurred."
+              exit 0
+            fi
+            sleep 1
+          done
+          docker logs cgn-production-dry-run
+          exit 1

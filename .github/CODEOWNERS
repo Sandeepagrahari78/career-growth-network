@@ -1,0 +1,10 @@
+# Until Prachi/Tanvi GitHub usernames are explicitly confirmed, Sandeep is the
+# repository-level fallback reviewer. Jira remains the execution-owner source of truth.
+* @Sandeepagrahari78
+
+/.github/ @Sandeepagrahari78
+/infra/ @Sandeepagrahari78
+/packages/contracts/ @Sandeepagrahari78
+/docs/adr/ @Sandeepagrahari78
+/docs/engineering-memory/ @Sandeepagrahari78
+/config/ @Sandeepagrahari78
