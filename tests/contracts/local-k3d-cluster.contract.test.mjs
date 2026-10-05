@@ -12,7 +12,10 @@ test("k3d cluster config matches the approved local network contract", () => {
   assert.match(config, /name: cgn-local/);
   assert.match(config, /image: rancher\/k3s:v1\.35\.9-k3s1/);
 
-  assert.match(config, new RegExp(`--cluster-cidr=${network.cluster.podSubnet}`));
+  assert.match(
+    config,
+    new RegExp(`--cluster-cidr=${network.cluster.podSubnet}`),
+  );
   assert.match(
     config,
     new RegExp(`--service-cidr=${network.cluster.serviceSubnet}`),
