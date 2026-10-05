@@ -6,7 +6,7 @@ COPY packages/contracts/package.json packages/contracts/package.json
 COPY services/health-demo/package.json services/health-demo/package.json
 RUN pnpm install --frozen-lockfile
 COPY services/health-demo services/health-demo
-RUN pnpm dlx typescript@5.9.3 tsc -p services/health-demo/tsconfig.json
+RUN pnpm --package=typescript@5.9.3 dlx tsc -p services/health-demo/tsconfig.json
 
 FROM node:22-alpine AS runtime
 WORKDIR /app
