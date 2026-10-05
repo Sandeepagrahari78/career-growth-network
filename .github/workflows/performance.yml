@@ -1,0 +1,28 @@
+name: Performance Smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: Staging URL, for example https://staging.example.com
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  k6-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Run controlled k6 smoke profile
+        env:
+          BASE_URL: ${{ inputs.base_url }}
+        run: |
+          docker run --rm \
+            -e BASE_URL="$BASE_URL" \
+            -v "$PWD:/work" \
+            grafana/k6:0.54.0 \
+            run /work/tests/performance/health-smoke.js
