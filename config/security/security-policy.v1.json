@@ -1,0 +1,51 @@
+{
+  "contract": "cgn.security-gates.v1",
+  "ticket": "CGN-91",
+  "dependencyScan": {
+    "scanner": "OSV-Scanner",
+    "failOnKnownVulnerability": true,
+    "reportFormat": "json"
+  },
+  "secretScan": {
+    "scanner": "Gitleaks",
+    "failOnDetection": true
+  },
+  "sast": {
+    "scanner": "Semgrep CE",
+    "failOnError": true
+  },
+  "filesystemScan": {
+    "scanner": "Trivy",
+    "severities": ["HIGH", "CRITICAL"],
+    "ignoreUnfixed": true,
+    "failOnMatch": true
+  },
+  "containerScan": {
+    "scanner": "Trivy",
+    "severities": ["HIGH", "CRITICAL"],
+    "ignoreUnfixed": true,
+    "failOnMatch": true
+  },
+  "sbom": {
+    "generator": "Trivy",
+    "format": "cyclonedx-json",
+    "artifactRetentionDays": 14
+  },
+  "scheduledRescan": {
+    "cron": "20 2 * * 1",
+    "includesDependencies": true,
+    "includesContainers": true
+  },
+  "exceptions": {
+    "allowlistByDefault": false,
+    "requiresJiraTicket": true,
+    "requiresSandeepReview": true,
+    "requiresExpiryDate": true
+  },
+  "rules": [
+    "Security findings must not be hidden by weakening a scanner or threshold only to make CI green.",
+    "A detected secret blocks the PR until the secret is removed and rotated where necessary.",
+    "Container images promoted beyond CI must be the same immutable SHA-tagged image that was scanned.",
+    "Paid security services must not be enabled without explicit Sandeep approval."
+  ]
+}
