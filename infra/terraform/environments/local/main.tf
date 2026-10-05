@@ -1,7 +1,5 @@
 locals {
-  network_baseline = jsondecode(
-    file("${path.module}/../../../../config/infra/local-network.v1.json"),
-  )
+  network_baseline = jsondecode(file("${path.module}/../../../../config/infra/local-network.v1.json"))
 }
 
 resource "terraform_data" "bootstrap" {
