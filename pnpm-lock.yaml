@@ -9,3 +9,5 @@ importers:
   .: {}
 
   packages/contracts: {}
+
+  services/health-demo: {}
