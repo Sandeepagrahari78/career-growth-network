@@ -1,0 +1,45 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: smoke-allow-target-egress
+  namespace: cgn-apps
+spec:
+  podSelector:
+    matchLabels:
+      app: netpol-client
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: cgn-data
+          podSelector:
+            matchLabels:
+              app: netpol-target
+      ports:
+        - protocol: TCP
+          port: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: smoke-allow-target-ingress
+  namespace: cgn-data
+spec:
+  podSelector:
+    matchLabels:
+      app: netpol-target
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: cgn-apps
+          podSelector:
+            matchLabels:
+              app: netpol-client
+      ports:
+        - protocol: TCP
+          port: 8080

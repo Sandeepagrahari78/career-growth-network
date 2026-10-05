@@ -1,0 +1,80 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: netpol-target
+  namespace: cgn-data
+  labels:
+    app: netpol-target
+spec:
+  automountServiceAccountToken: false
+  securityContext:
+    fsGroup: 65534
+    fsGroupChangePolicy: OnRootMismatch
+  containers:
+    - name: server
+      image: busybox:1.37.0
+      command:
+        - sh
+        - -c
+        - echo ok > /www/index.html && httpd -f -p 8080 -h /www
+      ports:
+        - containerPort: 8080
+          protocol: TCP
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+            - ALL
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        runAsUser: 65534
+        seccompProfile:
+          type: RuntimeDefault
+      volumeMounts:
+        - name: www
+          mountPath: /www
+  volumes:
+    - name: www
+      emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: netpol-target
+  namespace: cgn-data
+spec:
+  type: ClusterIP
+  selector:
+    app: netpol-target
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+      protocol: TCP
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: netpol-client
+  namespace: cgn-apps
+  labels:
+    app: netpol-client
+spec:
+  automountServiceAccountToken: false
+  containers:
+    - name: client
+      image: busybox:1.37.0
+      command:
+        - sh
+        - -c
+        - sleep 3600
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+            - ALL
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        runAsUser: 65534
+        seccompProfile:
+          type: RuntimeDefault

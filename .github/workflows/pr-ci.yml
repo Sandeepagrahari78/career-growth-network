@@ -226,6 +226,55 @@ jobs:
           fi
           echo "Unsupported production/cloud mode rejected as expected."
 
+  local-k8s:
+    name: Local Kubernetes create smoke destroy
+    needs: [changes, quality, terraform]
+    if: needs.changes.outputs.infra == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22
+
+      - name: Setup kubectl
+        uses: Azure/setup-kubectl@829323503d1be3d00ca8346e5391ca0b07a9ab0d # v5.1.0
+        with:
+          version: "v1.35.9"
+
+      - name: Install pinned k3d
+        shell: bash
+        run: |
+          curl --fail --location --silent --show-error \
+            -o /tmp/k3d-linux-amd64 \
+            https://github.com/k3d-io/k3d/releases/download/v5.9.0/k3d-linux-amd64
+          curl --fail --location --silent --show-error \
+            -o /tmp/checksums.txt \
+            https://github.com/k3d-io/k3d/releases/download/v5.9.0/checksums.txt
+          expected_sha="$(awk '$2 ~ /k3d-linux-amd64$/ {print $1}' /tmp/checksums.txt)"
+          test -n "$expected_sha"
+          echo "$expected_sha  /tmp/k3d-linux-amd64" | sha256sum --check -
+          sudo install -m 0755 /tmp/k3d-linux-amd64 /usr/local/bin/k3d
+          k3d version
+
+      - name: Create CGN local cluster
+        run: bash scripts/infra/k3d-up.sh
+
+      - name: Prove service discovery and NetworkPolicy enforcement
+        run: bash scripts/infra/k3d-smoke.sh
+
+      - name: Destroy CGN local cluster
+        if: always()
+        shell: bash
+        run: |
+          if command -v k3d >/dev/null 2>&1; then
+            bash scripts/infra/k3d-down.sh
+          else
+            echo "k3d is unavailable; no local cluster can exist."
+          fi
+
   docker:
     name: Docker build and security ${{ matrix.service }}
     needs: [changes, quality, security]
@@ -307,7 +356,7 @@ jobs:
   gate:
     name: PR quality gate summary
     if: always()
-    needs: [changes, context, quality, security, terraform, docker]
+    needs: [changes, context, quality, security, terraform, local-k8s, docker]
     runs-on: ubuntu-latest
     steps:
       - name: Require all relevant gates green
@@ -317,9 +366,11 @@ jobs:
           echo "quality=${{ needs.quality.result }}"
           echo "security=${{ needs.security.result }}"
           echo "terraform=${{ needs.terraform.result }}"
+          echo "local-k8s=${{ needs.local-k8s.result }}"
           echo "docker=${{ needs.docker.result }}"
           test "${{ needs.context.result }}" = "success"
           test "${{ needs.quality.result }}" = "success"
           test "${{ needs.security.result }}" = "success"
           test "${{ needs.terraform.result }}" = "success" -o "${{ needs.terraform.result }}" = "skipped"
+          test "${{ needs.local-k8s.result }}" = "success" -o "${{ needs.local-k8s.result }}" = "skipped"
           test "${{ needs.docker.result }}" = "success" -o "${{ needs.docker.result }}" = "skipped"
