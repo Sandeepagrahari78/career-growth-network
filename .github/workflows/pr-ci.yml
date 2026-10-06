@@ -26,6 +26,9 @@ jobs:
       k8s: ${{ steps.detect.outputs.k8s }}
       postgres: ${{ steps.detect.outputs.postgres }}
       docsOnly: ${{ steps.detect.outputs.docsOnly }}
+      integration: ${{ steps.detect.outputs.integration }}
+      e2e: ${{ steps.detect.outputs.e2e }}
+      performance: ${{ steps.detect.outputs.performance }}
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
@@ -406,6 +409,80 @@ jobs:
           echo "TRIVY_IMAGE_OUTCOME=$TRIVY_IMAGE_OUTCOME"
           test "$TRIVY_IMAGE_OUTCOME" = "success"
 
+  integration:
+    name: Integration dependency stack
+    needs: [changes, quality]
+    if: needs.changes.outputs.integration == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22
+
+      - name: Start and verify shared integration dependencies
+        run: node scripts/ci/integration-stack-smoke.mjs
+
+  e2e:
+    name: End-to-end deployment smoke
+    needs: [changes, quality]
+    if: needs.changes.outputs.e2e == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Build health-demo deployment artifact
+        run: docker build -f services/health-demo/Dockerfile -t cgn-health-demo:e2e .
+
+      - name: Run end-to-end HTTP journey
+        shell: bash
+        run: |
+          docker run -d --name cgn-e2e -p 127.0.0.1:3001:3001 cgn-health-demo:e2e
+          trap 'docker rm -f cgn-e2e >/dev/null 2>&1 || true' EXIT
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:3001/ready | grep -q '"status":"ready"'; then
+              BASE_URL=http://127.0.0.1:3001 node tests/e2e/health-demo.e2e.mjs
+              exit 0
+            fi
+            sleep 1
+          done
+          docker logs cgn-e2e
+          exit 1
+
+  performance-smoke:
+    name: Controlled k6 performance smoke
+    needs: [changes, quality]
+    if: needs.changes.outputs.performance == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Build health-demo performance artifact
+        run: docker build -f services/health-demo/Dockerfile -t cgn-health-demo:performance .
+
+      - name: Run k6 smoke against the deployment artifact
+        shell: bash
+        run: |
+          docker run -d --name cgn-performance -p 127.0.0.1:3001:3001 cgn-health-demo:performance
+          trap 'docker rm -f cgn-performance >/dev/null 2>&1 || true' EXIT
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:3001/ready >/dev/null; then
+              docker run --rm --network host \
+                -e BASE_URL=http://127.0.0.1:3001 \
+                -v "$PWD:/work" \
+                grafana/k6:0.54.0 \
+                run /work/tests/performance/health-smoke.js
+              exit 0
+            fi
+            sleep 1
+          done
+          docker logs cgn-performance
+          exit 1
+
   gate:
     name: PR quality gate summary
     if: always()
@@ -418,6 +495,9 @@ jobs:
       - local-k8s
       - local-postgres
       - docker
+      - integration
+      - e2e
+      - performance-smoke
     runs-on: ubuntu-latest
     steps:
       - name: Require all relevant gates green
@@ -430,6 +510,9 @@ jobs:
           echo "local-k8s=${{ needs.local-k8s.result }}"
           echo "local-postgres=${{ needs.local-postgres.result }}"
           echo "docker=${{ needs.docker.result }}"
+          echo "integration=${{ needs.integration.result }}"
+          echo "e2e=${{ needs.e2e.result }}"
+          echo "performance-smoke=${{ needs.performance-smoke.result }}"
           test "${{ needs.context.result }}" = "success"
           test "${{ needs.quality.result }}" = "success"
           test "${{ needs.security.result }}" = "success"
@@ -437,3 +520,6 @@ jobs:
           test "${{ needs.local-k8s.result }}" = "success" -o "${{ needs.local-k8s.result }}" = "skipped"
           test "${{ needs.local-postgres.result }}" = "success" -o "${{ needs.local-postgres.result }}" = "skipped"
           test "${{ needs.docker.result }}" = "success" -o "${{ needs.docker.result }}" = "skipped"
+          test "${{ needs.integration.result }}" = "success" -o "${{ needs.integration.result }}" = "skipped"
+          test "${{ needs.e2e.result }}" = "success" -o "${{ needs.e2e.result }}" = "skipped"
+          test "${{ needs.performance-smoke.result }}" = "success" -o "${{ needs.performance-smoke.result }}" = "skipped"
