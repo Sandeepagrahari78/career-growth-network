@@ -11,14 +11,20 @@ function topLevelValue(text, key) {
   const prefix = `${key}:`;
   const line = text.split(/\r?\n/).find((entry) => entry.startsWith(prefix));
   assert.ok(line, `Missing top-level value: ${key}`);
-  return line.slice(prefix.length).trim().replace(/^["']|["']$/g, "");
+  return line
+    .slice(prefix.length)
+    .trim()
+    .replace(/^["']|["']$/g, "");
 }
 
 function nestedValue(text, key) {
   const prefix = `  ${key}:`;
   const line = text.split(/\r?\n/).find((entry) => entry.startsWith(prefix));
   assert.ok(line, `Missing nested value: ${key}`);
-  return line.slice(prefix.length).trim().replace(/^["']|["']$/g, "");
+  return line
+    .slice(prefix.length)
+    .trim()
+    .replace(/^["']|["']$/g, "");
 }
 
 assert.equal(contract.schema, "cgn.helm-promotion.v1");
