@@ -1,6 +1,6 @@
 # 05 - Current Merged State
 
-Last updated: 2026-10-06 for the CGN-92 Argo CD staging GitOps delivery branch.
+Last updated: 2026-10-06 for the CGN-93 Helm promotion delivery branch.
 
 ## Repository
 - Shared Engineering Memory and agent synchronization: established.
@@ -12,7 +12,8 @@ Last updated: 2026-10-06 for the CGN-92 Argo CD staging GitOps delivery branch.
 - CGN-32: complete bounded-context ownership and integration-boundary contract merged via PR #10 / `bea4c4330d4b281a82e49c3538077c73decc8ba7`; post-merge validation is green.
 - CGN-33: explicit pnpm workspace packages and dependency-boundary enforcement merged via PR #11 / `109ac67dc15d5b2c3bf35a9f3d12b9f204187abb`.
 - CGN-227: release/rollback gate hardening merged via PR #13 / `47d719160d9b53ca0fed84cc59795b3bbd9f65f9`; Main CI, Docker Images and Staging Validation are green.
-- CGN-92 is now staged on branch `CGN-92-argocd-staging-gitops`; it adds Argo CD staging GitOps contract, manifests, runbook and local validation workflow.
+- CGN-92: Argo CD staging GitOps merged via PR #14 / `2dac829a0911ca15cb2572c6cf4960b543209f9b`; PR CI, Main CI, Local Kubernetes, Local GitOps and Staging Validation are green.
+- CGN-93 is staged on branch `CGN-93-helm-values-promotion`; it adds immutable Helm values promotion, render evidence and owner-approved production-values dry-run.
 - Real cloud provisioning and production deployment remain intentionally disabled.
 
 ## Infrastructure state
@@ -28,20 +29,20 @@ Last updated: 2026-10-06 for the CGN-92 Argo CD staging GitOps delivery branch.
 - Current service databases: identity, career, roadmap, evidence, growth, feed, network, community and messaging.
 - Staging GitOps contract: `cgn.staging-gitops.v1`.
 - Argo CD namespace/project/ApplicationSet manifests live under `infra/gitops/argocd/`.
+- Helm promotion contract: `cgn.helm-promotion.v1`; reference chart lives under `infra/helm/health-demo/`.
 - Product tables and runtime DB roles are not created by infrastructure bootstrap tickets.
 
 ## Product state
 Jira is the work source of truth. Figma defines the approved product flow for user-facing work. Infrastructure work must not invent product schemas, APIs or flows. Cross-domain ownership is frozen by `cgn.bounded-contexts.v1`; detailed APIs/events still require the owning Jira ticket.
 
-## Operational evidence expected for CGN-92
+## Operational evidence expected for CGN-93
 - PR CI: green.
-- `pnpm ci:gitops`: green.
-- Static Argo CD staging GitOps contract validation: green.
-- Contract tests for ApplicationSet source boundary and zero-budget safety: green.
-- Path-scoped Local GitOps Validation after merge: green.
-- Local k3d cluster creation, Argo CD install, ApplicationSet apply and cluster deletion: green.
+- `pnpm ci:helm`: green.
+- Helm chart lint: green.
+- Staging and production Helm template render: green.
+- Both environments resolve to the same immutable `sha-<release>` image tag.
+- Owner-approved manual production-values dry-run remains available without deploying to production.
 - Cloud resources created: none.
-- Committed repository credential: none.
 - Production deployment performed: none.
 
 ## Update rule
