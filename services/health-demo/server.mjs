@@ -10,6 +10,18 @@ const server = createServer((request, response) => {
     return;
   }
 
+  if (request.method === "GET" && request.url === "/ready") {
+    response.writeHead(200, { "content-type": "application/json" });
+    response.end(
+      JSON.stringify({
+        status: "ready",
+        service: "cgn-health-demo",
+        version: 1,
+      }),
+    );
+    return;
+  }
+
   response.writeHead(404, { "content-type": "application/json" });
   response.end(JSON.stringify({ error: "not_found" }));
 });

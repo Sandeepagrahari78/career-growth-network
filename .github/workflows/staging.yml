@@ -31,13 +31,20 @@ jobs:
       - name: Build production-like staging candidate
         run: docker build -f services/health-demo/Dockerfile -t cgn-health-demo:${{ steps.sha.outputs.value }} .
 
-      - name: Staging health smoke
+      - name: Staging health readiness E2E and performance smoke
         shell: bash
         run: |
-          docker run -d --name cgn-staging-health -p 3001:3001 cgn-health-demo:${{ steps.sha.outputs.value }}
+          docker run -d --name cgn-staging-health -p 127.0.0.1:3001:3001 cgn-health-demo:${{ steps.sha.outputs.value }}
           trap 'docker rm -f cgn-staging-health >/dev/null 2>&1 || true' EXIT
           for attempt in {1..30}; do
-            if curl --fail --silent http://127.0.0.1:3001/health | grep -q '"status":"ok"'; then
+            if curl --fail --silent http://127.0.0.1:3001/ready | grep -q '"status":"ready"'; then
+              curl --fail --silent http://127.0.0.1:3001/health | grep -q '"status":"ok"'
+              BASE_URL=http://127.0.0.1:3001 node tests/e2e/health-demo.e2e.mjs
+              docker run --rm --network host \
+                -e BASE_URL=http://127.0.0.1:3001 \
+                -v "$PWD:/work" \
+                grafana/k6:0.54.0 \
+                run /work/tests/performance/health-smoke.js
               echo "Ephemeral staging validation passed."
               echo "Persistent staging/GitOps activation remains owned by CGN-92/CGN-93."
               exit 0
@@ -46,3 +53,22 @@ jobs:
           done
           docker logs cgn-staging-health
           exit 1
+
+      - name: Write staging evidence
+        if: success()
+        shell: bash
+        env:
+          VALIDATED_SHA: ${{ steps.sha.outputs.value }}
+        run: |
+          timestamp="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          printf '{"schema":"cgn.staging-evidence.v1","sha":"%s","validatedAt":"%s","health":"passed","readiness":"passed","e2e":"passed","performanceSmoke":"passed"}\n' \
+            "$VALIDATED_SHA" "$timestamp" > staging-evidence.json
+
+      - name: Upload staging evidence
+        if: success()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: staging-evidence-${{ steps.sha.outputs.value }}
+          path: staging-evidence.json
+          if-no-files-found: error
+          retention-days: 30

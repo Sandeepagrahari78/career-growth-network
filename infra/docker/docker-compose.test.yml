@@ -11,7 +11,7 @@ services:
       timeout: 3s
       retries: 20
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
 
   valkey:
     image: valkey/valkey:8-alpine
@@ -22,7 +22,7 @@ services:
       timeout: 3s
       retries: 20
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6379:6379"
 
   redpanda:
     image: redpandadata/redpanda:v24.2.10
@@ -40,14 +40,10 @@ services:
       - "0"
       - --check=false
     ports:
-      - "9092:9092"
+      - "127.0.0.1:9092:9092"
 
   object-store:
-    image: minio/minio:RELEASE.2024-10-13T13-34-11Z
-    command: server /data --console-address ":9001"
-    environment:
-      MINIO_ROOT_USER: cgn
-      MINIO_ROOT_PASSWORD: cgn_test_password
+    image: chrislusf/seaweedfs:4.46
+    command: server -s3 -dir=/data
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "127.0.0.1:8333:8333"
