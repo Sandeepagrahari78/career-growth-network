@@ -16,7 +16,7 @@ spec:
             namespace: argocd
   template:
     metadata:
-      name: '{{name}}'
+      name: "{{name}}"
       labels:
         app.kubernetes.io/part-of: cgn-gitops
         cgn.io/environment: staging
@@ -25,10 +25,10 @@ spec:
       source:
         repoURL: https://github.com/Sandeepagrahari78/career-growth-network
         targetRevision: main
-        path: '{{path}}'
+        path: "{{path}}"
       destination:
         server: https://kubernetes.default.svc
-        namespace: '{{namespace}}'
+        namespace: "{{namespace}}"
       syncPolicy:
         automated:
           prune: true
