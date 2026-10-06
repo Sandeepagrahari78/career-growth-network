@@ -7,6 +7,7 @@ All cross-domain contracts live under `packages/contracts` unless a ticket delib
 - `cgn.workspace-boundaries.v1` — monorepo package roots and allowed workspace dependency direction.
 - `cgn.staging-gitops.v1` — zero-budget local-first Argo CD staging GitOps source, destination and safety contract.
 - `cgn.helm-base.v1` — reusable microservice Helm base-chart scope and safety contract.
+- `cgn.helm-promotion.v1` — immutable staging-to-production values promotion and owner-approval contract.
 - `career.activity.v1` — canonical eligible career-growth activity.
 - `domain.event.envelope.v1` — common versioned event envelope.
 - `http.error-envelope.v1` — common synchronous error shape.
@@ -31,6 +32,9 @@ It currently allows only `infra/k8s/base` as the GitOps source path and requires
 
 ## Helm Base Chart
 `config/kubernetes/helm-base.v1.json` defines the reusable Helm chart boundary for established service workspaces. CGN-44 owns the base Deployment/Service shape only; probes, HPA/PDB and service-account/IAM standards remain with CGN-45, CGN-60 and CGN-61.
+
+## Helm Promotion
+`config/gitops/helm-promotion.v1.json` extends the CGN-44 reusable chart without creating a second chart. It requires one immutable SHA-tagged artifact across staging and production candidates, owner approval, and render-only production intent until a real target is separately approved.
 
 ## Career Activity
 One meaningful career action can update Growth, Feed, Stories, Notifications and downstream opportunity projections. Do not create mobile-only or feature-specific copies of the activity model.
