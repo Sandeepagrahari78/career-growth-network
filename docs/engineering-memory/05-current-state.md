@@ -1,6 +1,6 @@
 # 05 - Current Merged State
 
-Last updated: 2026-10-06 for the CGN-94 database migration job delivery branch.
+Last updated: 2026-10-07 for the CGN-45 Kubernetes probe standards delivery branch.
 
 ## Repository
 - Shared Engineering Memory and agent synchronization: established.
@@ -15,7 +15,8 @@ Last updated: 2026-10-06 for the CGN-94 database migration job delivery branch.
 - CGN-92: Argo CD staging GitOps foundation merged via PR #14 / `2dac829a0911ca15cb2572c6cf4960b543209f9b`; PR CI, Main CI, Docker Images, Local Kubernetes Validation and Local GitOps Validation are green.
 - CGN-44: reusable microservice Helm base chart merged via PR #16 / `52ece317461db43c05f28106ca3eaf580f236e70`; Main CI, Local Helm, Local Kubernetes, Docker Images and Staging Validation are green.
 - CGN-93: immutable Helm staging-to-production promotion merged via PR #18 / `092fb724aa64f58f17f40704ad0dac7e93413fc8`; PR CI, Main CI, Docker, Helm, Kubernetes, GitOps and Staging Validation are green.
-- CGN-94 is staged on branch `CGN-94-database-migration-job`; it adds fail-closed service-owned migration sequencing before deployment validation.
+- CGN-94: fail-closed service-owned database migration deployment job merged via PR #19 / `f61585d9ee9badf6a710f35ffa747f805bf0606c`; PR CI and Database Migration Validation are green, with post-merge validation running at branch creation time.
+- CGN-45 is staged on branch `CGN-45-kubernetes-probe-standards`; it adds startup/readiness/liveness standards to the reusable CGN-44 Helm chart.
 - Real cloud provisioning and production deployment remain intentionally disabled.
 
 ## Infrastructure state
@@ -34,21 +35,22 @@ Last updated: 2026-10-06 for the CGN-94 database migration job delivery branch.
 - Helm base-chart contract: `cgn.helm-base.v1`; reusable chart lives under `infra/helm/cgn-service/`.
 - Helm promotion contract: `cgn.helm-promotion.v1`; staging and production candidates must use the same SHA-tagged artifact.
 - Database migration deployment contract: `cgn.database-migration-job.v1`.
+- Kubernetes probe contract: `cgn.kubernetes-probes.v1`; health-demo staging and promotion values enable the standard.
 - Product tables and runtime DB roles are not created by infrastructure bootstrap tickets.
 
 ## Product state
 Jira is the work source of truth. Figma defines the approved product flow for user-facing work. Infrastructure work must not invent product schemas, APIs or flows. Cross-domain ownership is frozen by `cgn.bounded-contexts.v1`; detailed APIs/events still require the owning Jira ticket.
 
-## Operational evidence expected for CGN-94
+## Operational evidence expected for CGN-45
 - PR CI: green.
-- `pnpm ci:migration-job`: green.
-- Database Migration Validation: green.
-- Service ownership verification: green.
-- Pre-migration backup proof: green.
-- Owner-scoped SQL migration: green.
-- Backup/restore proof: green.
-- Migration evidence contains no secret values or raw database dump.
-- Production database changed: no.
+- `pnpm ci:probes`: green.
+- Local Helm Validation on the PR: green.
+- Invalid probe path is rejected by Helm schema validation.
+- health-demo startup/readiness/liveness paths render and install in local staging.
+- `/health` and `/ready` runtime smoke: green.
+- Kubernetes pod status/events provide probe observability.
+- Cloud resources created: none.
+- Production deployment performed: none.
 
 ## Update rule
 After each merged PR, record the ticket, PR/merge reference, modules/contracts changed, operational status, risks and exact next dependency.
