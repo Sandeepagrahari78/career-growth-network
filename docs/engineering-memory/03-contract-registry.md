@@ -6,6 +6,7 @@ All cross-domain contracts live under `packages/contracts` unless a ticket delib
 - `cgn.bounded-contexts.v1` — cross-domain ownership and integration-boundary contract.
 - `cgn.workspace-boundaries.v1` — monorepo package roots and allowed workspace dependency direction.
 - `cgn.staging-gitops.v1` — zero-budget local-first Argo CD staging GitOps source, destination and safety contract.
+- `cgn.helm-promotion.v1` — immutable staging-to-production Helm values promotion and approval contract.
 - `career.activity.v1` — canonical eligible career-growth activity.
 - `domain.event.envelope.v1` — common versioned event envelope.
 - `http.error-envelope.v1` — common synchronous error shape.
@@ -27,6 +28,9 @@ Detailed endpoint paths and new event names are intentionally not invented by th
 `config/gitops/staging-gitops.v1.json` defines the approved Argo CD staging GitOps boundary for the zero-budget/local-first phase.
 
 It currently allows only `infra/k8s/base` as the GitOps source path and requires no cloud provider, no committed repository credential, no production auto-deploy and manual production release control.
+
+## Helm Promotion
+`config/gitops/helm-promotion.v1.json` defines the release-promotion invariant: staging and production candidates use the same exact SHA-tagged artifact, mutable tags are forbidden, environment drift is limited to approved sizing values, and production remains manual/render-only until a real target is approved.
 
 ## Career Activity
 One meaningful career action can update Growth, Feed, Stories, Notifications and downstream opportunity projections. Do not create mobile-only or feature-specific copies of the activity model.
