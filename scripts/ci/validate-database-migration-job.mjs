@@ -4,13 +4,8 @@ import { existsSync, readFileSync } from "node:fs";
 const contract = JSON.parse(
   readFileSync("config/deployment/database-migration-job.v1.json", "utf8"),
 );
-const databases = JSON.parse(
-  readFileSync(contract.databaseContract, "utf8"),
-);
-const postgresRunner = readFileSync(
-  "scripts/infra/postgres-local.mjs",
-  "utf8",
-);
+const databases = JSON.parse(readFileSync(contract.databaseContract, "utf8"));
+const postgresRunner = readFileSync("scripts/infra/postgres-local.mjs", "utf8");
 const migrationRunner = readFileSync(contract.runner, "utf8");
 const releaseWorkflow = readFileSync(contract.deploymentWorkflow, "utf8");
 const validationWorkflow = readFileSync(contract.validationWorkflow, "utf8");
@@ -38,7 +33,10 @@ assert.equal(contract.execution.evidenceRequired, true);
 
 assert.match(postgresRunner, /SET ROLE/);
 assert.match(postgresRunner, /ON_ERROR_STOP=1/);
-assert.match(postgresRunner, /Migration SQL path must stay inside the repository/);
+assert.match(
+  postgresRunner,
+  /Migration SQL path must stay inside the repository/,
+);
 assert.match(migrationRunner, /cgn\.database\.migration\.started/);
 assert.match(migrationRunner, /cgn\.database\.migration\.completed/);
 assert.match(migrationRunner, /secretValuesIncluded:\s*false/);
