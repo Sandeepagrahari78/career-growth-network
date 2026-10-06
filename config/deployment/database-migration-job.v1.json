@@ -1,0 +1,35 @@
+{
+  "schema": "cgn.database-migration-job.v1",
+  "ticket": "CGN-94",
+  "databaseContract": "config/infra/postgres-databases.v1.json",
+  "runner": "scripts/infra/run-database-migration-job.mjs",
+  "deploymentWorkflow": ".github/workflows/release.yml",
+  "validationWorkflow": ".github/workflows/database-migration.yml",
+  "smoke": {
+    "service": "identity",
+    "sqlFile": "tests/fixtures/postgres/migration-smoke.sql"
+  },
+  "execution": {
+    "oneServicePerJob": true,
+    "ownerRoleOnly": true,
+    "onErrorStop": true,
+    "automaticRetry": false,
+    "preMigrationBackupRequired": true,
+    "backupRestoreProofRequired": true,
+    "evidenceRequired": true
+  },
+  "safety": {
+    "noCrossServiceDatabaseAccess": true,
+    "noCommittedCredential": true,
+    "noRawBackupArtifactUpload": true,
+    "noDirectProductionDatabaseEdit": true,
+    "noAutomaticProductionDeployment": true
+  },
+  "observability": {
+    "structuredLogs": true,
+    "releaseShaInEvidence": true,
+    "serviceInEvidence": true,
+    "databaseInEvidence": true,
+    "secretValuesInEvidence": false
+  }
+}
