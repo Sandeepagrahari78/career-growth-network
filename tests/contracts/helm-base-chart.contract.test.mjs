@@ -31,13 +31,16 @@ test("Helm base chart covers the established service workspaces", () => {
   ]);
 });
 
-test("base chart stays within CGN-44 scope", () => {
+test("base chart includes CGN-45 probes but keeps later concerns out", () => {
   const templates = [deployment, service].join("\n");
   assert.match(deployment, /kind:\s*Deployment/);
   assert.match(service, /kind:\s*Service/);
+  assert.match(deployment, /startupProbe/);
+  assert.match(deployment, /readinessProbe/);
+  assert.match(deployment, /livenessProbe/);
   assert.doesNotMatch(
     templates,
-    /livenessProbe|readinessProbe|startupProbe|HorizontalPodAutoscaler|PodDisruptionBudget/,
+    /HorizontalPodAutoscaler|PodDisruptionBudget/,
   );
   assert.doesNotMatch(templates, /kind:\s*ServiceAccount|kind:\s*Secret/i);
 });
