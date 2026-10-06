@@ -44,6 +44,7 @@ Expected:
 
 - `pnpm ci:helm`
 - contract tests
+- Semgrep/Gitleaks/OSV/Trivy source-security gate; dynamic regular expressions were removed after Semgrep correctly blocked them.
 - PR CI / `pnpm ci:quick`
 - Helm lint and staging/production template render in `Helm Promotion Validation`
 - post-merge main Helm validation
