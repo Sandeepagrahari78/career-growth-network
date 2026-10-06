@@ -35,10 +35,7 @@ test("missing replica bounds remain a fail-closed render case", () => {
     "tests/fixtures/helm/missing-autoscaling-bounds.yaml",
     "utf8",
   );
-  const hpa = readFileSync(
-    "infra/helm/cgn-service/templates/hpa.yaml",
-    "utf8",
-  );
+  const hpa = readFileSync("infra/helm/cgn-service/templates/hpa.yaml", "utf8");
 
   assert.match(fixture, /enabled:\s*true/);
   assert.doesNotMatch(fixture, /minReplicas|maxReplicas/);
