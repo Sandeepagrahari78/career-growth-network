@@ -6,6 +6,7 @@ NAMESPACE="cgn-apps"
 IMAGE="cgn-health-demo:helm-smoke"
 CHART="infra/helm/cgn-service"
 VALUES="infra/helm/values/health-demo-staging.yaml"
+INVALID_PROBE_VALUES="tests/fixtures/helm/invalid-probe-path.yaml"
 
 for command in docker k3d kubectl helm curl; do
   command -v "$command" >/dev/null 2>&1 || {
@@ -21,6 +22,12 @@ cleanup() {
 }
 trap cleanup EXIT
 
+if helm lint "$CHART" -f "$INVALID_PROBE_VALUES"; then
+  echo "Invalid probe path unexpectedly passed Helm schema validation." >&2
+  exit 1
+fi
+echo "Invalid probe path rejected as expected."
+
 helm lint "$CHART" -f "$VALUES"
 helm template "$RELEASE" "$CHART" -n "$NAMESPACE" -f "$VALUES" >/tmp/cgn-helm-rendered.yaml
 
@@ -34,6 +41,10 @@ helm upgrade --install "$RELEASE" "$CHART" \
   --timeout 180s
 
 kubectl -n "$NAMESPACE" rollout status deployment/cgn-health-demo --timeout=180s
+
+test "$(kubectl -n "$NAMESPACE" get deployment cgn-health-demo -o jsonpath='{.spec.template.spec.containers[0].startupProbe.httpGet.path}')" = "/health"
+test "$(kubectl -n "$NAMESPACE" get deployment cgn-health-demo -o jsonpath='{.spec.template.spec.containers[0].readinessProbe.httpGet.path}')" = "/ready"
+test "$(kubectl -n "$NAMESPACE" get deployment cgn-health-demo -o jsonpath='{.spec.template.spec.containers[0].livenessProbe.httpGet.path}')" = "/health"
 
 kubectl -n "$NAMESPACE" port-forward service/cgn-health-demo 3001:3001 >/tmp/cgn-helm-port-forward.log 2>&1 &
 PORT_FORWARD_PID=$!
