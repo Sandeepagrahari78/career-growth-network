@@ -14,3 +14,11 @@
 app.kubernetes.io/name: {{ include "cgn-service.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
+
+{{- define "cgn-service.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create }}
+{{- default (include "cgn-service.fullname" .) .Values.serviceAccount.name }}
+{{- else }}
+{{- required "serviceAccount.name is required when serviceAccount.create=false" .Values.serviceAccount.name }}
+{{- end }}
+{{- end }}
