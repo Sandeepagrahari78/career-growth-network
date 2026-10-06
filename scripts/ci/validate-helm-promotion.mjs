@@ -45,10 +45,7 @@ for (const forbiddenTag of contract.artifact.forbiddenTags) {
 }
 
 assert.equal(topLevelValue(staging, "nameOverride"), "cgn-health-demo");
-assert.equal(
-  topLevelValue(production, "nameOverride"),
-  "cgn-health-demo",
-);
+assert.equal(topLevelValue(production, "nameOverride"), "cgn-health-demo");
 assert.equal(Number(topLevelValue(staging, "replicaCount")), 1);
 assert.equal(Number(topLevelValue(production, "replicaCount")), 2);
 
@@ -69,11 +66,6 @@ assert.equal(contract.safety.noCloudProvider, true);
 assert.equal(contract.safety.noPaidResource, true);
 assert.equal(contract.safety.noCommittedSecret, true);
 assert.equal(contract.safety.noAutomaticProductionDeployment, true);
-assert.equal(
-  contract.safety.renderOnlyUntilProductionTargetApproved,
-  true,
-);
+assert.equal(contract.safety.renderOnlyUntilProductionTargetApproved, true);
 
-console.log(
-  "CGN-93 Helm promotion contract is valid and uses the CGN-44 reusable chart.",
-);
+console.log("CGN-93 Helm promotion contract is valid.");
