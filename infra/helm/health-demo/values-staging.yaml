@@ -1,0 +1,14 @@
+replicaCount: 1
+
+image:
+  repository: cgn-health-demo
+  tag: "sha-__RELEASE_SHA__"
+  pullPolicy: IfNotPresent
+
+resources:
+  requests:
+    cpu: 25m
+    memory: 32Mi
+  limits:
+    cpu: 250m
+    memory: 128Mi
