@@ -38,10 +38,7 @@ test("base chart includes CGN-45 probes but keeps later concerns out", () => {
   assert.match(deployment, /startupProbe/);
   assert.match(deployment, /readinessProbe/);
   assert.match(deployment, /livenessProbe/);
-  assert.doesNotMatch(
-    templates,
-    /HorizontalPodAutoscaler|PodDisruptionBudget/,
-  );
+  assert.doesNotMatch(templates, /HorizontalPodAutoscaler|PodDisruptionBudget/);
   assert.doesNotMatch(templates, /kind:\s*ServiceAccount|kind:\s*Secret/i);
 });
 
