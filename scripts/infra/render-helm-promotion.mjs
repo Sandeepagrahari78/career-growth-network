@@ -43,7 +43,7 @@ for (const [environment, sourcePath] of environments) {
   const source = readFileSync(sourcePath, "utf8");
   const rendered = source.replaceAll("__RELEASE_SHA__", releaseSha);
   assert.doesNotMatch(rendered, /__RELEASE_SHA__/);
-  assert.match(rendered, new RegExp(`sha-${releaseSha}`));
+  assert.equal(rendered.includes(`sha-${releaseSha}`), true);
 
   const destination = resolve(outputDir, `${environment}-values.yaml`);
   writeFileSync(destination, rendered);
