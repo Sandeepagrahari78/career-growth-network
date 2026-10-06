@@ -1,0 +1,86 @@
+name: Database Migration Validation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "config/deployment/database-migration-job.v1.json"
+      - "config/infra/postgres-databases.v1.json"
+      - "scripts/ci/validate-database-migration-job.mjs"
+      - "scripts/infra/postgres-local.mjs"
+      - "scripts/infra/run-database-migration-job.mjs"
+      - "tests/fixtures/postgres/**"
+      - "tests/contracts/database-migration-job.contract.test.mjs"
+      - ".github/workflows/database-migration.yml"
+      - ".github/workflows/release.yml"
+  push:
+    branches: [main]
+    paths:
+      - "config/deployment/database-migration-job.v1.json"
+      - "config/infra/postgres-databases.v1.json"
+      - "scripts/ci/validate-database-migration-job.mjs"
+      - "scripts/infra/postgres-local.mjs"
+      - "scripts/infra/run-database-migration-job.mjs"
+      - "tests/fixtures/postgres/**"
+      - "tests/contracts/database-migration-job.contract.test.mjs"
+      - ".github/workflows/database-migration.yml"
+      - ".github/workflows/release.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: database-migration-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  migration:
+    name: Database migration job validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22
+
+      - name: Generate ephemeral database password
+        shell: bash
+        run: |
+          password="$(openssl rand -hex 24)"
+          echo "::add-mask::$password"
+          echo "CGN_POSTGRES_PASSWORD=$password" >> "$GITHUB_ENV"
+
+      - name: Validate migration contract
+        run: node scripts/ci/validate-database-migration-job.mjs
+
+      - name: Start local PostgreSQL
+        run: node scripts/infra/postgres-local.mjs up
+
+      - name: Verify service database ownership
+        run: node scripts/infra/postgres-local.mjs verify
+
+      - name: Pre-migration backup
+        run: |
+          node scripts/infra/postgres-local.mjs backup             identity             .local/migrations/cgn_identity.pre-migration.dump
+          test -s .local/migrations/cgn_identity.pre-migration.dump
+
+      - name: Run owner-scoped migration job
+        run: |
+          node scripts/infra/run-database-migration-job.mjs             --service identity             --sql-file tests/fixtures/postgres/migration-smoke.sql             --release-sha "$GITHUB_SHA"             --evidence .local/migrations/database-migration-evidence.json
+
+      - name: Prove backup and restore mechanism
+        run: node scripts/infra/postgres-local.mjs backup-restore-smoke
+
+      - name: Upload migration evidence only
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: database-migration-${{ github.sha }}
+          path: .local/migrations/database-migration-evidence.json
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Destroy local PostgreSQL and volume
+        if: always()
+        run: node scripts/infra/postgres-local.mjs reset

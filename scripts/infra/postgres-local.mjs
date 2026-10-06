@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, resolve } from "node:path";
+import { dirname, isAbsolute, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
@@ -239,6 +239,14 @@ export function migrate(serviceName, sqlFile) {
   requirePassword();
   const service = getServiceConfig(serviceName);
   const migrationPath = resolve(repoRoot, sqlFile);
+  const migrationRelativePath = relative(repoRoot, migrationPath);
+
+  if (
+    isAbsolute(migrationRelativePath) ||
+    migrationRelativePath.startsWith("..")
+  ) {
+    throw new Error("Migration SQL path must stay inside the repository.");
+  }
 
   if (!existsSync(migrationPath) || !migrationPath.endsWith(".sql")) {
     throw new Error(`Migration SQL file not found: ${sqlFile}`);
