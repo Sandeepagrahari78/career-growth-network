@@ -57,11 +57,10 @@ assert.match(stagingValues, /nameOverride:\s*cgn-health-demo/);
 assert.match(stagingValues, /tag:\s*helm-smoke/);
 
 const chartTemplates = [deployment, service].join("\n---\n");
-assert.doesNotMatch(
-  chartTemplates,
-  /livenessProbe|readinessProbe|startupProbe/,
-  "Probe standards belong to CGN-45.",
-);
+assert.match(chartTemplates, /startupProbe/);
+assert.match(chartTemplates, /readinessProbe/);
+assert.match(chartTemplates, /livenessProbe/);
+assert.ok(schema.required.includes("probes"));
 assert.doesNotMatch(
   chartTemplates,
   /HorizontalPodAutoscaler|PodDisruptionBudget/,
