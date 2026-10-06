@@ -39,7 +39,8 @@ assert.equal(contract.defaults.pdbMinAvailable, 1);
 assert.ok(schema.required.includes("autoscaling"));
 assert.ok(schema.required.includes("disruptionBudget"));
 assert.equal(
-  schema.properties.autoscaling.properties.targetCPUUtilizationPercentage.maximum,
+  schema.properties.autoscaling.properties.targetCPUUtilizationPercentage
+    .maximum,
   100,
 );
 assert.equal(
