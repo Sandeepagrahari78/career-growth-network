@@ -24,6 +24,7 @@ This branch configures a staging Argo CD namespace, project and ApplicationSet f
 - `tests/contracts/argocd-staging-gitops.contract.test.mjs`
 - `.github/workflows/local-gitops.yml`
 - `docs/runbooks/staging-gitops.md`
+- `docs/engineering-memory/03-contract-registry.md`
 - `docs/engineering-memory/05-current-state.md`
 - `docs/engineering-memory/06-known-risks.md`
 - `package.json`
@@ -89,7 +90,7 @@ No cloud resource cleanup is required.
 
 ## Engineering Memory updated
 
-- [ ] 03-contract-registry.md
+- [x] 03-contract-registry.md
 - [ ] 04-decisions.md / ADR if needed
 - [x] 05-current-state.md
 - [x] 06-known-risks.md if needed
