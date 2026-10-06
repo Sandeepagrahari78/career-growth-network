@@ -32,10 +32,7 @@ assert.equal(contract.schema, "cgn.helm-promotion.v1");
 assert.equal(contract.ticket, "CGN-93");
 assert.equal(contract.mode, "zero-budget-release-promotion-dry-run");
 assert.equal(contract.chart.path, "infra/helm/health-demo");
-assert.equal(
-  contract.artifact.imageTagTemplate,
-  "sha-__RELEASE_SHA__",
-);
+assert.equal(contract.artifact.imageTagTemplate, "sha-__RELEASE_SHA__");
 assert.equal(contract.artifact.requireImmutableShaTag, true);
 assert.equal(contract.promotion.requireExactMainSha, true);
 assert.equal(contract.promotion.sameArtifactAcrossEnvironments, true);
