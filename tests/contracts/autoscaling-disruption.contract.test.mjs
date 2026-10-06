@@ -30,6 +30,22 @@ test("invalid utilization target is outside the approved schema bound", () => {
   );
 });
 
+test("missing replica bounds remain a fail-closed render case", () => {
+  const fixture = readFileSync(
+    "tests/fixtures/helm/missing-autoscaling-bounds.yaml",
+    "utf8",
+  );
+  const hpa = readFileSync(
+    "infra/helm/cgn-service/templates/hpa.yaml",
+    "utf8",
+  );
+
+  assert.match(fixture, /enabled:\s*true/);
+  assert.doesNotMatch(fixture, /minReplicas|maxReplicas/);
+  assert.match(hpa, /autoscaling\.minReplicas is required/);
+  assert.match(hpa, /autoscaling\.maxReplicas is required/);
+});
+
 test("capacity contract remains the source of scale-trigger percentages", () => {
   const capacity = JSON.parse(
     readFileSync("config/performance/capacity.v1.json", "utf8"),
