@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cgn-health-demo
+  labels:
+    app.kubernetes.io/name: cgn-health-demo
+    app.kubernetes.io/part-of: cgn
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    app.kubernetes.io/name: cgn-health-demo
+  ports:
+    - name: http
+      port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
