@@ -6,11 +6,9 @@ import { join } from "node:path";
 import test from "node:test";
 
 test("CGN-93 static Helm promotion contract passes", () => {
-  const output = execFileSync(
-    "node",
-    ["scripts/ci/validate-helm-promotion.mjs"],
-    { encoding: "utf8" },
-  );
+  const output = execFileSync("node", ["scripts/ci/validate-helm-promotion.mjs"], {
+    encoding: "utf8",
+  });
 
   assert.match(output, /CGN-93 Helm promotion contract is valid/);
 });
@@ -32,7 +30,10 @@ test("staging and production resolve the same immutable release artifact", () =>
       { encoding: "utf8" },
     );
 
-    const staging = readFileSync(join(outputDir, "staging-values.yaml"), "utf8");
+    const staging = readFileSync(
+      join(outputDir, "staging-values.yaml"),
+      "utf8",
+    );
     const production = readFileSync(
       join(outputDir, "production-values.yaml"),
       "utf8",
