@@ -19,5 +19,7 @@ Use this file for short accepted decisions. Large decisions get an ADR under `do
 
 - 2026-10-05 / CGN-33: all established apps/services/shared packages are explicit private pnpm workspace packages; app/service implementations may depend on shared packages, but direct app-to-service and service-to-service workspace dependencies are forbidden.
 
+- 2026-10-06 / CGN-227: production merge and production deployment remain separate manual decisions; PR/Main/Staging gates fail closed, release/rollback use owner-confirmed immutable SHAs, and real deployment remains disabled until a production target is explicitly approved.
+
 ## Template
 Date | Ticket | Decision | Why | Impacted domains | Supersedes
