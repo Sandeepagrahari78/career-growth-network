@@ -1,0 +1,39 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: cgn-staging-applications
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: cgn-gitops
+    cgn.io/environment: staging
+    cgn.io/ticket: CGN-92
+spec:
+  generators:
+    - list:
+        elements:
+          - name: cgn-platform-baseline
+            path: infra/k8s/base
+            namespace: argocd
+  template:
+    metadata:
+      name: "{{name}}"
+      labels:
+        app.kubernetes.io/part-of: cgn-gitops
+        cgn.io/environment: staging
+    spec:
+      project: cgn-staging
+      source:
+        repoURL: https://github.com/Sandeepagrahari78/career-growth-network
+        targetRevision: main
+        path: "{{path}}"
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "{{namespace}}"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=false
+          - ApplyOutOfSyncOnly=true
+          - ServerSideApply=true

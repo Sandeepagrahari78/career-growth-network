@@ -1,0 +1,31 @@
+{
+  "schema": "cgn.staging-gitops.v1",
+  "ticket": "CGN-92",
+  "mode": "zero-budget-local-first",
+  "repository": {
+    "url": "https://github.com/Sandeepagrahari78/career-growth-network",
+    "revision": "main"
+  },
+  "argoCd": {
+    "namespace": "argocd",
+    "project": "cgn-staging",
+    "applicationSet": "cgn-staging-applications",
+    "allowedDestinationServer": "https://kubernetes.default.svc",
+    "approvedSourcePaths": ["infra/k8s/base"],
+    "forbiddenSourcePaths": ["apps/**", "services/**", ".github/**"],
+    "repoCredentialsRequiredForPersistentPrivateSync": true
+  },
+  "safety": {
+    "noCloudProvider": true,
+    "noPaidResource": true,
+    "noCommittedRepositoryCredential": true,
+    "noProductionAutoDeploy": true,
+    "loopbackOnlyLocalValidation": true,
+    "manualProductionReleaseRemainsRequired": true
+  },
+  "evidence": {
+    "staticValidation": "scripts/ci/validate-argocd-staging.mjs",
+    "localSmoke": "scripts/infra/argocd-staging-smoke.sh",
+    "pathScopedWorkflow": ".github/workflows/local-gitops.yml"
+  }
+}

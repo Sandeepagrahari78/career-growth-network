@@ -1,0 +1,71 @@
+name: Local GitOps Validation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "infra/gitops/**"
+      - "config/gitops/**"
+      - "scripts/infra/argocd-*.sh"
+      - "scripts/ci/validate-argocd-staging.mjs"
+      - "tests/contracts/argocd-staging-gitops.contract.test.mjs"
+      - ".github/workflows/local-gitops.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: local-gitops-main
+  cancel-in-progress: false
+
+jobs:
+  argocd-staging-smoke:
+    name: Argo CD staging GitOps smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22
+
+      - name: Setup kubectl
+        uses: Azure/setup-kubectl@829323503d1be3d00ca8346e5391ca0b07a9ab0d # v5.1.0
+        with:
+          version: "v1.35.9"
+
+      - name: Install pinned k3d
+        shell: bash
+        run: |
+          curl --fail --location --silent --show-error \
+            -o /tmp/k3d-linux-amd64 \
+            https://github.com/k3d-io/k3d/releases/download/v5.9.0/k3d-linux-amd64
+          curl --fail --location --silent --show-error \
+            -o /tmp/checksums.txt \
+            https://github.com/k3d-io/k3d/releases/download/v5.9.0/checksums.txt
+          expected_sha="$(awk '$2 ~ /k3d-linux-amd64$/ {print $1}' /tmp/checksums.txt)"
+          test -n "$expected_sha"
+          echo "$expected_sha  /tmp/k3d-linux-amd64" | sha256sum --check -
+          sudo install -m 0755 /tmp/k3d-linux-amd64 /usr/local/bin/k3d
+          k3d version
+
+      - name: Validate static GitOps contract
+        run: node scripts/ci/validate-argocd-staging.mjs
+
+      - name: Create CGN local cluster
+        run: bash scripts/infra/k3d-up.sh
+
+      - name: Install Argo CD and apply staging ApplicationSet
+        run: bash scripts/infra/argocd-staging-smoke.sh
+
+      - name: Destroy CGN local cluster
+        if: always()
+        shell: bash
+        run: |
+          if command -v k3d >/dev/null 2>&1; then
+            bash scripts/infra/k3d-down.sh
+          else
+            echo "k3d is unavailable; no local cluster can exist."
+          fi
