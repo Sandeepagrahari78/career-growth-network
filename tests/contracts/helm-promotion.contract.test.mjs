@@ -32,10 +32,7 @@ test("staging and production resolve the same immutable release artifact", () =>
       { encoding: "utf8" },
     );
 
-    const staging = readFileSync(
-      join(outputDir, "staging-values.yaml"),
-      "utf8",
-    );
+    const staging = readFileSync(join(outputDir, "staging-values.yaml"), "utf8");
     const production = readFileSync(
       join(outputDir, "production-values.yaml"),
       "utf8",
