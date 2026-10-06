@@ -1,0 +1,23 @@
+nameOverride: cgn-health-demo
+replicaCount: 1
+
+image:
+  repository: cgn-health-demo
+  tag: helm-smoke
+  pullPolicy: IfNotPresent
+
+container:
+  port: 3001
+
+service:
+  type: ClusterIP
+  port: 3001
+
+podLabels:
+  cgn.io/environment: staging
+
+env:
+  - name: PORT
+    value: "3001"
+
+resources: {}
