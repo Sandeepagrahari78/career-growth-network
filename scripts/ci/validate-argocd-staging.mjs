@@ -52,7 +52,7 @@ assert.match(
   /repoURL:\s*https:\/\/github\.com\/Sandeepagrahari78\/career-growth-network/,
 );
 assert.match(applicationSet, /targetRevision:\s*main/);
-assert.match(applicationSet, /path:\s*'\{\{path\}\}'/);
+assert.match(applicationSet, /path:\\s*["\']\\{\\{path\\}\\}["\']/);
 assert.match(applicationSet, /server:\s*https:\/\/kubernetes\.default\.svc/);
 assert.match(applicationSet, /CreateNamespace=false/);
 assert.match(applicationSet, /ServerSideApply=true/);
