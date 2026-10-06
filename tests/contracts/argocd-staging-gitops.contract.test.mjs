@@ -28,7 +28,7 @@ test("ApplicationSet is locked to the approved staging source boundary", () => {
   assert.match(applicationSet, /kind:\s*ApplicationSet/);
   assert.match(applicationSet, /name:\s*cgn-staging-applications/);
   assert.match(applicationSet, /targetRevision:\s*main/);
-  assert.match(applicationSet, /path:\\s*["\']\\{\\{path\\}\\}["\']/);
+  assert.match(applicationSet, /path:\s*["']\{\{path\}\}["']/);
   assert.match(applicationSet, /- name:\s*cgn-platform-baseline/);
   assert.match(applicationSet, /path:\s*infra\/k8s\/base/);
   assert.doesNotMatch(applicationSet, /apps\//);
