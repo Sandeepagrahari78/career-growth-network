@@ -8,7 +8,9 @@
     "service",
     "probes",
     "autoscaling",
-    "disruptionBudget"
+    "disruptionBudget",
+    "serviceAccount",
+    "workloadIdentity"
   ],
   "properties": {
     "nameOverride": {
@@ -307,6 +309,62 @@
           "type": "integer",
           "minimum": 1,
           "maximum": 100
+        }
+      },
+      "additionalProperties": false
+    },
+    "serviceAccount": {
+      "type": "object",
+      "required": [
+        "create",
+        "name",
+        "automountServiceAccountToken",
+        "annotations"
+      ],
+      "properties": {
+        "create": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 253,
+          "pattern": "^$|^[a-z0-9]([-a-z0-9.]*[a-z0-9])?$"
+        },
+        "automountServiceAccountToken": {
+          "type": "boolean",
+          "const": false
+        },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "workloadIdentity": {
+      "type": "object",
+      "required": [
+        "awsIrsa"
+      ],
+      "properties": {
+        "awsIrsa": {
+          "type": "object",
+          "required": [
+            "enabled",
+            "roleArn"
+          ],
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "roleArn": {
+              "type": "string",
+              "pattern": "^$|^arn:aws:iam::[0-9]{12}:role/[A-Za-z0-9+=,.@_/-]+$"
+            }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": false
