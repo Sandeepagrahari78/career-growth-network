@@ -67,16 +67,7 @@ try {
 
   waitFor("Redpanda", () => {
     runDocker(
-      [
-        ...composeBase,
-        "exec",
-        "-T",
-        "redpanda",
-        "rpk",
-        "cluster",
-        "health",
-        "--brokers=localhost:9092",
-      ],
+      [...composeBase, "exec", "-T", "redpanda", "rpk", "cluster", "info"],
       { capture: true },
     );
   });
