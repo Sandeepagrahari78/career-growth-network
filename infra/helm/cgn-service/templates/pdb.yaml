@@ -1,0 +1,13 @@
+{{- if .Values.disruptionBudget.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "cgn-service.fullname" . }}
+  labels:
+    {{- include "cgn-service.selectorLabels" . | nindent 4 }}
+spec:
+  minAvailable: {{ .Values.disruptionBudget.minAvailable }}
+  selector:
+    matchLabels:
+      {{- include "cgn-service.selectorLabels" . | nindent 6 }}
+{{- end }}
