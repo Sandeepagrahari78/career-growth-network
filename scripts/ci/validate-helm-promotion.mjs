@@ -15,19 +15,21 @@ const production = readFileSync(
 );
 
 function scalar(text, key) {
-  const match = text.match(
-    new RegExp(`^${key}:\\s*["\']?([^"\'\\s]+)["\']?\\s*$`, "m"),
-  );
-  assert.ok(match, `Missing scalar ${key}`);
-  return match[1];
+  const prefix = `${key}:`;
+  const line = text
+    .split(/\r?\n/)
+    .find((entry) => entry.startsWith(prefix));
+  assert.ok(line, `Missing scalar ${key}`);
+  return line.slice(prefix.length).trim().replace(/^["']|["']$/g, "");
 }
 
 function nestedScalar(text, key) {
-  const match = text.match(
-    new RegExp(`^\\s{2}${key}:\\s*["']?([^"'\\s]+)["']?\\s*$`, "m"),
-  );
-  assert.ok(match, `Missing nested scalar ${key}`);
-  return match[1];
+  const prefix = `  ${key}:`;
+  const line = text
+    .split(/\r?\n/)
+    .find((entry) => entry.startsWith(prefix));
+  assert.ok(line, `Missing nested scalar ${key}`);
+  return line.slice(prefix.length).trim().replace(/^["']|["']$/g, "");
 }
 
 assert.equal(contract.schema, "cgn.helm-promotion.v1");
