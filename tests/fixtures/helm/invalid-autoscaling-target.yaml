@@ -1,0 +1,2 @@
+autoscaling:
+  targetCPUUtilizationPercentage: 101

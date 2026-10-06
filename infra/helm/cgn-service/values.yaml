@@ -44,3 +44,14 @@ probes:
     timeoutSeconds: 2
     failureThreshold: 3
     successThreshold: 1
+
+autoscaling:
+  enabled: false
+  minReplicas: null
+  maxReplicas: null
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 75
+
+disruptionBudget:
+  enabled: false
+  minAvailable: 1

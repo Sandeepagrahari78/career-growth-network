@@ -8,6 +8,7 @@ All cross-domain contracts live under `packages/contracts` unless a ticket delib
 - `cgn.staging-gitops.v1` — zero-budget local-first Argo CD staging GitOps source, destination and safety contract.
 - `cgn.helm-base.v1` — reusable microservice Helm base-chart scope and safety contract.
 - `cgn.kubernetes-probes.v1` — startup/readiness/liveness HTTP probe defaults, failure behavior and observability contract.
+- `cgn.autoscaling-disruption.v1` — HPA utilization targets, replica-bound evidence rule, PDB baseline and Kubernetes observability contract.
 - `cgn.helm-promotion.v1` — immutable staging-to-production values promotion and owner-approval contract.
 - `cgn.database-migration-job.v1` — service-owned database migration sequencing, backup, evidence and fail-closed deployment contract.
 - `career.activity.v1` — canonical eligible career-growth activity.
@@ -43,6 +44,9 @@ It currently allows only `infra/k8s/base` as the GitOps source path and requires
 
 ## Kubernetes Probes
 `config/kubernetes/probes.v1.json` defines CGN-45 probe behavior for the reusable Helm chart. Health-demo enables the standard in staging and promotion values; generic service defaults remain disabled until the owning service exposes compatible health endpoints.
+
+## Autoscaling and Disruption
+`config/kubernetes/autoscaling-disruption.v1.json` binds HPA CPU/memory targets to the approved `cgn.capacity.v1` thresholds. Generic autoscaling remains disabled and replica bounds require service/load evidence; the local smoke profile exists only to validate HPA/PDB wiring.
 
 ## Career Activity
 One meaningful career action can update Growth, Feed, Stories, Notifications and downstream opportunity projections. Do not create mobile-only or feature-specific copies of the activity model.

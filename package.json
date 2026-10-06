@@ -21,12 +21,13 @@
     "ci:verify-branch": "node scripts/ci/verify-branch.mjs",
     "ci:detect-changes": "node scripts/ci/detect-changes.mjs",
     "ci:gitops": "node scripts/ci/validate-argocd-staging.mjs",
-    "ci:quick": "pnpm ci:boundaries && pnpm ci:gitops && pnpm ci:helm && pnpm ci:helm-promotion && pnpm ci:migration-job && pnpm ci:probes && pnpm format:check && pnpm lint && pnpm typecheck && pnpm test:unit && pnpm test:contracts && pnpm build",
+    "ci:quick": "pnpm ci:boundaries && pnpm ci:gitops && pnpm ci:helm && pnpm ci:helm-promotion && pnpm ci:migration-job && pnpm ci:probes && pnpm ci:autoscaling && pnpm format:check && pnpm lint && pnpm typecheck && pnpm test:unit && pnpm test:contracts && pnpm build",
     "ci:full": "pnpm memory:check && pnpm demo:sync && pnpm ci:quick",
     "ci:boundaries": "node scripts/ci/verify-workspace-boundaries.mjs",
     "ci:helm": "node scripts/ci/validate-helm-base.mjs",
     "ci:helm-promotion": "node scripts/ci/validate-helm-promotion.mjs",
     "ci:migration-job": "node scripts/ci/validate-database-migration-job.mjs",
-    "ci:probes": "node scripts/ci/validate-kubernetes-probes.mjs"
+    "ci:probes": "node scripts/ci/validate-kubernetes-probes.mjs",
+    "ci:autoscaling": "node scripts/ci/validate-autoscaling-disruption.mjs"
   }
 }
