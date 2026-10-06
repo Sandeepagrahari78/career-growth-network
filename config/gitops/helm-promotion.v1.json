@@ -1,0 +1,26 @@
+{
+  "schema": "cgn.helm-promotion.v1",
+  "ticket": "CGN-93",
+  "chartPath": "infra/helm/cgn-service",
+  "stagingValues": "infra/helm/values/health-demo-promotion-staging.yaml",
+  "productionValues": "infra/helm/values/health-demo-production.yaml",
+  "artifact": {
+    "repository": "cgn-health-demo",
+    "tagTemplate": "sha-__RELEASE_SHA__",
+    "immutableShaRequired": true,
+    "forbiddenTags": ["latest", "main", "staging", "production", "helm-smoke"]
+  },
+  "promotion": {
+    "sameArtifactAcrossEnvironments": true,
+    "allowedEnvironmentDrift": ["replicaCount", "resources", "podLabels.cgn.io/environment"],
+    "exactMainShaRequired": true,
+    "ownerApprovalRequired": true
+  },
+  "safety": {
+    "noCloudProvider": true,
+    "noPaidResource": true,
+    "noCommittedSecret": true,
+    "noAutomaticProductionDeployment": true,
+    "renderOnlyUntilProductionTargetApproved": true
+  }
+}
