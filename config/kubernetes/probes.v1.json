@@ -1,0 +1,53 @@
+{
+  "schema": "cgn.kubernetes-probes.v1",
+  "ticket": "CGN-45",
+  "chartPath": "infra/helm/cgn-service",
+  "runnableValidationService": "health-demo",
+  "defaultsEnabled": false,
+  "transport": {
+    "type": "httpGet",
+    "portName": "http",
+    "startupPath": "/health",
+    "readinessPath": "/ready",
+    "livenessPath": "/health"
+  },
+  "defaults": {
+    "startup": {
+      "initialDelaySeconds": 0,
+      "periodSeconds": 2,
+      "timeoutSeconds": 2,
+      "failureThreshold": 30,
+      "successThreshold": 1
+    },
+    "readiness": {
+      "initialDelaySeconds": 2,
+      "periodSeconds": 5,
+      "timeoutSeconds": 2,
+      "failureThreshold": 3,
+      "successThreshold": 1
+    },
+    "liveness": {
+      "initialDelaySeconds": 10,
+      "periodSeconds": 10,
+      "timeoutSeconds": 2,
+      "failureThreshold": 3,
+      "successThreshold": 1
+    }
+  },
+  "failureBehavior": {
+    "startupFailure": "container-restart",
+    "readinessFailure": "remove-from-service-endpoints",
+    "livenessFailure": "container-restart"
+  },
+  "observability": {
+    "kubernetesPodStatus": true,
+    "kubernetesEvents": true
+  },
+  "safety": {
+    "httpGetOnly": true,
+    "noExecProbe": true,
+    "noTcpSocketProbe": true,
+    "noCloudProvider": true,
+    "noCommittedSecret": true
+  }
+}

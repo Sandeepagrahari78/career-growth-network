@@ -1,0 +1,4 @@
+probes:
+  enabled: true
+  liveness:
+    path: health

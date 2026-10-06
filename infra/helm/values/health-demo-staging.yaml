@@ -21,3 +21,6 @@ env:
     value: "3001"
 
 resources: {}
+
+probes:
+  enabled: true

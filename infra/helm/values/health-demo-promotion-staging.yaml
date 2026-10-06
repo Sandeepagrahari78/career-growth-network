@@ -27,3 +27,6 @@ resources:
   limits:
     cpu: 250m
     memory: 128Mi
+
+probes:
+  enabled: true

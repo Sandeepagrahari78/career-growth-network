@@ -1,58 +1,256 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "required": ["replicaCount", "image", "container", "service"],
+  "required": [
+    "replicaCount",
+    "image",
+    "container",
+    "service",
+    "probes"
+  ],
   "properties": {
-    "nameOverride": { "type": "string" },
-    "fullnameOverride": { "type": "string" },
-    "replicaCount": { "type": "integer", "minimum": 1 },
+    "nameOverride": {
+      "type": "string"
+    },
+    "fullnameOverride": {
+      "type": "string"
+    },
+    "replicaCount": {
+      "type": "integer",
+      "minimum": 1
+    },
     "image": {
       "type": "object",
-      "required": ["repository", "tag", "pullPolicy"],
+      "required": [
+        "repository",
+        "tag",
+        "pullPolicy"
+      ],
       "properties": {
-        "repository": { "type": "string", "minLength": 1 },
-        "tag": { "type": "string", "minLength": 1 },
+        "repository": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tag": {
+          "type": "string",
+          "minLength": 1
+        },
         "pullPolicy": {
           "type": "string",
-          "enum": ["Always", "IfNotPresent", "Never"]
+          "enum": [
+            "Always",
+            "IfNotPresent",
+            "Never"
+          ]
         }
       },
       "additionalProperties": false
     },
     "container": {
       "type": "object",
-      "required": ["port"],
+      "required": [
+        "port"
+      ],
       "properties": {
-        "port": { "type": "integer", "minimum": 1, "maximum": 65535 }
+        "port": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535
+        }
       },
       "additionalProperties": false
     },
     "service": {
       "type": "object",
-      "required": ["type", "port"],
+      "required": [
+        "type",
+        "port"
+      ],
       "properties": {
-        "type": { "type": "string", "enum": ["ClusterIP"] },
-        "port": { "type": "integer", "minimum": 1, "maximum": 65535 }
+        "type": {
+          "type": "string",
+          "enum": [
+            "ClusterIP"
+          ]
+        },
+        "port": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535
+        }
       },
       "additionalProperties": false
     },
     "podLabels": {
       "type": "object",
-      "additionalProperties": { "type": "string" }
+      "additionalProperties": {
+        "type": "string"
+      }
     },
     "env": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["name", "value"],
+        "required": [
+          "name",
+          "value"
+        ],
         "properties": {
-          "name": { "type": "string", "minLength": 1 },
-          "value": { "type": "string" }
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "value": {
+            "type": "string"
+          }
         },
         "additionalProperties": false
       }
     },
-    "resources": { "type": "object" }
+    "resources": {
+      "type": "object"
+    },
+    "probes": {
+      "type": "object",
+      "required": [
+        "enabled",
+        "startup",
+        "readiness",
+        "liveness"
+      ],
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "startup": {
+          "type": "object",
+          "required": [
+            "path",
+            "initialDelaySeconds",
+            "periodSeconds",
+            "timeoutSeconds",
+            "failureThreshold",
+            "successThreshold"
+          ],
+          "properties": {
+            "path": {
+              "type": "string",
+              "pattern": "^/[^\\s]*$"
+            },
+            "initialDelaySeconds": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 300
+            },
+            "periodSeconds": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 300
+            },
+            "timeoutSeconds": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 60
+            },
+            "failureThreshold": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 60
+            },
+            "successThreshold": {
+              "type": "integer",
+              "const": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        "readiness": {
+          "type": "object",
+          "required": [
+            "path",
+            "initialDelaySeconds",
+            "periodSeconds",
+            "timeoutSeconds",
+            "failureThreshold",
+            "successThreshold"
+          ],
+          "properties": {
+            "path": {
+              "type": "string",
+              "pattern": "^/[^\\s]*$"
+            },
+            "initialDelaySeconds": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 300
+            },
+            "periodSeconds": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 300
+            },
+            "timeoutSeconds": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 60
+            },
+            "failureThreshold": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 60
+            },
+            "successThreshold": {
+              "type": "integer",
+              "const": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        "liveness": {
+          "type": "object",
+          "required": [
+            "path",
+            "initialDelaySeconds",
+            "periodSeconds",
+            "timeoutSeconds",
+            "failureThreshold",
+            "successThreshold"
+          ],
+          "properties": {
+            "path": {
+              "type": "string",
+              "pattern": "^/[^\\s]*$"
+            },
+            "initialDelaySeconds": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 300
+            },
+            "periodSeconds": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 300
+            },
+            "timeoutSeconds": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 60
+            },
+            "failureThreshold": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 60
+            },
+            "successThreshold": {
+              "type": "integer",
+              "const": 1
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
   },
   "additionalProperties": false
 }

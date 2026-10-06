@@ -1,14 +1,27 @@
 name: Local Helm Validation
 
 on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "infra/helm/**"
+      - "config/kubernetes/**"
+      - "scripts/ci/validate-helm-base.mjs"
+      - "scripts/ci/validate-kubernetes-probes.mjs"
+      - "scripts/infra/helm-base-smoke.sh"
+      - "tests/contracts/**"
+      - "tests/fixtures/helm/**"
+      - ".github/workflows/local-helm.yml"
   push:
     branches: [main]
     paths:
       - "infra/helm/**"
-      - "config/kubernetes/helm-base.v1.json"
+      - "config/kubernetes/**"
       - "scripts/ci/validate-helm-base.mjs"
+      - "scripts/ci/validate-kubernetes-probes.mjs"
       - "scripts/infra/helm-base-smoke.sh"
-      - "tests/contracts/helm-base-chart.contract.test.mjs"
+      - "tests/contracts/**"
+      - "tests/fixtures/helm/**"
       - ".github/workflows/local-helm.yml"
   workflow_dispatch:
 
@@ -16,8 +29,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: local-helm-main
-  cancel-in-progress: false
+  group: local-helm-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   validate:
@@ -61,8 +74,10 @@ jobs:
           sudo install -m 0755 /tmp/linux-amd64/helm /usr/local/bin/helm
           helm version
 
-      - name: Validate static Helm contract
-        run: node scripts/ci/validate-helm-base.mjs
+      - name: Validate static Helm contracts
+        run: |
+          node scripts/ci/validate-helm-base.mjs
+          node scripts/ci/validate-kubernetes-probes.mjs
 
       - name: Create CGN local cluster
         run: bash scripts/infra/k3d-up.sh

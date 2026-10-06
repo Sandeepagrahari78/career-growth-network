@@ -7,6 +7,7 @@ All cross-domain contracts live under `packages/contracts` unless a ticket delib
 - `cgn.workspace-boundaries.v1` — monorepo package roots and allowed workspace dependency direction.
 - `cgn.staging-gitops.v1` — zero-budget local-first Argo CD staging GitOps source, destination and safety contract.
 - `cgn.helm-base.v1` — reusable microservice Helm base-chart scope and safety contract.
+- `cgn.kubernetes-probes.v1` — startup/readiness/liveness HTTP probe defaults, failure behavior and observability contract.
 - `cgn.helm-promotion.v1` — immutable staging-to-production values promotion and owner-approval contract.
 - `cgn.database-migration-job.v1` — service-owned database migration sequencing, backup, evidence and fail-closed deployment contract.
 - `career.activity.v1` — canonical eligible career-growth activity.
@@ -39,6 +40,9 @@ It currently allows only `infra/k8s/base` as the GitOps source path and requires
 
 ## Database Migration Job
 `config/deployment/database-migration-job.v1.json` defines the deployment migration sequence. It reuses the CGN-42 database ownership contract, requires a pre-migration backup and restore proof, executes one service migration under its owner role, stores redacted evidence only, and does not define product schemas.
+
+## Kubernetes Probes
+`config/kubernetes/probes.v1.json` defines CGN-45 probe behavior for the reusable Helm chart. Health-demo enables the standard in staging and promotion values; generic service defaults remain disabled until the owning service exposes compatible health endpoints.
 
 ## Career Activity
 One meaningful career action can update Growth, Feed, Stories, Notifications and downstream opportunity projections. Do not create mobile-only or feature-specific copies of the activity model.
