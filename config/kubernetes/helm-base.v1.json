@@ -26,5 +26,10 @@
     "noPaidResource": true,
     "noProductionDeployment": true,
     "noCommittedSecret": true
+  },
+  "standardStatus": {
+    "probes": "delivered",
+    "autoscalingAndDisruption": "delivered",
+    "serviceAccounts": "deferred"
   }
 }
