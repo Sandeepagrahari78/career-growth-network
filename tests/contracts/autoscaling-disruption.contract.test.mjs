@@ -35,10 +35,7 @@ test("capacity contract remains the source of scale-trigger percentages", () => 
     readFileSync("config/performance/capacity.v1.json", "utf8"),
   );
   const contract = JSON.parse(
-    readFileSync(
-      "config/kubernetes/autoscaling-disruption.v1.json",
-      "utf8",
-    ),
+    readFileSync("config/kubernetes/autoscaling-disruption.v1.json", "utf8"),
   );
 
   assert.equal(
