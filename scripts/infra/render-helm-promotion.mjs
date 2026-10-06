@@ -6,7 +6,9 @@ const args = process.argv.slice(2);
 
 function argument(flag, fallback = null) {
   const index = args.indexOf(flag);
-  if (index === -1) return fallback;
+  if (index === -1) {
+    return fallback;
+  }
   return args[index + 1] ?? fallback;
 }
 
