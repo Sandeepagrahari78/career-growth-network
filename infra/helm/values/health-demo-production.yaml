@@ -1,0 +1,29 @@
+nameOverride: cgn-health-demo
+replicaCount: 2
+
+image:
+  repository: cgn-health-demo
+  tag: "sha-__RELEASE_SHA__"
+  pullPolicy: IfNotPresent
+
+container:
+  port: 3001
+
+service:
+  type: ClusterIP
+  port: 3001
+
+podLabels:
+  cgn.io/environment: production
+
+env:
+  - name: PORT
+    value: "3001"
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
