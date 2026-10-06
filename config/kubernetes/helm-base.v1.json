@@ -1,0 +1,30 @@
+{
+  "schema": "cgn.helm-base.v1",
+  "ticket": "CGN-44",
+  "chartPath": "infra/helm/cgn-service",
+  "runnableValidationService": "health-demo",
+  "servicePackages": [
+    "career",
+    "community",
+    "evidence",
+    "feed",
+    "gateway",
+    "growth",
+    "health-demo",
+    "identity",
+    "messaging",
+    "network",
+    "roadmap"
+  ],
+  "deferredStandards": {
+    "probes": "CGN-45",
+    "autoscalingAndDisruption": "CGN-60",
+    "serviceAccounts": "CGN-61"
+  },
+  "safety": {
+    "noCloudProvider": true,
+    "noPaidResource": true,
+    "noProductionDeployment": true,
+    "noCommittedSecret": true
+  }
+}

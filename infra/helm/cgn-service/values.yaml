@@ -1,0 +1,22 @@
+nameOverride: ""
+fullnameOverride: ""
+
+replicaCount: 1
+
+image:
+  repository: cgn-service
+  tag: dev
+  pullPolicy: IfNotPresent
+
+container:
+  port: 3000
+
+service:
+  type: ClusterIP
+  port: 3000
+
+podLabels: {}
+
+env: []
+
+resources: {}
