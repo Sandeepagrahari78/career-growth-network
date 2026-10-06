@@ -1,0 +1,94 @@
+name: Rollback Production Dry Run
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_sha:
+        description: Known-good main commit SHA to restore
+        required: true
+        type: string
+      confirmation:
+        description: Type ROLLBACK-PRODUCTION
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  rollback-dry-run:
+    name: Owner-only immutable rollback rehearsal
+    runs-on: ubuntu-latest
+    env:
+      CGN_TARGET_SHA: ${{ inputs.target_sha }}
+    steps:
+      - name: Verify owner and confirmation
+        shell: bash
+        env:
+          CGN_CONFIRMATION: ${{ inputs.confirmation }}
+        run: |
+          test "$GITHUB_ACTOR" = "Sandeepagrahari78"
+          test "$CGN_CONFIRMATION" = "ROLLBACK-PRODUCTION"
+
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+
+      - name: Verify target SHA belongs to main history
+        shell: bash
+        run: |
+          git fetch origin main --no-tags
+          node scripts/ci/verify-release-sha.mjs "$CGN_TARGET_SHA"
+          git checkout --detach "$CGN_TARGET_SHA"
+
+      - name: Rebuild known-good immutable artifact
+        run: docker build -f services/health-demo/Dockerfile -t "cgn-health-demo:rollback-$CGN_TARGET_SHA" .
+
+      - id: trivy_image
+        name: Re-scan rollback artifact
+        continue-on-error: true
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: image
+          image-ref: cgn-health-demo:rollback-${{ inputs.target_sha }}
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+
+      - name: Enforce rollback image security gate
+        shell: bash
+        env:
+          TRIVY_IMAGE_OUTCOME: ${{ steps.trivy_image.outcome }}
+        run: test "$TRIVY_IMAGE_OUTCOME" = "success"
+
+      - name: Rehearse rollback health and readiness
+        shell: bash
+        run: |
+          docker run -d --name cgn-rollback-dry-run -p 127.0.0.1:3001:3001 "cgn-health-demo:rollback-$CGN_TARGET_SHA"
+          trap 'docker rm -f cgn-rollback-dry-run >/dev/null 2>&1 || true' EXIT
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:3001/ready | grep -q '"status":"ready"'; then
+              BASE_URL=http://127.0.0.1:3001 node tests/e2e/health-demo.e2e.mjs
+              exit 0
+            fi
+            sleep 1
+          done
+          docker logs cgn-rollback-dry-run
+          exit 1
+
+      - name: Write rollback evidence
+        if: success()
+        shell: bash
+        run: |
+          timestamp="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          printf '{"schema":"cgn.rollback-evidence.v1","mode":"dry-run","targetSha":"%s","actor":"%s","validatedAt":"%s","security":"passed","health":"passed","readiness":"passed","e2e":"passed","realRollback":false}\n' \
+            "$CGN_TARGET_SHA" "$GITHUB_ACTOR" "$timestamp" > rollback-evidence.json
+
+      - name: Upload rollback evidence
+        if: success()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: rollback-dry-run-${{ inputs.target_sha }}
+          path: rollback-evidence.json
+          if-no-files-found: error
+          retention-days: 90

@@ -16,6 +16,7 @@ Use this file for short accepted decisions. Large decisions get an ADR under `do
 - AI is provider-agnostic and not hard-wired to a paid provider.
 
 - 2026-10-05 / CGN-32: bounded-context ownership is frozen in `cgn.bounded-contexts.v1`; synchronous access uses versioned owning-service APIs, asynchronous propagation uses versioned events, and cross-service database reads remain forbidden.
+- 2026-10-06 / CGN-227: production merge and production deployment remain separate manual decisions; PR/Main/Staging gates fail closed, release/rollback use owner-confirmed immutable SHAs, and real deployment remains disabled until a production target is explicitly approved.
 
 ## Template
 Date | Ticket | Decision | Why | Impacted domains | Supersedes

@@ -29,9 +29,51 @@ jobs:
           test "$CGN_ACTOR" = "Sandeepagrahari78"
           test "$CGN_CONFIRMATION" = "DEPLOY-PRODUCTION"
 
+  migration-preflight:
+    name: Database migration backup restore preflight
+    needs: authorize
+    runs-on: ubuntu-latest
+    env:
+      CGN_RELEASE_SHA: ${{ inputs.release_sha }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22
+
+      - name: Verify and checkout approved main SHA
+        shell: bash
+        run: |
+          git fetch origin main --no-tags
+          node scripts/ci/verify-release-sha.mjs "$CGN_RELEASE_SHA"
+          git checkout --detach "$CGN_RELEASE_SHA"
+
+      - name: Generate ephemeral database password
+        shell: bash
+        run: |
+          password="$(openssl rand -hex 24)"
+          echo "::add-mask::$password"
+          echo "CGN_POSTGRES_PASSWORD=$password" >> "$GITHUB_ENV"
+
+      - name: Start local release-preflight PostgreSQL
+        run: node scripts/infra/postgres-local.mjs up
+
+      - name: Run owner-scoped migration smoke
+        run: node scripts/infra/postgres-local.mjs migration-smoke
+
+      - name: Prove backup and restore before release
+        run: node scripts/infra/postgres-local.mjs backup-restore-smoke
+
+      - name: Destroy preflight PostgreSQL
+        if: always()
+        run: node scripts/infra/postgres-local.mjs reset
+
   dry-run:
     name: Production deployment dry run
-    needs: authorize
+    needs: [authorize, migration-preflight]
     runs-on: ubuntu-latest
     env:
       CGN_RELEASE_SHA: ${{ inputs.release_sha }}
@@ -52,13 +94,46 @@ jobs:
       - name: Build exact SHA artifact
         run: docker build -f services/health-demo/Dockerfile -t "cgn-health-demo:$CGN_RELEASE_SHA" .
 
-      - name: Dry-run post-deploy smoke
+      - id: trivy_image
+        name: Scan exact release image
+        continue-on-error: true
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: image
+          image-ref: cgn-health-demo:${{ inputs.release_sha }}
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+
+      - name: Generate release CycloneDX SBOM
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: image
+          image-ref: cgn-health-demo:${{ inputs.release_sha }}
+          format: cyclonedx
+          output: release-sbom.cdx.json
+          exit-code: "0"
+
+      - name: Enforce release image security gate
+        shell: bash
+        env:
+          TRIVY_IMAGE_OUTCOME: ${{ steps.trivy_image.outcome }}
+        run: test "$TRIVY_IMAGE_OUTCOME" = "success"
+
+      - name: Dry-run post-deploy health readiness E2E and performance
         shell: bash
         run: |
-          docker run -d --name cgn-production-dry-run -p 3001:3001 "cgn-health-demo:$CGN_RELEASE_SHA"
+          docker run -d --name cgn-production-dry-run -p 127.0.0.1:3001:3001 "cgn-health-demo:$CGN_RELEASE_SHA"
           trap 'docker rm -f cgn-production-dry-run >/dev/null 2>&1 || true' EXIT
           for attempt in {1..30}; do
-            if curl --fail --silent http://127.0.0.1:3001/health | grep -q '"status":"ok"'; then
+            if curl --fail --silent http://127.0.0.1:3001/ready | grep -q '"status":"ready"'; then
+              curl --fail --silent http://127.0.0.1:3001/health | grep -q '"status":"ok"'
+              BASE_URL=http://127.0.0.1:3001 node tests/e2e/health-demo.e2e.mjs
+              docker run --rm --network host \
+                -e BASE_URL=http://127.0.0.1:3001 \
+                -v "$PWD:/work" \
+                grafana/k6:0.54.0 \
+                run /work/tests/performance/health-smoke.js
               echo "Production gate dry run passed. No real production deployment occurred."
               exit 0
             fi
@@ -66,3 +141,22 @@ jobs:
           done
           docker logs cgn-production-dry-run
           exit 1
+
+      - name: Write immutable release evidence
+        if: success()
+        shell: bash
+        run: |
+          timestamp="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          printf '{"schema":"cgn.release-evidence.v1","mode":"dry-run","sha":"%s","actor":"%s","validatedAt":"%s","migrationPreflight":"passed","security":"passed","health":"passed","readiness":"passed","e2e":"passed","performanceSmoke":"passed","realDeployment":false}\n' \
+            "$CGN_RELEASE_SHA" "$GITHUB_ACTOR" "$timestamp" > release-evidence.json
+
+      - name: Upload release evidence and SBOM
+        if: success()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: production-dry-run-${{ inputs.release_sha }}
+          path: |
+            release-evidence.json
+            release-sbom.cdx.json
+          if-no-files-found: error
+          retention-days: 90

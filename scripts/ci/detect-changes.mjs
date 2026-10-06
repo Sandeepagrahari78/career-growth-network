@@ -50,6 +50,29 @@ const flags = {
       file.startsWith("infra/docker/") ||
       file.endsWith("Dockerfile"),
   ),
+  integration: changed.some(
+    (file) =>
+      file.startsWith("services/") ||
+      file.startsWith("packages/") ||
+      file.startsWith("tests/integration/") ||
+      file === "infra/docker/docker-compose.test.yml" ||
+      file === "scripts/ci/integration-stack-smoke.mjs" ||
+      file === ".github/workflows/pr-ci.yml",
+  ),
+  e2e: changed.some(
+    (file) =>
+      file.startsWith("apps/web/") ||
+      file.startsWith("services/health-demo/") ||
+      file.startsWith("tests/e2e/") ||
+      file === ".github/workflows/pr-ci.yml",
+  ),
+  performance: changed.some(
+    (file) =>
+      file.startsWith("services/health-demo/") ||
+      file.startsWith("tests/performance/") ||
+      file.startsWith("config/performance/") ||
+      file === ".github/workflows/pr-ci.yml",
+  ),
   docsOnly:
     changed.length > 0 &&
     changed.every(
