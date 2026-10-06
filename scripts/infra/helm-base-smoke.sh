@@ -7,6 +7,8 @@ IMAGE="cgn-health-demo:helm-smoke"
 CHART="infra/helm/cgn-service"
 VALUES="infra/helm/values/health-demo-staging.yaml"
 INVALID_PROBE_VALUES="tests/fixtures/helm/invalid-probe-path.yaml"
+AUTOSCALING_SMOKE_VALUES="tests/fixtures/helm/hpa-pdb-smoke.yaml"
+INVALID_AUTOSCALING_VALUES="tests/fixtures/helm/invalid-autoscaling-target.yaml"
 
 for command in docker k3d kubectl helm curl; do
   command -v "$command" >/dev/null 2>&1 || {
@@ -28,8 +30,19 @@ if helm lint "$CHART" -f "$INVALID_PROBE_VALUES"; then
 fi
 echo "Invalid probe path rejected as expected."
 
-helm lint "$CHART" -f "$VALUES"
-helm template "$RELEASE" "$CHART" -n "$NAMESPACE" -f "$VALUES" >/tmp/cgn-helm-rendered.yaml
+if helm lint "$CHART" -f "$INVALID_AUTOSCALING_VALUES"; then
+  echo "Invalid autoscaling target unexpectedly passed Helm schema validation." >&2
+  exit 1
+fi
+echo "Invalid autoscaling target rejected as expected."
+
+helm lint "$CHART" -f "$VALUES" -f "$AUTOSCALING_SMOKE_VALUES"
+helm template "$RELEASE" "$CHART"   -n "$NAMESPACE"   -f "$VALUES"   -f "$AUTOSCALING_SMOKE_VALUES"   >/tmp/cgn-helm-rendered.yaml
+
+grep -q "kind: HorizontalPodAutoscaler" /tmp/cgn-helm-rendered.yaml
+grep -q "kind: PodDisruptionBudget" /tmp/cgn-helm-rendered.yaml
+grep -q "averageUtilization: 70" /tmp/cgn-helm-rendered.yaml
+grep -q "averageUtilization: 75" /tmp/cgn-helm-rendered.yaml
 
 docker build -f services/health-demo/Dockerfile -t "$IMAGE" .
 k3d image import "$IMAGE" -c cgn-local
@@ -37,6 +50,7 @@ k3d image import "$IMAGE" -c cgn-local
 helm upgrade --install "$RELEASE" "$CHART" \
   --namespace "$NAMESPACE" \
   --values "$VALUES" \
+  --values "$AUTOSCALING_SMOKE_VALUES" \
   --wait \
   --timeout 180s
 
@@ -45,6 +59,11 @@ kubectl -n "$NAMESPACE" rollout status deployment/cgn-health-demo --timeout=180s
 test "$(kubectl -n "$NAMESPACE" get deployment cgn-health-demo -o jsonpath='{.spec.template.spec.containers[0].startupProbe.httpGet.path}')" = "/health"
 test "$(kubectl -n "$NAMESPACE" get deployment cgn-health-demo -o jsonpath='{.spec.template.spec.containers[0].readinessProbe.httpGet.path}')" = "/ready"
 test "$(kubectl -n "$NAMESPACE" get deployment cgn-health-demo -o jsonpath='{.spec.template.spec.containers[0].livenessProbe.httpGet.path}')" = "/health"
+test "$(kubectl -n "$NAMESPACE" get hpa cgn-health-demo -o jsonpath='{.spec.minReplicas}')" = "2"
+test "$(kubectl -n "$NAMESPACE" get hpa cgn-health-demo -o jsonpath='{.spec.maxReplicas}')" = "4"
+test "$(kubectl -n "$NAMESPACE" get hpa cgn-health-demo -o jsonpath='{.spec.metrics[?(@.resource.name=="cpu")].resource.target.averageUtilization}')" = "70"
+test "$(kubectl -n "$NAMESPACE" get hpa cgn-health-demo -o jsonpath='{.spec.metrics[?(@.resource.name=="memory")].resource.target.averageUtilization}')" = "75"
+test "$(kubectl -n "$NAMESPACE" get pdb cgn-health-demo -o jsonpath='{.spec.minAvailable}')" = "1"
 
 kubectl -n "$NAMESPACE" port-forward service/cgn-health-demo 3001:3001 >/tmp/cgn-helm-port-forward.log 2>&1 &
 PORT_FORWARD_PID=$!
