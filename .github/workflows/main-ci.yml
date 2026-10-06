@@ -6,12 +6,62 @@ on:
 
 permissions:
   contents: read
+  pull-requests: read
 
 concurrency:
   group: main-ci
   cancel-in-progress: false
 
 jobs:
+  source-security:
+    name: Main source security revalidation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+
+      - id: gitleaks
+        name: Gitleaks secret scan
+        continue-on-error: true
+        uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+
+      - id: semgrep
+        name: Semgrep CE
+        continue-on-error: true
+        run: |
+          python -m pip install --disable-pip-version-check semgrep
+          semgrep --config=auto --config=config/semgrep/cgn.yml --error
+
+      - id: trivy_fs
+        name: Trivy filesystem scan
+        continue-on-error: true
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+
+      - name: Enforce main source security gate
+        if: always()
+        shell: bash
+        env:
+          GITLEAKS_OUTCOME: ${{ steps.gitleaks.outcome }}
+          SEMGREP_OUTCOME: ${{ steps.semgrep.outcome }}
+          TRIVY_FS_OUTCOME: ${{ steps.trivy_fs.outcome }}
+        run: |
+          test "$GITLEAKS_OUTCOME" = "success"
+          test "$SEMGREP_OUTCOME" = "success"
+          test "$TRIVY_FS_OUTCOME" = "success"
+
   revalidate:
     name: Main revalidation
     runs-on: ubuntu-latest
@@ -19,6 +69,25 @@ jobs:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           fetch-depth: 0
+
+      - name: Audit owner-controlled PR entry to main
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          test "$GITHUB_ACTOR" = "Sandeepagrahari78"
+          for attempt in {1..10}; do
+            count="$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/pulls" --jq 'length')"
+            if [ "$count" -gt 0 ]; then
+              echo "Main commit is associated with a reviewed pull request."
+              break
+            fi
+            if [ "$attempt" -eq 10 ]; then
+              echo "Main entry audit failed: no associated pull request found."
+              exit 1
+            fi
+            sleep 3
+          done
 
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
@@ -102,13 +171,37 @@ jobs:
       - name: Smoke candidate image
         shell: bash
         run: |
-          docker run -d --name cgn-health-demo -p 3001:3001 cgn-health-demo:${{ github.sha }}
+          docker run -d --name cgn-health-demo -p 127.0.0.1:3001:3001 cgn-health-demo:${{ github.sha }}
           trap 'docker rm -f cgn-health-demo >/dev/null 2>&1 || true' EXIT
           for attempt in {1..30}; do
             if curl --fail --silent http://127.0.0.1:3001/health | grep -q '"status":"ok"'; then
+              curl --fail --silent http://127.0.0.1:3001/ready | grep -q '"status":"ready"'
               exit 0
             fi
             sleep 1
           done
           docker logs cgn-health-demo
+          exit 1
+
+      - name: Revalidate shared integration dependencies
+        run: node scripts/ci/integration-stack-smoke.mjs
+
+      - name: Revalidate end-to-end and performance smoke
+        shell: bash
+        run: |
+          docker run -d --name cgn-main-validation -p 127.0.0.1:3001:3001 cgn-health-demo:${{ github.sha }}
+          trap 'docker rm -f cgn-main-validation >/dev/null 2>&1 || true' EXIT
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:3001/ready >/dev/null; then
+              BASE_URL=http://127.0.0.1:3001 node tests/e2e/health-demo.e2e.mjs
+              docker run --rm --network host \
+                -e BASE_URL=http://127.0.0.1:3001 \
+                -v "$PWD:/work" \
+                grafana/k6:0.54.0 \
+                run /work/tests/performance/health-smoke.js
+              exit 0
+            fi
+            sleep 1
+          done
+          docker logs cgn-main-validation
           exit 1
