@@ -108,11 +108,9 @@ export function validateWorkspaceGraph(
 
   for (const workspacePackage of packages) {
     const { manifest, path, category } = workspacePackage;
-    const escapedPrefix = boundaries.packagePrefix.replace("/", "\\/");
 
-    assert.match(
-      manifest.name,
-      new RegExp(`^${escapedPrefix}`),
+    assert.ok(
+      manifest.name.startsWith(boundaries.packagePrefix),
       `${path} must use the ${boundaries.packagePrefix} package namespace`,
     );
     assert.equal(manifest.private, true, `${path} must remain private`);
@@ -160,12 +158,11 @@ export function validateWorkspaceFile(
   const workspace = readFileSync(workspacePath, "utf8");
 
   for (const rootName of Object.values(boundaries.roots)) {
-    const escapedRoot = rootName.replace("/", "\\/");
-    const pattern = new RegExp(`["']${escapedRoot}\\/\\*["']`);
+    const doubleQuoted = `"${rootName}/*"`;
+    const singleQuoted = `'${rootName}/*'`;
 
-    assert.match(
-      workspace,
-      pattern,
+    assert.ok(
+      workspace.includes(doubleQuoted) || workspace.includes(singleQuoted),
       `pnpm-workspace.yaml must include ${rootName}/*`,
     );
   }
