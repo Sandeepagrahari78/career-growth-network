@@ -44,8 +44,10 @@ test("Argo CD project does not grant broad production or cloud access", () => {
 });
 
 test("static GitOps validator passes", () => {
-  const output = execFileSync("node", [
-    "scripts/ci/validate-argocd-staging.mjs",
-  ], { encoding: "utf8" });
+  const output = execFileSync(
+    "node",
+    ["scripts/ci/validate-argocd-staging.mjs"],
+    { encoding: "utf8" },
+  );
   assert.match(output, /CGN-92 Argo CD staging GitOps contract is valid/);
 });
