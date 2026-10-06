@@ -1,0 +1,139 @@
+name: Helm Promotion Validation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "config/gitops/helm-promotion.v1.json"
+      - "infra/helm/values/health-demo-promotion-staging.yaml"
+      - "infra/helm/values/health-demo-production.yaml"
+      - "scripts/ci/validate-helm-promotion.mjs"
+      - "scripts/infra/render-helm-promotion.mjs"
+      - "tests/contracts/helm-promotion.contract.test.mjs"
+      - ".github/workflows/helm-promotion.yml"
+  push:
+    branches: [main]
+    paths:
+      - "config/gitops/helm-promotion.v1.json"
+      - "infra/helm/values/health-demo-promotion-staging.yaml"
+      - "infra/helm/values/health-demo-production.yaml"
+      - "scripts/ci/validate-helm-promotion.mjs"
+      - "scripts/infra/render-helm-promotion.mjs"
+      - "tests/contracts/helm-promotion.contract.test.mjs"
+      - ".github/workflows/helm-promotion.yml"
+  workflow_dispatch:
+    inputs:
+      release_sha:
+        description: Exact approved main commit SHA
+        required: true
+        type: string
+      confirmation:
+        description: Type PROMOTE-PRODUCTION-VALUES
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: helm-promotion-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  validate:
+    name: Validate immutable Helm promotion
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CGN_RELEASE_SHA: ${{ inputs.release_sha }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22
+
+      - name: Enable pinned pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@11.25.0 --activate
+
+      - name: Install frozen workspace
+        run: pnpm install --frozen-lockfile
+
+      - name: Install pinned Helm
+        shell: bash
+        env:
+          HELM_VERSION: v3.18.6
+        run: |
+          archive="helm-$HELM_VERSION-linux-amd64.tar.gz"
+          curl --fail --location --silent --show-error             -o "/tmp/$archive"             "https://get.helm.sh/$archive"
+          curl --fail --location --silent --show-error             -o "/tmp/$archive.sha256sum"             "https://get.helm.sh/$archive.sha256sum"
+          expected_sha="$(awk '{print $1}' "/tmp/$archive.sha256sum")"
+          test -n "$expected_sha"
+          echo "$expected_sha  /tmp/$archive" | sha256sum --check -
+          tar -xzf "/tmp/$archive" -C /tmp
+          sudo install -m 0755 /tmp/linux-amd64/helm /usr/local/bin/helm
+          helm version
+
+      - name: Verify owner-approved dispatch
+        if: github.event_name == 'workflow_dispatch'
+        shell: bash
+        env:
+          CGN_CONFIRMATION: ${{ inputs.confirmation }}
+        run: |
+          test "$GITHUB_ACTOR" = "Sandeepagrahari78"
+          test "$CGN_CONFIRMATION" = "PROMOTE-PRODUCTION-VALUES"
+          git fetch origin main --no-tags
+          node scripts/ci/verify-release-sha.mjs "$CGN_RELEASE_SHA"
+
+      - id: release
+        name: Resolve immutable release SHA
+        shell: bash
+        env:
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            sha="$CGN_RELEASE_SHA"
+          elif [ "${{ github.event_name }}" = "pull_request" ]; then
+            sha="$PR_HEAD_SHA"
+          else
+            sha="$GITHUB_SHA"
+          fi
+          printf '%s' "$sha" | grep -Eq '^[0-9a-f]{40}$'
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+
+      - name: Validate CGN-93 promotion contract
+        run: pnpm ci:helm-promotion
+
+      - name: Render staging and production values
+        run: |
+          node scripts/infra/render-helm-promotion.mjs             --release-sha "${{ steps.release.outputs.sha }}"             --output-dir .local/helm-promotion
+
+      - name: Lint reusable CGN-44 chart
+        run: helm lint infra/helm/cgn-service
+
+      - name: Render staging candidate
+        run: |
+          helm template cgn-health-demo infra/helm/cgn-service             --namespace cgn-apps             --values .local/helm-promotion/staging-values.yaml             > .local/helm-promotion/staging-rendered.yaml
+
+      - name: Render production candidate
+        run: |
+          helm template cgn-health-demo infra/helm/cgn-service             --namespace cgn-apps             --values .local/helm-promotion/production-values.yaml             > .local/helm-promotion/production-rendered.yaml
+
+      - name: Prove one immutable artifact is promoted
+        shell: bash
+        run: |
+          expected="cgn-health-demo:sha-${{ steps.release.outputs.sha }}"
+          grep -F "$expected" .local/helm-promotion/staging-rendered.yaml
+          grep -F "$expected" .local/helm-promotion/production-rendered.yaml
+
+      - name: Upload promotion evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: helm-promotion-${{ steps.release.outputs.sha }}
+          path: .local/helm-promotion/
+          if-no-files-found: error
+          retention-days: ${{ github.event_name == 'workflow_dispatch' && 90 || 14 }}
