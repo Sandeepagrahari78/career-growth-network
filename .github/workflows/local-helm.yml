@@ -1,0 +1,75 @@
+name: Local Helm Validation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "infra/helm/**"
+      - "config/kubernetes/helm-base.v1.json"
+      - "scripts/ci/validate-helm-base.mjs"
+      - "scripts/infra/helm-base-smoke.sh"
+      - "tests/contracts/helm-base-chart.contract.test.mjs"
+      - ".github/workflows/local-helm.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: local-helm-main
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Helm lint template install smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22
+
+      - name: Setup kubectl
+        uses: Azure/setup-kubectl@829323503d1be3d00ca8346e5391ca0b07a9ab0d # v5.1.0
+        with:
+          version: "v1.35.9"
+
+      - name: Install pinned k3d
+        shell: bash
+        run: |
+          curl --fail --location --silent --show-error             -o /tmp/k3d-linux-amd64             https://github.com/k3d-io/k3d/releases/download/v5.9.0/k3d-linux-amd64
+          curl --fail --location --silent --show-error             -o /tmp/k3d-checksums.txt             https://github.com/k3d-io/k3d/releases/download/v5.9.0/checksums.txt
+          expected_sha="$(awk '$2 ~ /k3d-linux-amd64$/ {print $1}' /tmp/k3d-checksums.txt)"
+          test -n "$expected_sha"
+          echo "$expected_sha  /tmp/k3d-linux-amd64" | sha256sum --check -
+          sudo install -m 0755 /tmp/k3d-linux-amd64 /usr/local/bin/k3d
+
+      - name: Install pinned Helm
+        shell: bash
+        env:
+          HELM_VERSION: v3.18.6
+        run: |
+          archive="helm-$HELM_VERSION-linux-amd64.tar.gz"
+          curl --fail --location --silent --show-error             -o "/tmp/$archive"             "https://get.helm.sh/$archive"
+          curl --fail --location --silent --show-error             -o "/tmp/$archive.sha256sum"             "https://get.helm.sh/$archive.sha256sum"
+          expected_sha="$(awk '{print $1}' "/tmp/$archive.sha256sum")"
+          test -n "$expected_sha"
+          echo "$expected_sha  /tmp/$archive" | sha256sum --check -
+          tar -xzf "/tmp/$archive" -C /tmp
+          sudo install -m 0755 /tmp/linux-amd64/helm /usr/local/bin/helm
+          helm version
+
+      - name: Validate static Helm contract
+        run: node scripts/ci/validate-helm-base.mjs
+
+      - name: Create CGN local cluster
+        run: bash scripts/infra/k3d-up.sh
+
+      - name: Validate Helm staging install
+        run: bash scripts/infra/helm-base-smoke.sh
+
+      - name: Destroy CGN local cluster
+        if: always()
+        run: bash scripts/infra/k3d-down.sh
