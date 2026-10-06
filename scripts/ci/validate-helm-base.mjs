@@ -17,6 +17,8 @@ const service = readFileSync(
   "infra/helm/cgn-service/templates/service.yaml",
   "utf8",
 );
+const hpa = readFileSync("infra/helm/cgn-service/templates/hpa.yaml", "utf8");
+const pdb = readFileSync("infra/helm/cgn-service/templates/pdb.yaml", "utf8");
 const stagingValues = readFileSync(
   "infra/helm/values/health-demo-staging.yaml",
   "utf8",
@@ -56,16 +58,15 @@ assert.match(service, /kind:\s*Service/);
 assert.match(stagingValues, /nameOverride:\s*cgn-health-demo/);
 assert.match(stagingValues, /tag:\s*helm-smoke/);
 
-const chartTemplates = [deployment, service].join("\n---\n");
+const chartTemplates = [deployment, service, hpa, pdb].join("\n---\n");
 assert.match(chartTemplates, /startupProbe/);
 assert.match(chartTemplates, /readinessProbe/);
 assert.match(chartTemplates, /livenessProbe/);
 assert.ok(schema.required.includes("probes"));
-assert.doesNotMatch(
-  chartTemplates,
-  /HorizontalPodAutoscaler|PodDisruptionBudget/,
-  "Autoscaling and disruption defaults belong to CGN-60.",
-);
+assert.match(chartTemplates, /HorizontalPodAutoscaler/);
+assert.match(chartTemplates, /PodDisruptionBudget/);
+assert.ok(schema.required.includes("autoscaling"));
+assert.ok(schema.required.includes("disruptionBudget"));
 assert.doesNotMatch(
   chartTemplates,
   /kind:\s*ServiceAccount|iam\.amazonaws\.com/,
