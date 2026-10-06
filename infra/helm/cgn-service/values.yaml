@@ -55,3 +55,14 @@ autoscaling:
 disruptionBudget:
   enabled: false
   minAvailable: 1
+
+serviceAccount:
+  create: true
+  name: ""
+  automountServiceAccountToken: false
+  annotations: {}
+
+workloadIdentity:
+  awsIrsa:
+    enabled: false
+    roleArn: ""
