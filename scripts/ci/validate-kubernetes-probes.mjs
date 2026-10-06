@@ -36,10 +36,12 @@ assert.equal(contract.transport.livenessPath, "/health");
 
 assert.ok(schema.required.includes("probes"));
 assert.equal(schema.properties.probes.type, "object");
-assert.deepEqual(
-  schema.properties.probes.required,
-  ["enabled", "startup", "readiness", "liveness"],
-);
+assert.deepEqual(schema.properties.probes.required, [
+  "enabled",
+  "startup",
+  "readiness",
+  "liveness",
+]);
 
 assert.ok(values.includes("probes:\n  enabled: false"));
 assert.ok(values.includes("startup:\n    path: /health"));
