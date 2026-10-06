@@ -6,9 +6,13 @@ import { join } from "node:path";
 import test from "node:test";
 
 test("CGN-93 static Helm promotion contract passes", () => {
-  const output = execFileSync("node", ["scripts/ci/validate-helm-promotion.mjs"], {
-    encoding: "utf8",
-  });
+  const output = execFileSync(
+    "node",
+    ["scripts/ci/validate-helm-promotion.mjs"],
+    {
+      encoding: "utf8",
+    },
+  );
 
   assert.match(output, /CGN-93 Helm promotion contract is valid/);
 });
@@ -43,10 +47,7 @@ test("staging and production resolve the same immutable release artifact", () =>
     );
 
     assert.match(staging, /sha-0123456789abcdef0123456789abcdef01234567/);
-    assert.match(
-      production,
-      /sha-0123456789abcdef0123456789abcdef01234567/,
-    );
+    assert.match(production, /sha-0123456789abcdef0123456789abcdef01234567/);
     assert.equal(evidence.releaseSha, releaseSha);
     assert.equal(evidence.sameArtifactAcrossEnvironments, true);
     assert.equal(evidence.realProductionDeployment, false);
