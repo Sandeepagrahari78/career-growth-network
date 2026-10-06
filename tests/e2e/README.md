@@ -1,7 +1,19 @@
-# E2E tests
+# End-to-end tests
 
-Playwright journeys will live here as CGN product surfaces become executable.
+The pipeline already has an executable end-to-end smoke against the current
+health-demo deployment artifact:
 
-The approved Figma flow is the journey map, not a pixel-perfect snapshot contract. High-value paths will cover Social Home, My Career, proof/validation, Growth Identity, connections/messaging, communities, opportunities, and privacy/permission failures.
+```bash
+BASE_URL=http://127.0.0.1:3001 node tests/e2e/health-demo.e2e.mjs
+```
 
-The skeleton exists now so feature tickets add E2E coverage without inventing a second testing layout.
+It verifies `/health`, `/ready`, and a negative 404 path.
+
+When the real web application is introduced, the web workspace must add a
+Playwright `test:e2e` script and its user-journey tests. PR CI is structured so
+the current HTTP smoke can be replaced/extended by the real browser journey
+without changing the release model.
+
+Required product journeys will include signup/login, Social Home, My Career,
+proof/validation, Growth Profile, Network/Messaging, Communities and
+Opportunities.
