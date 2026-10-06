@@ -15,7 +15,9 @@ const production = readFileSync(
 );
 
 function scalar(text, key) {
-  const match = text.match(new RegExp(`^${key}:\\s*["']?([^"'\\s]+)["']?\\s*$`, "m"));
+  const match = text.match(
+    new RegExp(`^${key}:\\s*["\']?([^"\'\\s]+)["\']?\\s*$`, "m"),
+  );
   assert.ok(match, `Missing scalar ${key}`);
   return match[1];
 }
