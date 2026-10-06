@@ -8,6 +8,30 @@ importers:
 
   .: {}
 
+  apps/mobile: {}
+
+  apps/web: {}
+
   packages/contracts: {}
 
+  services/career: {}
+
+  services/community: {}
+
+  services/evidence: {}
+
+  services/feed: {}
+
+  services/gateway: {}
+
+  services/growth: {}
+
   services/health-demo: {}
+
+  services/identity: {}
+
+  services/messaging: {}
+
+  services/network: {}
+
+  services/roadmap: {}

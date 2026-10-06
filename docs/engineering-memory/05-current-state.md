@@ -1,6 +1,6 @@
 # 05 - Current Merged State
 
-Last updated: 2026-10-05 for the CGN-32 architecture-boundary delivery.
+Last updated: 2026-10-05 for the CGN-33 monorepo-boundary delivery.
 
 ## Repository
 - Shared Engineering Memory and agent synchronization: established.
@@ -9,7 +9,8 @@ Last updated: 2026-10-05 for the CGN-32 architecture-boundary delivery.
 - CGN-40: local network/security baseline merged via PR #7 / `42499116c5e2d81552bf206585e3cae04f31ecf9`.
 - CGN-41: local k3d/K3s cluster merged via PR #8 / `797fbaf4144cf86919817dc61177870480ead5d9`; PR and post-merge local Kubernetes validation are green.
 - CGN-42: local PostgreSQL service-database ownership, migration and backup/restore foundation merged via PR #9 / `f686e47be8209b5c834354383d2212c6f2390094`; post-merge validation is green.
-- CGN-32: complete bounded-context ownership and integration-boundary contract is delivered by this change.
+- CGN-32: complete bounded-context ownership and integration-boundary contract merged via PR #10 / `bea4c4330d4b281a82e49c3538077c73decc8ba7`; post-merge validation is green.
+- CGN-33: explicit pnpm workspace packages and dependency-boundary enforcement are delivered by this change.
 - Real cloud provisioning and production deployment remain intentionally disabled.
 
 ## Infrastructure state

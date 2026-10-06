@@ -17,5 +17,7 @@ Use this file for short accepted decisions. Large decisions get an ADR under `do
 
 - 2026-10-05 / CGN-32: bounded-context ownership is frozen in `cgn.bounded-contexts.v1`; synchronous access uses versioned owning-service APIs, asynchronous propagation uses versioned events, and cross-service database reads remain forbidden.
 
+- 2026-10-05 / CGN-33: all established apps/services/shared packages are explicit private pnpm workspace packages; app/service implementations may depend on shared packages, but direct app-to-service and service-to-service workspace dependencies are forbidden.
+
 ## Template
 Date | Ticket | Decision | Why | Impacted domains | Supersedes
