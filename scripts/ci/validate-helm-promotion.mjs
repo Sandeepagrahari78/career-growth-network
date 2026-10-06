@@ -9,18 +9,14 @@ const production = readFileSync(contract.productionValues, "utf8");
 
 function topLevelValue(text, key) {
   const prefix = `${key}:`;
-  const line = text
-    .split(/\r?\n/)
-    .find((entry) => entry.startsWith(prefix));
+  const line = text.split(/\r?\n/).find((entry) => entry.startsWith(prefix));
   assert.ok(line, `Missing top-level value: ${key}`);
   return line.slice(prefix.length).trim().replace(/^["']|["']$/g, "");
 }
 
 function nestedValue(text, key) {
   const prefix = `  ${key}:`;
-  const line = text
-    .split(/\r?\n/)
-    .find((entry) => entry.startsWith(prefix));
+  const line = text.split(/\r?\n/).find((entry) => entry.startsWith(prefix));
   assert.ok(line, `Missing nested value: ${key}`);
   return line.slice(prefix.length).trim().replace(/^["']|["']$/g, "");
 }
@@ -49,7 +45,10 @@ for (const forbiddenTag of contract.artifact.forbiddenTags) {
 }
 
 assert.equal(topLevelValue(staging, "nameOverride"), "cgn-health-demo");
-assert.equal(topLevelValue(production, "nameOverride"), "cgn-health-demo");
+assert.equal(
+  topLevelValue(production, "nameOverride"),
+  "cgn-health-demo",
+);
 assert.equal(Number(topLevelValue(staging, "replicaCount")), 1);
 assert.equal(Number(topLevelValue(production, "replicaCount")), 2);
 
@@ -70,7 +69,10 @@ assert.equal(contract.safety.noCloudProvider, true);
 assert.equal(contract.safety.noPaidResource, true);
 assert.equal(contract.safety.noCommittedSecret, true);
 assert.equal(contract.safety.noAutomaticProductionDeployment, true);
-assert.equal(contract.safety.renderOnlyUntilProductionTargetApproved, true);
+assert.equal(
+  contract.safety.renderOnlyUntilProductionTargetApproved,
+  true,
+);
 
 console.log(
   "CGN-93 Helm promotion contract is valid and uses the CGN-44 reusable chart.",
