@@ -1,0 +1,10 @@
+serviceAccount:
+  create: true
+  name: cgn-irsa-smoke
+  automountServiceAccountToken: false
+  annotations: {}
+
+workloadIdentity:
+  awsIrsa:
+    enabled: true
+    roleArn: arn:aws:iam::123456789012:role/cgn-irsa-smoke
