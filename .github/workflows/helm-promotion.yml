@@ -55,14 +55,6 @@ jobs:
         with:
           node-version: 22
 
-      - name: Enable pinned pnpm
-        run: |
-          corepack enable
-          corepack prepare pnpm@11.25.0 --activate
-
-      - name: Install frozen workspace
-        run: pnpm install --frozen-lockfile
-
       - name: Install pinned Helm
         shell: bash
         env:
@@ -106,7 +98,7 @@ jobs:
           echo "sha=$sha" >> "$GITHUB_OUTPUT"
 
       - name: Validate CGN-93 promotion contract
-        run: pnpm ci:helm-promotion
+        run: node scripts/ci/validate-helm-promotion.mjs
 
       - name: Render staging and production values
         run: |
