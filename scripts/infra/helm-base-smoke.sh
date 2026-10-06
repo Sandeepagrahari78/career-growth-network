@@ -9,6 +9,7 @@ VALUES="infra/helm/values/health-demo-staging.yaml"
 INVALID_PROBE_VALUES="tests/fixtures/helm/invalid-probe-path.yaml"
 AUTOSCALING_SMOKE_VALUES="tests/fixtures/helm/hpa-pdb-smoke.yaml"
 INVALID_AUTOSCALING_VALUES="tests/fixtures/helm/invalid-autoscaling-target.yaml"
+MISSING_AUTOSCALING_BOUNDS_VALUES="tests/fixtures/helm/missing-autoscaling-bounds.yaml"
 
 for command in docker k3d kubectl helm curl; do
   command -v "$command" >/dev/null 2>&1 || {
@@ -35,6 +36,12 @@ if helm lint "$CHART" -f "$INVALID_AUTOSCALING_VALUES"; then
   exit 1
 fi
 echo "Invalid autoscaling target rejected as expected."
+
+if helm template "$RELEASE" "$CHART" -n "$NAMESPACE" -f "$MISSING_AUTOSCALING_BOUNDS_VALUES" >/dev/null; then
+  echo "Missing autoscaling replica bounds unexpectedly rendered." >&2
+  exit 1
+fi
+echo "Missing autoscaling replica bounds rejected as expected."
 
 helm lint "$CHART" -f "$VALUES" -f "$AUTOSCALING_SMOKE_VALUES"
 helm template "$RELEASE" "$CHART"   -n "$NAMESPACE"   -f "$VALUES"   -f "$AUTOSCALING_SMOKE_VALUES"   >/tmp/cgn-helm-rendered.yaml
