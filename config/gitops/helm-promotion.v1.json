@@ -1,0 +1,33 @@
+{
+  "schema": "cgn.helm-promotion.v1",
+  "ticket": "CGN-93",
+  "mode": "zero-budget-release-promotion-dry-run",
+  "chart": {
+    "path": "infra/helm/health-demo",
+    "stagingValues": "infra/helm/health-demo/values-staging.yaml",
+    "productionValues": "infra/helm/health-demo/values-production.yaml"
+  },
+  "artifact": {
+    "imageTagTemplate": "sha-__RELEASE_SHA__",
+    "requireImmutableShaTag": true,
+    "forbidMutableTags": ["latest", "main", "staging", "production"]
+  },
+  "promotion": {
+    "requireExactMainSha": true,
+    "sameArtifactAcrossEnvironments": true,
+    "allowedEnvironmentDrift": ["replicaCount", "resources"],
+    "manualProductionApprovalRequired": true
+  },
+  "safety": {
+    "noCloudProvider": true,
+    "noPaidResource": true,
+    "noCommittedCredential": true,
+    "noAutomaticProductionDeployment": true,
+    "renderOnlyUntilProductionTargetApproved": true
+  },
+  "evidence": {
+    "validator": "scripts/ci/validate-helm-promotion.mjs",
+    "renderer": "scripts/infra/render-helm-promotion.mjs",
+    "workflow": ".github/workflows/helm-promotion.yml"
+  }
+}
