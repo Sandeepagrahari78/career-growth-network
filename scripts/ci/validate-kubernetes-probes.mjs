@@ -15,10 +15,7 @@ const deployment = readFileSync(
 const server = readFileSync("services/health-demo/server.mjs", "utf8");
 const environmentValues = [
   readFileSync("infra/helm/values/health-demo-staging.yaml", "utf8"),
-  readFileSync(
-    "infra/helm/values/health-demo-promotion-staging.yaml",
-    "utf8",
-  ),
+  readFileSync("infra/helm/values/health-demo-promotion-staging.yaml", "utf8"),
   readFileSync("infra/helm/values/health-demo-production.yaml", "utf8"),
 ];
 
