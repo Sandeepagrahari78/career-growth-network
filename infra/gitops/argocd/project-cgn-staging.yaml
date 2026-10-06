@@ -1,0 +1,37 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: cgn-staging
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: cgn-gitops
+    cgn.io/environment: staging
+    cgn.io/ticket: CGN-92
+spec:
+  description: CGN zero-budget staging GitOps boundary
+  sourceRepos:
+    - https://github.com/Sandeepagrahari78/career-growth-network
+  destinations:
+    - namespace: "*"
+      server: https://kubernetes.default.svc
+  sourceNamespaces:
+    - argocd
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace
+    - group: networking.k8s.io
+      kind: NetworkPolicy
+  namespaceResourceWhitelist:
+    - group: ""
+      kind: ConfigMap
+    - group: ""
+      kind: Service
+    - group: apps
+      kind: Deployment
+    - group: networking.k8s.io
+      kind: NetworkPolicy
+  roles:
+    - name: readonly
+      description: Read-only staging visibility; no deployment mutation.
+      policies:
+        - p, proj:cgn-staging:readonly, applications, get, cgn-staging/*, allow
