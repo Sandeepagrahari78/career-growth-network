@@ -13,10 +13,7 @@ const applicationSet = readFileSync(
   "infra/gitops/argocd/applicationset-cgn-staging.yaml",
   "utf8",
 );
-const namespace = readFileSync(
-  "infra/gitops/argocd/namespace.yaml",
-  "utf8",
-);
+const namespace = readFileSync("infra/gitops/argocd/namespace.yaml", "utf8");
 const kustomization = readFileSync(
   "infra/gitops/argocd/kustomization.yaml",
   "utf8",
