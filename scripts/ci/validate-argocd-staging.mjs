@@ -22,7 +22,9 @@ const kustomization = readFileSync(
   "utf8",
 );
 
-const allYaml = [project, applicationSet, namespace, kustomization].join("\n---\n");
+const allYaml = [project, applicationSet, namespace, kustomization].join(
+  "\n---\n",
+);
 
 assert.equal(contract.schema, "cgn.staging-gitops.v1");
 assert.equal(contract.ticket, "CGN-92");
@@ -45,7 +47,10 @@ assert.match(project, /namespace:\s*argocd/);
 assert.match(applicationSet, /kind:\s*ApplicationSet/);
 assert.match(applicationSet, /name:\s*cgn-staging-applications/);
 assert.match(applicationSet, /project:\s*cgn-staging/);
-assert.match(applicationSet, /repoURL:\s*https:\/\/github\.com\/Sandeepagrahari78\/career-growth-network/);
+assert.match(
+  applicationSet,
+  /repoURL:\s*https:\/\/github\.com\/Sandeepagrahari78\/career-growth-network/,
+);
 assert.match(applicationSet, /targetRevision:\s*main/);
 assert.match(applicationSet, /path:\s*'\{\{path\}\}'/);
 assert.match(applicationSet, /server:\s*https:\/\/kubernetes\.default\.svc/);
