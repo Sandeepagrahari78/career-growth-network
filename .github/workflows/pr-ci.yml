@@ -106,6 +106,9 @@ jobs:
       - name: Synchronization regression proof
         run: pnpm demo:sync
 
+      - name: Debug Prettier CGN-92 validator
+        run: pnpm dlx prettier@3.6.2 scripts/ci/validate-argocd-staging.mjs
+
       - name: Quality gates
         run: pnpm ci:quick
 
