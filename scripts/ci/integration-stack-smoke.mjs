@@ -14,7 +14,7 @@ function sleep(ms) {
   Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
 }
 
-function waitFor(label, check, attempts = 45) {
+function waitFor(label, check, attempts = 60) {
   let lastError;
 
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
@@ -84,12 +84,7 @@ try {
   waitFor("S3-compatible object store", () => {
     execFileSync(
       "curl",
-      [
-        "--fail",
-        "--silent",
-        "--show-error",
-        "http://127.0.0.1:9000/minio/health/live",
-      ],
+      ["--fail", "--silent", "--show-error", "http://127.0.0.1:8333/"],
       { stdio: "ignore" },
     );
   });
