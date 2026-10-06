@@ -1,0 +1,39 @@
+{
+  "schema": "cgn.autoscaling-disruption.v1",
+  "ticket": "CGN-60",
+  "chartPath": "infra/helm/cgn-service",
+  "capacityContract": "config/performance/capacity.v1.json",
+  "defaults": {
+    "enabled": false,
+    "targetCPUUtilizationPercentage": 70,
+    "targetMemoryUtilizationPercentage": 75,
+    "replicaBoundsRequireServiceEvidence": true,
+    "pdbMinAvailable": 1
+  },
+  "validationProfile": {
+    "service": "health-demo",
+    "minReplicas": 2,
+    "maxReplicas": 4,
+    "pdbMinAvailable": 1,
+    "scope": "local-staging-smoke-only"
+  },
+  "failureBehavior": {
+    "missingReplicaBounds": "fail-helm-render",
+    "invalidPercentage": "fail-values-schema",
+    "hpaMetricUnavailable": "retain-current-replicas-and-surface-kubernetes-condition",
+    "voluntaryDisruptionBelowBudget": "deny-eviction"
+  },
+  "observability": {
+    "hpaConditions": true,
+    "hpaCurrentDesiredReplicas": true,
+    "kubernetesEvents": true,
+    "pdbDisruptionsAllowed": true
+  },
+  "safety": {
+    "noCloudProvider": true,
+    "noPaidResource": true,
+    "noCommittedSecret": true,
+    "noProductionCapacityClaim": true,
+    "noAutomaticProductionDeployment": true
+  }
+}
