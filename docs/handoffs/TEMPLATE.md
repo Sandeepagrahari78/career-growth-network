@@ -29,3 +29,10 @@
 - [ ] 04-decisions.md / ADR if needed
 - [ ] 05-current-state.md
 - [ ] 06-known-risks.md if needed
+
+## Owner review and PR references
+- GitHub PR URL:
+- Commit / merge SHA:
+- Jira live dependency/status verification:
+- Source and tests inspected on latest main:
+- Required Sandeep review (if sensitive):

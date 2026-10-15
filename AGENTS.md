@@ -58,3 +58,12 @@ Then run:
 ```bash
 pnpm memory:check
 ```
+
+## Multi-agent preflight (CGN-285)
+- Every agent must start from a fresh copy of `main` on a unique `CGN-NNN-description` feature branch or separate worktree. Never assume a previous agent's chat/branch is merged truth.
+- Verify Jira ticket status/owner/blockers live before code changes. The default `pnpm agent:context --ticket CGN-NNN --domain <domain>` is offline; optional `--jira-live` reads Jira with local environment credentials, **never** using an embedded token. Optionally supply a dated `docs/work-items/CGN-NNN.md` export for offline agents.
+- Read [visual project flow](docs/architecture/PROJECT_FLOW.md), [module paths](docs/architecture/MODULE_DEPENDENCIES.md), [team workflow](docs/architecture/AGENT_WORKFLOW.md) and only relevant predecessor handoffs/merged code.
+- The [three-person synthetic handoff proof](docs/architecture/TEAM_ONBOARDING_DEMO.md) is not evidence of real feature implementation or live Jira status.
+- Show an exact-file impact plan + tests first; use the ticket-defined owning module. A conceptual diagram never authorizes creating API routes or database schemas.
+- Source/infra changes require a changed ticket-matched `docs/handoffs/CGN-NNN.md` with evidence and a meaningful next-agent trail. CI checks it on PRs.
+- Agents may commit to their feature branches after review of scope, but GitHub Actions does not create commits; technical review by Sandeep precedes merging main. No automatic production deploy.

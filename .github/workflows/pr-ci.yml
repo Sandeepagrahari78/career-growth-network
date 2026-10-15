@@ -84,6 +84,11 @@ jobs:
         env:
           CGN_BASE_SHA: ${{ github.event.pull_request.base.sha }}
 
+      - name: Require matching ticket handoff for source changes
+        run: node scripts/ci/verify-agent-handoff.mjs
+        env:
+          CGN_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+
   quality:
     name: Format lint types unit contract build
     needs: [context]
