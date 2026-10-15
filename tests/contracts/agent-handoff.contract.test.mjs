@@ -20,7 +20,7 @@ function complete(ticket = "CGN-285") {
   );
 }
 
-test("requires scoped handoff for app, service, contract, infra and CI changes", () => {
+test("requires handoff for source, infra and CI changes", () => {
   for (const p of [
     "apps/web/src/index.tsx",
     "services/identity/index.ts",
@@ -33,12 +33,13 @@ test("requires scoped handoff for app, service, contract, infra and CI changes",
   }
 });
 
-test("documentation-only PRs do not require handoff", () => {
-  assert.equal(needsTicketHandoff(["README.md", "docs/architecture/README.md"]), false);
+test("docs-only PRs do not require a handoff", () => {
+  const docs = ["README.md", "docs/architecture/README.md"];
+  assert.equal(needsTicketHandoff(docs), false);
   assert.equal(needsTicketHandoff([]), false);
 });
 
-test("extracts only Jira-scoped branch identifiers", () => {
+test("only CGN-scoped branch identifiers are valid", () => {
   assert.equal(ticketFromBranch("CGN-220-opportunity-publishing"), "CGN-220");
   assert.equal(ticketFromBranch("CGN-285-shared-agent-navigation"), "CGN-285");
   assert.equal(ticketFromBranch("hotfix"), null);
@@ -52,21 +53,15 @@ test("complete handoff with matching ticket is valid", () => {
 });
 
 test("rejects a handoff for a different ticket", () => {
-  assert.match(
-    validateTicketHandoff("CGN-220", complete("CGN-285")).join("; "),
-    /identify ticket CGN-220/,
-  );
+  const errors = validateTicketHandoff("CGN-220", complete("CGN-285"));
+  assert.match(errors.join("; "), /identify ticket CGN-220/);
 });
 
 test("rejects empty and placeholder handoff sections", () => {
-  assert.match(
-    validateTicketHandoff("CGN-285", complete().replace("- Verified on this PR.", "")).
-      join("; "),
-    /Missing meaningful section/,
-  );
-  assert.match(
-    validateTicketHandoff("CGN-285", complete().replace("- Verified on this PR.", "TODO")).
-      join("; "),
-    /Missing meaningful section/,
-  );
+  const missing = complete().replace("- Verified on this PR.", "");
+  const placeholder = complete().replace("- Verified on this PR.", "TODO");
+  const missingErrors = validateTicketHandoff("CGN-285", missing);
+  const placeholderErrors = validateTicketHandoff("CGN-285", placeholder);
+  assert.match(missingErrors.join("; "), /Missing meaningful section/);
+  assert.match(placeholderErrors.join("; "), /Missing meaningful section/);
 });
