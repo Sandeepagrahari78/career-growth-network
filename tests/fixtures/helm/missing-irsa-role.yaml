@@ -1,0 +1,4 @@
+workloadIdentity:
+  awsIrsa:
+    enabled: true
+    roleArn: ""

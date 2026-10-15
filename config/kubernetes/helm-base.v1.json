@@ -30,6 +30,6 @@
   "standardStatus": {
     "probes": "delivered",
     "autoscalingAndDisruption": "delivered",
-    "serviceAccounts": "deferred"
+    "serviceAccounts": "delivered"
   }
 }

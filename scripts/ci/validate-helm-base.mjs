@@ -19,6 +19,10 @@ const service = readFileSync(
 );
 const hpa = readFileSync("infra/helm/cgn-service/templates/hpa.yaml", "utf8");
 const pdb = readFileSync("infra/helm/cgn-service/templates/pdb.yaml", "utf8");
+const serviceAccount = readFileSync(
+  "infra/helm/cgn-service/templates/serviceaccount.yaml",
+  "utf8",
+);
 const stagingValues = readFileSync(
   "infra/helm/values/health-demo-staging.yaml",
   "utf8",
@@ -58,7 +62,9 @@ assert.match(service, /kind:\s*Service/);
 assert.match(stagingValues, /nameOverride:\s*cgn-health-demo/);
 assert.match(stagingValues, /tag:\s*helm-smoke/);
 
-const chartTemplates = [deployment, service, hpa, pdb].join("\n---\n");
+const chartTemplates = [deployment, service, hpa, pdb, serviceAccount].join(
+  "\n---\n",
+);
 assert.match(chartTemplates, /startupProbe/);
 assert.match(chartTemplates, /readinessProbe/);
 assert.match(chartTemplates, /livenessProbe/);
@@ -67,13 +73,17 @@ assert.match(chartTemplates, /HorizontalPodAutoscaler/);
 assert.match(chartTemplates, /PodDisruptionBudget/);
 assert.ok(schema.required.includes("autoscaling"));
 assert.ok(schema.required.includes("disruptionBudget"));
+assert.match(chartTemplates, /kind:\s*ServiceAccount/);
+assert.match(deployment, /serviceAccountName:/);
+assert.match(deployment, /automountServiceAccountToken:/);
+assert.ok(schema.required.includes("serviceAccount"));
+assert.ok(schema.required.includes("workloadIdentity"));
+assert.doesNotMatch(chartTemplates, /kind:\s*Secret/i);
+assert.doesNotMatch(chartTemplates, /type:\s*LoadBalancer/i);
 assert.doesNotMatch(
   chartTemplates,
-  /kind:\s*ServiceAccount|iam\.amazonaws\.com/,
-  "Service-account/cloud-IAM standards belong to CGN-61.",
+  /accessKeyId|secretAccessKey|aws_access_key|aws_secret/i,
 );
-assert.doesNotMatch(chartTemplates, /kind:\s*Secret/i);
-assert.doesNotMatch(chartTemplates, /aws|eks|gke|aks|azure|loadBalancer/i);
 
 assert.equal(contract.safety.noCloudProvider, true);
 assert.equal(contract.safety.noPaidResource, true);

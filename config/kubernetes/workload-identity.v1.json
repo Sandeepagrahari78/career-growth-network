@@ -1,0 +1,40 @@
+{
+  "schema": "cgn.workload-identity.v1",
+  "ticket": "CGN-61",
+  "chartPath": "infra/helm/cgn-service",
+  "defaults": {
+    "createDedicatedServiceAccount": true,
+    "automountServiceAccountToken": false,
+    "defaultServiceAccountFallbackAllowed": false
+  },
+  "awsIrsa": {
+    "patternOnly": true,
+    "enabledByDefault": false,
+    "annotationKey": "eks.amazonaws.com/role-arn",
+    "roleArnRequiredWhenEnabled": true,
+    "chartMustOwnAnnotatedServiceAccount": true,
+    "roleArnIsIdentifierNotCredential": true
+  },
+  "failureBehavior": {
+    "externalServiceAccountWithoutName": "fail-helm-render",
+    "irsaWithoutRoleArn": "fail-helm-render",
+    "irsaOnExternalServiceAccount": "fail-helm-render",
+    "serviceAccountTokenAutomountTrue": "fail-values-schema",
+    "rawIrsaAnnotationBypass": "fail-values-schema"
+  },
+  "observability": {
+    "podServiceAccountName": true,
+    "serviceAccountAnnotations": true,
+    "kubernetesEvents": true
+  },
+  "safety": {
+    "noAwsResourceCreation": true,
+    "noIamRoleCreation": true,
+    "noCloudProviderActivation": true,
+    "noCommittedRoleArn": true,
+    "noCredential": true,
+    "noSecret": true,
+    "noPaidResource": true,
+    "noProductionDeployment": true
+  }
+}
