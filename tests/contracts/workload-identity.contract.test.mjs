@@ -4,11 +4,8 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 test("CGN-61 workload identity validator passes", () => {
-  const output = execFileSync(
-    "node",
-    ["scripts/ci/validate-workload-identity.mjs"],
-    { encoding: "utf8" },
-  );
+  const args = ["scripts/ci/validate-workload-identity.mjs"];
+  const output = execFileSync("node", args, { encoding: "utf8" });
 
   assert.match(output, /CGN-61 ServiceAccount and IRSA policy pattern is valid/);
 });
@@ -22,11 +19,8 @@ test("service-account token automount is fail-closed by schema", () => {
     "utf8",
   );
 
-  assert.equal(
-    schema.properties.serviceAccount.properties.automountServiceAccountToken
-      .const,
-    false,
-  );
+  const sa = schema.properties.serviceAccount;
+  assert.equal(sa.properties.automountServiceAccountToken.const, false);
   assert.match(invalid, /automountServiceAccountToken:\s*true/);
 });
 
@@ -39,11 +33,8 @@ test("raw IRSA annotation bypass is reserved by schema", () => {
     "utf8",
   );
 
-  assert.equal(
-    schema.properties.serviceAccount.properties.annotations.propertyNames.not
-      .const,
-    "eks.amazonaws.com/role-arn",
-  );
+  const annotations = schema.properties.serviceAccount.properties.annotations;
+  assert.equal(annotations.propertyNames.not.const, "eks.amazonaws.com/role-arn");
   assert.match(bypass, /eks\.amazonaws\.com\/role-arn/);
 });
 
