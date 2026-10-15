@@ -7,6 +7,7 @@ CGN is a Career Growth **Social Network** under active development. The goal →
 - [CGN product flow, architecture and CI/CD diagrams](docs/architecture/PROJECT_FLOW.md)
 - [Module and file ownership / dependencies](docs/architecture/MODULE_DEPENDENCIES.md)
 - [Sandeep, Prachi, Tanvi multi-agent workflow](docs/architecture/AGENT_WORKFLOW.md)
+- [Three-member demo and optional live Jira context onboarding](docs/architecture/TEAM_ONBOARDING_DEMO.md)
 - [Module guides and current implementation status](docs/modules/README.md)
 - [Agent operating rules](AGENTS.md)
 - [Merged implementation state](docs/engineering-memory/05-current-state.md)
@@ -37,22 +38,31 @@ pnpm install --frozen-lockfile
 pnpm agent:context --ticket CGN-220 --domain admin
 ```
 
-5. Read `AGENTS.md`, generated `.cgn/context-CGN-220.md`, linked Jira ticket, module source, contracts and previous relevant handoffs. **The script does not fetch Jira live**.
-6. Propose exact changed files and tests, implement only owning scope; update `docs/handoffs/CGN-NNN.md` using [handoff template](docs/handoffs/TEMPLATE.md).
-7. Verify locally when tools are available:
+5. (Optional) With locally configured Jira READ credentials (`CGN_JIRA_EMAIL` and `CGN_JIRA_API_TOKEN`), use `pnpm agent:context --ticket CGN-220 --domain admin --jira-live`. It fails closed without credentials and only reads from the approved Jira site.
+6. Read `AGENTS.md`, generated `.cgn/context-CGN-220.md`, linked Jira ticket, module source, contracts and previous relevant handoffs. **The script does not fetch Jira live**.
+7. Propose exact changed files and tests, implement only owning scope; update `docs/handoffs/CGN-NNN.md` using [handoff template](docs/handoffs/TEMPLATE.md).
+8. Verify locally when tools are available:
 
 ```bash
 pnpm ci:quick
 pnpm memory:check
 ```
 
-8. Push branch → PR → affected-path checks + ticket handoff gate → owner technical review → merge main → post-merge Main CI/staging.
+9. Push branch → PR → affected-path checks + ticket handoff gate → owner technical review → merge main → post-merge Main CI/staging.
 
-To demonstrate that Engineering Memory survives independent agents:
+To demonstrate that Engineering Memory survives a two-agent simulation:
 
 ```bash
 pnpm demo:sync
 ```
+
+To verify the additional **three-person synthetic handoff simulation**:
+
+```bash
+pnpm demo:three-agents
+```
+
+This is a deterministic simulation, not three live autonomous coding agents. See [onboarding demo](docs/architecture/TEAM_ONBOARDING_DEMO.md).
 
 ## Non-negotiable boundaries
 
