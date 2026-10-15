@@ -21,7 +21,7 @@ AI agents act *for* the ticket owner, not as independent owners of architecture.
 1. Confirm exact ticket key, owner, parent, acceptance criteria and upstream blockers **from Jira**. Do not substitute numbered-order guesses.
 2. Fetch/pull `main` and create `CGN-NNN-specific-scope`; never start from an outdated agent branch.
 3. Copy a current ticket export to `docs/work-items/CGN-NNN.md` if the agent has no live Jira connector. Mark export date and current Jira link; regenerate when Jira changes. **Never commit secrets**.
-4. Run `pnpm agent:context --ticket CGN-NNN --domain admin` (choose relevant domain); open the generated `.cgn/context-CGN-NNN.md`. This local context pack includes checked-in rules/architecture, ticket export when supplied, and named predecessor handoffs. It is **not** a live Jira fetch.
+4. Run `pnpm agent:context --ticket CGN-NNN --domain admin` (choose relevant domain); open the generated `.cgn/context-CGN-NNN.md`. This local context pack includes checked-in rules/architecture, ticket export when supplied, and named predecessor handoffs. By default it is **not** a live Jira fetch. Optional `--jira-live` uses read-only Jira REST when `CGN_JIRA_EMAIL` and `CGN_JIRA_API_TOKEN` are securely supplied.
 5. Read relevant source code, package boundaries, contract ownership, existing tests and `git log`; submit a small exact-file impact plan. Stop when dependencies/contract details are missing.
 6. Implement only approved files, update source/test/contract/module docs together. Never directly read another service DB.
 7. Update `docs/handoffs/CGN-NNN.md` using [template](../handoffs/TEMPLATE.md): changed files, behavior, contracts/events, tests and results, risks, next agent instruction, rollback.
@@ -38,6 +38,10 @@ pnpm agent:context --ticket CGN-220 --domain admin
 ```
 
 The agent must describe what already exists, what is missing, exact proposed files and which neighboring tickets/contracts are needed; *do not implement a new Admin service only because its name appears on a diagram*.
+
+## Three-member proof and CLI onboarding
+
+Run `pnpm demo:three-agents` after `pnpm install` to verify a deterministic Sandeep → Prachi → Tanvi handoff simulation. This is not a three-model execution or evidence of a completed business feature. Full instructions: [TEAM_ONBOARDING_DEMO.md](TEAM_ONBOARDING_DEMO.md).
 
 ## Rules for handoff automation
 
