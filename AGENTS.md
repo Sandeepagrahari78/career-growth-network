@@ -67,3 +67,11 @@ pnpm memory:check
 - Show an exact-file impact plan + tests first; use the ticket-defined owning module. A conceptual diagram never authorizes creating API routes or database schemas.
 - Source/infra changes require a changed ticket-matched `docs/handoffs/CGN-NNN.md` with evidence and a meaningful next-agent trail. CI checks it on PRs.
 - Agents may commit to their feature branches after review of scope, but GitHub Actions does not create commits; technical review by Sandeep precedes merging main. No automatic production deploy.
+
+## CGN-286 platform file-scope gate (monorepo)
+
+- **Web:** Jira CGN-86/87 etc. → `apps/web/` using Next.js/React; **Android:** Jira CGN-128/129 etc. → `apps/mobile/` using Expo/React Native. Both use approved backend APIs and shared contracts. No iOS release currently.
+- Before proposing app files, read **live Jira ticket** and `config/ci/ticket-platform-scopes.v1.json`. The registry is an offline reviewed Jira-to-platform cache, not live Jira; an unknown ticket must be registered with Sandeep review.
+- PR CI runs `scripts/ci/verify-platform-scope.mjs`. Editing `apps/mobile/` from a web-only ticket or `apps/web/` from a mobile-only ticket fails the gate. Both-platform edits need explicit reviewed Jira scope and registry entry.
+- This is a file-path check. It does **not** validate UI framework dependencies or prevent direct pushes to unprotected main; all authorizations/security review still apply.
+- Google Play public launch requirements and cost approvals: [Android release checklist](docs/runbooks/android-play-release-checklist.md), tracked by CGN-287. Do not register/pay/publish under this CI task.

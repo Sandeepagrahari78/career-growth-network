@@ -89,6 +89,11 @@ jobs:
         env:
           CGN_BASE_SHA: ${{ github.event.pull_request.base.sha }}
 
+      - name: Enforce reviewed Jira web or Android platform scope
+        run: node scripts/ci/verify-platform-scope.mjs
+        env:
+          CGN_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+
   quality:
     name: Format lint types unit contract build
     needs: [context]

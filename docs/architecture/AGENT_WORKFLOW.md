@@ -49,3 +49,7 @@ Run `pnpm demo:three-agents` after `pnpm install` to verify a deterministic Sand
 - Handoff must include required sections and the exact ticket key, with meaningful nonempty content. A handoff is an audit artifact, not evidence that all tests succeeded; actual Actions run is authoritative.
 - This gate protects PRs, not direct main pushes; on current private GitHub Free account branch protection isn't enforced. Team policy: never push directly to main.
 - No real-production deploy, cloud expenses or committed Jira tokens.
+
+## Before an agent edits web or Android files
+
+Read [platform ownership rules](WEB_ANDROID_AGENT_OWNERSHIP.md) and the ticket entry in `config/ci/ticket-platform-scopes.v1.json`. Mobile-only tickets must not edit `apps/web/`; web-only tickets must not edit `apps/mobile/`. For an unregistered ticket, verify the live Jira scope and get Sandeep approval to register it. The PR CI file-scope gate enforces this against changed files. A single monorepo preserves the shared contract layer; this path check alone does not validate actual Play Store deployment.
