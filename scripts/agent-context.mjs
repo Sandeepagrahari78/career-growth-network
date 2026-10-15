@@ -34,11 +34,11 @@ function gitInfo() {
 function run() {
   const ticket = arg("--ticket");
   const domain = arg("--domain", "unspecified");
-  if (!/^CGN-[1-9][0-9]*$/.test(ticket)) {
-    throw new Error("Provide a valid --ticket CGN-NNN; refusing unknown ticket.");
+  if (!/^CGN-[1-9][0-9]*$/.test(ticket) && ticket !== "DEMO-001") {
+    throw new Error("Provide a valid --ticket CGN-NNN (or DEMO-001 for the built-in regression demo).");
   }
-  if (!/^[a-z][a-z0-9-]*$/.test(domain)) {
-    throw new Error("--domain must be a lowercase domain slug.");
+  if (!/^[a-z][a-z0-9-]*$/.test(domain) && !(ticket === "DEMO-001" && domain === "Roadmap->Social")) {
+    throw new Error("--domain must be a lowercase domain slug (except built-in DEMO-001).");
   }
   const output = arg("--out", ".cgn/context-" + ticket + ".md");
   const outPath = path.resolve(root, output);
