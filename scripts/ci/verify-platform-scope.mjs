@@ -1,6 +1,9 @@
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
-import { validatePlatformScope, platformsChanged } from "./platform-scope-policy.mjs";
+import {
+  validatePlatformScope,
+  platformsChanged,
+} from "./platform-scope-policy.mjs";
 
 function main() {
   const baseSha = process.env.CGN_BASE_SHA;
