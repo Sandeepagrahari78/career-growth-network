@@ -68,10 +68,7 @@ assert.match(serviceAccount, /workloadIdentity\.awsIrsa requires/);
 assert.doesNotMatch(serviceAccount, /kind:\s*Secret/i);
 assert.doesNotMatch(serviceAccount, /accessKey|secretAccessKey|password/i);
 
-assert.match(
-  irsaFixture,
-  /arn:aws:iam::123456789012:role\/cgn-irsa-smoke/,
-);
+assert.match(irsaFixture, /arn:aws:iam::123456789012:role\/cgn-irsa-smoke/);
 assert.match(irsaFixture, /automountServiceAccountToken:\s*false/);
 
 assert.equal(
