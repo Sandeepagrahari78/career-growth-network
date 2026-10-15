@@ -43,7 +43,9 @@ if (!base || !/^[a-f0-9]{40}$/.test(base)) {
             readFileSync(handoff, "utf8"),
           );
           if (errors.length) {
-            for (const error of errors) fail(error);
+            for (const error of errors) {
+              fail(error);
+            }
           } else {
             console.log("Ticket handoff gate passed for " + ticket);
           }
