@@ -1,0 +1,183 @@
+{
+  "$schemaVersion": 1,
+  "sourceOfTruth": "Jira live ticket description and parent; this registry is a reviewed offline CI cache, not automatic Jira sync.",
+  "reviewRule": "Sandeep reviews changes to this registry and any both-platform ticket; ticket numbers are not dependencies.",
+  "tickets": {
+    "CGN-2": {
+      "platforms": [
+        "web"
+      ],
+      "note": "Existing frontend shell"
+    },
+    "CGN-70": {
+      "platforms": [
+        "web"
+      ],
+      "note": "Web signup/login screens"
+    },
+    "CGN-86": {
+      "platforms": [
+        "web"
+      ],
+      "note": "Next.js web app shell"
+    },
+    "CGN-87": {
+      "platforms": [
+        "web"
+      ],
+      "note": "Web typed API/auth client"
+    },
+    "CGN-117": {
+      "platforms": [
+        "web"
+      ],
+      "note": "Web roadmap UI"
+    },
+    "CGN-132": {
+      "platforms": [
+        "web"
+      ],
+      "note": "Web analytics"
+    },
+    "CGN-183": {
+      "platforms": [
+        "web"
+      ],
+      "note": "Web cohort UX"
+    },
+    "CGN-220": {
+      "platforms": [
+        "web"
+      ],
+      "note": "Admin opportunity publishing UI; backend auth changes separately approved"
+    },
+    "CGN-221": {
+      "platforms": [
+        "web"
+      ],
+      "note": "Web recruiter/admin shells"
+    },
+    "CGN-256": {
+      "platforms": [
+        "web"
+      ],
+      "note": "Playwright web E2E suite"
+    },
+    "CGN-275": {
+      "platforms": [
+        "web"
+      ],
+      "note": "Web messaging UX"
+    },
+    "CGN-281": {
+      "platforms": [
+        "web"
+      ],
+      "note": "Web admin directory/activity"
+    },
+    "CGN-71": {
+      "platforms": [
+        "mobile"
+      ],
+      "note": "Mobile auth and secure token storage"
+    },
+    "CGN-118": {
+      "platforms": [
+        "mobile"
+      ],
+      "note": "Mobile roadmap/today actions"
+    },
+    "CGN-128": {
+      "platforms": [
+        "mobile"
+      ],
+      "note": "Expo mobile app shell"
+    },
+    "CGN-129": {
+      "platforms": [
+        "mobile"
+      ],
+      "note": "Mobile typed API/auth"
+    },
+    "CGN-130": {
+      "platforms": [
+        "mobile"
+      ],
+      "note": "Mobile today actions"
+    },
+    "CGN-140": {
+      "platforms": [
+        "mobile"
+      ],
+      "note": "Mobile offline task completion"
+    },
+    "CGN-157": {
+      "platforms": [
+        "mobile"
+      ],
+      "note": "Mobile analytics"
+    },
+    "CGN-175": {
+      "platforms": [
+        "mobile"
+      ],
+      "note": "Mobile Growth Profile"
+    },
+    "CGN-184": {
+      "platforms": [
+        "mobile"
+      ],
+      "note": "Mobile squad UX"
+    },
+    "CGN-199": {
+      "platforms": [
+        "mobile"
+      ],
+      "note": "Mobile cohort check-in"
+    },
+    "CGN-222": {
+      "platforms": [
+        "mobile"
+      ],
+      "note": "Mobile opportunities"
+    },
+    "CGN-250": {
+      "platforms": [
+        "mobile"
+      ],
+      "note": "Mobile crash/deep-link notifications"
+    },
+    "CGN-251": {
+      "platforms": [
+        "mobile"
+      ],
+      "note": "Android internal beta distribution; not public Play launch"
+    },
+    "CGN-257": {
+      "platforms": [
+        "mobile"
+      ],
+      "note": "Mobile QA regression"
+    },
+    "CGN-277": {
+      "platforms": [
+        "mobile"
+      ],
+      "note": "Mobile Social Home"
+    },
+    "CGN-287": {
+      "platforms": [
+        "mobile"
+      ],
+      "note": "Android Google Play release checklist only; no store submission"
+    },
+    "CGN-133": {
+      "platforms": [
+        "web",
+        "mobile"
+      ],
+      "reviewRequired": true,
+      "note": "Cross-platform Sentry ticket; owning backend/service changes still require separate authority"
+    }
+  }
+}
