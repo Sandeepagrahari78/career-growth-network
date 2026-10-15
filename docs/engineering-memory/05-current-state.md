@@ -20,6 +20,7 @@ Last updated: 2026-10-15 after CGN-61 and staging rollback rehearsal merges.
 - CGN-60: HPA/PodDisruptionBudget standards merged via PR #21 / `323a5b814081fdc934c7c6f6f15930929a366d44`; local Helm and Kubernetes validations previously passed.
 - CGN-61: dedicated Kubernetes ServiceAccount and opt-in IRSA *configuration pattern only* merged via PR #22 / `d18093b2e9497709793b764e680109dd0975cbc7`. PR security, unit/contract/quality and local Helm checks passed; no AWS resources created.
 - CGN-227 staging recovery regression: ephemeral Docker fault-injection/rollback rehearsal merged via PR #23 / `aefe416acd71084b3d7a2d1fc7ad992cd5616fa1`. PR quality/security and rollback rehearsal passed. No real Kubernetes/GitOps or production rollback happened.
+- CGN-285: cross-agent navigation, module guides, optional credential-gated read-only Jira context and simulated Sandeep → Prachi → Tanvi handoff merged via PR #25 / `7de3f7a7943fd97b24aee1b3a5c451b4b0a3f2e1`. PR CI run `38748769481` and local Helm validation run `38748769680` succeeded. Demo is synthetic, not three independently running AI models; a live Jira REST request requires local user credentials.
 - Real cloud provisioning and production deployment remain intentionally disabled.
 
 ## Infrastructure state
