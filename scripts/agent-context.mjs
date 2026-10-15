@@ -1,3 +1,4 @@
+import { fetchJiraContext } from "./jira-context.mjs";
 import fs from "node:fs";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
@@ -31,7 +32,7 @@ function gitInfo() {
   }
 }
 
-function run() {
+async function run() {
   const ticket = arg("--ticket");
   const domain = arg("--domain", "unspecified");
   if (!/^CGN-[1-9][0-9]*$/.test(ticket) && ticket !== "DEMO-001") {
@@ -39,6 +40,10 @@ function run() {
   }
   if (!/^[a-z][a-z0-9-]*$/.test(domain) && !(ticket === "DEMO-001" && domain === "Roadmap->Social")) {
     throw new Error("--domain must be a lowercase domain slug (except built-in DEMO-001).");
+  }
+  const liveJira = args.includes("--jira-live");
+  if (liveJira && ticket === "DEMO-001") {
+    throw new Error("DEMO-001 is a local regression fixture, not a Jira ticket.");
   }
   const output = arg("--out", ".cgn/context-" + ticket + ".md");
   const outPath = path.resolve(root, output);
@@ -92,7 +97,11 @@ function run() {
     "> Generated from the current checkout. Jira is the work/dependency truth, " +
     "latest main is merged implementation truth, and contracts/ADRs are integration truth.\n\n" +
     "## Jira source freshness\n\n";
-  if (hasTicketExport) {
+  if (liveJira) {
+    const issue = await fetchJiraContext(ticket);
+    body += "Jira read-only data retrieved during this invocation; it may change after fetch.\n\n";
+    body += issue + "\n\n";
+  } else if (hasTicketExport) {
     body +=
       "A local ticket export is included below. It may be stale: verify Jira status, " +
       "owner, blockers and acceptance criteria LIVE before editing code.\n\n";
@@ -101,7 +110,7 @@ function run() {
       "**No local Jira ticket export found.** Open https://sandeepagrahari1.atlassian.net/browse/" +
       ticket +
       " and inspect the ticket, links and dependencies before coding. " +
-      "This tool does NOT fetch Jira automatically or prove the ticket is ready.\n\n";
+      "This invocation did NOT fetch Jira. Use --jira-live with environment credentials to opt in.\n\n";
   }
 
   const handoffsDir = path.join(root, "docs/handoffs");
@@ -131,12 +140,10 @@ function run() {
   fs.mkdirSync(path.dirname(outPath), { recursive: true });
   fs.writeFileSync(outPath, body);
   console.log("Generated " + path.relative(root, outPath));
-  console.log(hasTicketExport ? "Jira snapshot included; verify it is current." : "WARNING: No offline Jira snapshot; live Jira review required.");
+  console.log(liveJira ? "Live Jira read-only snapshot included; verify linked dependencies." : hasTicketExport ? "Jira snapshot included; verify it is current." : "WARNING: No offline Jira snapshot; live Jira review required.");
 }
 
-try {
-  run();
-} catch (error) {
+run().catch((error) => {
   console.error(error.message);
   process.exitCode = 1;
-}
+});
