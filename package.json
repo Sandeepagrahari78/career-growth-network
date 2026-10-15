@@ -29,6 +29,7 @@
     "ci:migration-job": "node scripts/ci/validate-database-migration-job.mjs",
     "ci:probes": "node scripts/ci/validate-kubernetes-probes.mjs",
     "ci:autoscaling": "node scripts/ci/validate-autoscaling-disruption.mjs",
-    "ci:workload-identity": "node scripts/ci/validate-workload-identity.mjs"
+    "ci:workload-identity": "node scripts/ci/validate-workload-identity.mjs",
+    "demo:three-agents": "node scripts/run-three-agent-demo.mjs"
   }
 }
