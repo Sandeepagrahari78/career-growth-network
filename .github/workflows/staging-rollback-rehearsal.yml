@@ -1,0 +1,42 @@
+name: CGN Staging Rollback Rehearsal
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/staging-rollback-rehearsal.yml
+      - scripts/ci/staging-rollback-rehearsal.mjs
+      - docs/handoffs/CGN-227-staging-rollback-rehearsal.md
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  staging-rollback:
+    name: Inject failure and restore known-good staging
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22
+
+      - name: Prove staged service failure detection and recovery
+        run: node scripts/ci/staging-rollback-rehearsal.mjs
+
+      - name: Upload rollback rehearsal evidence
+        if: success()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: staging-rollback-rehearsal
+          path: .local/rehearsal/rollback-evidence.json
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Cleanup ephemeral containers
+        if: always()
+        run: |
+          docker rm -f cgn-rehearsal-good cgn-rehearsal-fault || true
