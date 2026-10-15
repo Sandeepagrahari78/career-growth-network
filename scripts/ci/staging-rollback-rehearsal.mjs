@@ -77,7 +77,7 @@ try {
 
   writeFileSync(
     join(scratch, "Dockerfile"),
-    "FROM node:22-alpine\nWORKDIR /app\nCOPY fault.mjs ./fault.mjs\nUSER node\nEXPOSE 3001\nCMD [\"node\", \"fault.mjs\"]\n",
+    'FROM node:22-alpine\nWORKDIR /app\nCOPY fault.mjs ./fault.mjs\nUSER node\nEXPOSE 3001\nCMD ["node", "fault.mjs"]\n',
   );
   writeFileSync(
     join(scratch, "fault.mjs"),
@@ -91,7 +91,9 @@ try {
   const failedReady = await expectHttp("/ready", 503);
   assert.equal(failedHealth.faultInjected, true);
   assert.equal(failedReady.faultInjected, true);
-  console.log("Intentionally bad staging candidate rejected by readiness checks.");
+  console.log(
+    "Intentionally bad staging candidate rejected by readiness checks.",
+  );
 
   removeContainer(faultyContainer);
   startContainer(goodContainer, knownGoodImage);
@@ -130,7 +132,9 @@ try {
     ".local/rehearsal/rollback-evidence.json",
     JSON.stringify(evidence, null, 2) + "\n",
   );
-  console.log("PASS: unhealthy staging candidate detected and known-good image restored.");
+  console.log(
+    "PASS: unhealthy staging candidate detected and known-good image restored.",
+  );
 } finally {
   removeContainer(faultyContainer);
   removeContainer(goodContainer);
