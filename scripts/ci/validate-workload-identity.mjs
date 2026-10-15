@@ -46,16 +46,10 @@ assert.equal(
     .const,
   false,
 );
-assert.equal(
-  schema.properties.serviceAccount.properties.annotations.propertyNames.not
-    .const,
-  "eks.amazonaws.com/role-arn",
-);
-assert.match(
-  schema.properties.workloadIdentity.properties.awsIrsa.properties.roleArn
-    .pattern,
-  /arn:aws:iam/,
-);
+const annotations = schema.properties.serviceAccount.properties.annotations;
+assert.equal(annotations.propertyNames.not.const, "eks.amazonaws.com/role-arn");
+const irsa = schema.properties.workloadIdentity.properties.awsIrsa;
+assert.match(irsa.properties.roleArn.pattern, /arn:aws:iam/);
 
 assert.ok(values.includes("serviceAccount:\n  create: true"));
 assert.ok(values.includes("automountServiceAccountToken: false"));
