@@ -11,7 +11,10 @@ const example = {
     description: {
       type: "doc",
       content: [
-        { type: "paragraph", content: [{ type: "text", text: "Do not invent APIs." }] },
+        {
+          type: "paragraph",
+          content: [{ type: "text", text: "Do not invent APIs." }],
+        },
       ],
     },
     issuelinks: [
@@ -44,7 +47,8 @@ test("optional fetch uses approved Jira HTTPS host and no credentials in output"
     token: "test-secret-do-not-log",
     fetcher: async (url, options) => {
       called += 1;
-      assert.match(url, /^https:\/\/sandeepagrahari1\.atlassian\.net\/rest\/api\/3\/issue\/CGN-220\?/);
+      const host = "https://sandeepagrahari1.atlassian.net/rest/api/3/issue/";
+      assert(url.startsWith(host + "CGN-220?"));
       assert.equal(options.method, "GET");
       assert.match(options.headers.Authorization, /^Basic /);
       return { ok: true, json: async () => example };
@@ -58,7 +62,11 @@ test("optional fetch uses approved Jira HTTPS host and no credentials in output"
 
 test("fails closed on absent credentials, invalid IDs, mismatched issues and 401", async () => {
   await assert.rejects(
-    fetchJiraContext("CGN-220", { email: "", token: "", fetcher: async () => {} }),
+    fetchJiraContext("CGN-220", {
+      email: "",
+      token: "",
+      fetcher: async () => {},
+    }),
     /requires/,
   );
   await assert.rejects(
