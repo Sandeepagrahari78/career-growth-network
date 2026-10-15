@@ -1,6 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { fetchJiraContext, renderJiraIssue } from "../../scripts/jira-context.mjs";
+import {
+  fetchJiraContext,
+  renderJiraIssue,
+} from "../../scripts/jira-context.mjs";
 
 const example = {
   key: "CGN-220",
@@ -30,7 +33,7 @@ const example = {
   },
 };
 
-test("live response preserves ownership, status and explicit link direction", () => {
+test("live issue preserves link direction and owner", () => {
   const report = renderJiraIssue(example, "CGN-220");
   assert.match(report, /Tanvi/);
   assert.match(report, /To Do/);
@@ -40,7 +43,7 @@ test("live response preserves ownership, status and explicit link direction", ()
   assert.doesNotMatch(report, /CGN-219/);
 });
 
-test("optional fetch uses approved Jira HTTPS host and no credentials in output", async () => {
+test("live fetch uses approved site and masks credentials", async () => {
   let called = 0;
   const report = await fetchJiraContext("CGN-220", {
     email: "private@example.com",
@@ -60,7 +63,7 @@ test("optional fetch uses approved Jira HTTPS host and no credentials in output"
   assert.doesNotMatch(report, /private@example\.com/);
 });
 
-test("fails closed on absent credentials, invalid IDs, mismatched issues and 401", async () => {
+test("invalid Jira calls fail closed", async () => {
   await assert.rejects(
     fetchJiraContext("CGN-220", {
       email: "",
