@@ -16,9 +16,7 @@ export function platformsChanged(files) {
 }
 
 export function ticketFromBranch(branch) {
-  const match = /^CGN-([1-9][0-9]*)-[a-z0-9][a-z0-9-]*$/.exec(
-    branch || "",
-  );
+  const match = /^CGN-([1-9][0-9]*)-[a-z0-9][a-z0-9-]*$/.exec(branch || "");
   return match ? "CGN-" + match[1] : null;
 }
 
@@ -62,9 +60,7 @@ export function validatePlatformScope({ files, branch, registry }) {
   }
   const ticket = ticketFromBranch(branch);
   if (!ticket) {
-    return [
-      "Changes to apps/web or apps/mobile require a CGN-NNN-description branch.",
-    ];
+    return ["Changes to app platforms require a CGN-NNN-description branch."];
   }
   const scope = registry.tickets[ticket];
   if (!scope) {
