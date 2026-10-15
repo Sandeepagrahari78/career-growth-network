@@ -8,6 +8,8 @@ CGN is a Career Growth **Social Network** under active development. The goal →
 - [Module and file ownership / dependencies](docs/architecture/MODULE_DEPENDENCIES.md)
 - [Sandeep, Prachi, Tanvi multi-agent workflow](docs/architecture/AGENT_WORKFLOW.md)
 - [Three-member demo and optional live Jira context onboarding](docs/architecture/TEAM_ONBOARDING_DEMO.md)
+- [Web vs Android coding-agent file ownership / PR gate](docs/architecture/WEB_ANDROID_AGENT_OWNERSHIP.md)
+- [Android Google Play release checklist (CGN-287)](docs/runbooks/android-play-release-checklist.md)
 - [Module guides and current implementation status](docs/modules/README.md)
 - [Agent operating rules](AGENTS.md)
 - [Merged implementation state](docs/engineering-memory/05-current-state.md)
