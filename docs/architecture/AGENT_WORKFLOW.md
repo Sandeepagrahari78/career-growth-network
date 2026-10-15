@@ -19,29 +19,29 @@ AI agents act *for* the ticket owner, not as independent owners of architecture.
 ## Repeatable steps for each Jira ticket
 
 1. Confirm exact ticket key, owner, parent, acceptance criteria and upstream blockers **from Jira**. Do not substitute numbered-order guesses.
-2. Fetch/pull \`main\` and create \`CGN-NNN-specific-scope\`; never start from an outdated agent branch.
-3. Copy a current ticket export to \`docs/work-items/CGN-NNN.md\` if the agent has no live Jira connector. Mark export date and current Jira link; regenerate when Jira changes. **Never commit secrets**.
-4. Run \`pnpm agent:context --ticket CGN-NNN --domain admin\` (choose relevant domain); open the generated \`.cgn/context-CGN-NNN.md\`. This local context pack includes checked-in rules/architecture, ticket export when supplied, and named predecessor handoffs. It is **not** a live Jira fetch.
-5. Read relevant source code, package boundaries, contract ownership, existing tests and \`git log\`; submit a small exact-file impact plan. Stop when dependencies/contract details are missing.
+2. Fetch/pull `main` and create `CGN-NNN-specific-scope`; never start from an outdated agent branch.
+3. Copy a current ticket export to `docs/work-items/CGN-NNN.md` if the agent has no live Jira connector. Mark export date and current Jira link; regenerate when Jira changes. **Never commit secrets**.
+4. Run `pnpm agent:context --ticket CGN-NNN --domain admin` (choose relevant domain); open the generated `.cgn/context-CGN-NNN.md`. This local context pack includes checked-in rules/architecture, ticket export when supplied, and named predecessor handoffs. It is **not** a live Jira fetch.
+5. Read relevant source code, package boundaries, contract ownership, existing tests and `git log`; submit a small exact-file impact plan. Stop when dependencies/contract details are missing.
 6. Implement only approved files, update source/test/contract/module docs together. Never directly read another service DB.
-7. Update \`docs/handoffs/CGN-NNN.md\` using [template](../handoffs/TEMPLATE.md): changed files, behavior, contracts/events, tests and results, risks, next agent instruction, rollback.
+7. Update `docs/handoffs/CGN-NNN.md` using [template](../handoffs/TEMPLATE.md): changed files, behavior, contracts/events, tests and results, risks, next agent instruction, rollback.
 8. Push branch and open PR. Run CI; on failure fix and push new commit. **A green PR does not automatically merge itself.**
 9. Sandeep reviews integration/security/architecture-impacting changes; merge through PR into main; verify post-merge Main CI and staging. Update Jira to Done only after acceptance evidence.
 10. The next agent starts at step 1 against **new** main and predecessor handoffs, not prior chat memory.
 
 ## CGN-220 concrete example
 
-Tanvi first opens [CGN-220](https://sandeepagrahari1.atlassian.net/browse/CGN-220) and checks its links. She creates \`CGN-220-opportunity-publishing\`, exports approved Jira text to \`docs/work-items/CGN-220.md\` if offline, then runs:
+Tanvi first opens [CGN-220](https://sandeepagrahari1.atlassian.net/browse/CGN-220) and checks its links. She creates `CGN-220-opportunity-publishing`, exports approved Jira text to `docs/work-items/CGN-220.md` if offline, then runs:
 
-\`\`\`bash
+```bash
 pnpm agent:context --ticket CGN-220 --domain admin
-\`\`\`
+```
 
 The agent must describe what already exists, what is missing, exact proposed files and which neighboring tickets/contracts are needed; *do not implement a new Admin service only because its name appears on a diagram*.
 
 ## Rules for handoff automation
 
-- PR CI verifies \`docs/handoffs/CGN-NNN.md\` is **changed** for changed product code (\`apps/\`, \`services/\`, \`packages/\`) or infrastructure (\`infra/\`). Docs-only PRs are exempt.
+- PR CI verifies `docs/handoffs/CGN-NNN.md` is **changed** for changed product code (`apps/`, `services/`, `packages/`) or infrastructure (`infra/`). Docs-only PRs are exempt.
 - Handoff must include required sections and the exact ticket key, with meaningful nonempty content. A handoff is an audit artifact, not evidence that all tests succeeded; actual Actions run is authoritative.
 - This gate protects PRs, not direct main pushes; on current private GitHub Free account branch protection isn't enforced. Team policy: never push directly to main.
 - No real-production deploy, cloud expenses or committed Jira tokens.
