@@ -24,6 +24,16 @@ jobs:
         with:
           node-version: 22
 
+      - name: Print exact Prettier output for diagnostic
+        shell: bash
+        run: |
+          corepack enable
+          corepack prepare pnpm@11.25.0 --activate
+          pnpm dlx prettier@3.6.2 --write scripts/ci/staging-rollback-rehearsal.mjs
+          echo CGN227_FORMAT_START
+          cat scripts/ci/staging-rollback-rehearsal.mjs
+          echo CGN227_FORMAT_END
+
       - name: Prove staged service failure detection and recovery
         run: node scripts/ci/staging-rollback-rehearsal.mjs
 
