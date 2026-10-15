@@ -19,7 +19,7 @@ test("offline context includes ticket, latest source maps and freshness warning"
   assert.match(bundle, /Ticket: CGN-285/);
   assert.match(bundle, /PROJECT_FLOW\.md/);
   assert.match(bundle, /Jira source freshness/);
-  assert.match(bundle, /Verify Jira|verify Jira|verify it is current|verify Jira status|verify Jira status, owner|verify Jira status, owner, blockers|verify Jira status, owner, blockers and acceptance criteria|verify Jira status/i);
+  assert.match(bundle, /verify Jira status/i);
   assert.match(bundle, /## Required agent preflight/);
 });
 
