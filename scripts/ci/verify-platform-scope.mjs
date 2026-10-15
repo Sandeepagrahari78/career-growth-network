@@ -31,7 +31,7 @@ function main() {
     return;
   }
   const changedPlatforms = platformsChanged(changed).join(", ");
-  console.log("Platform CI scope passed: " + (changedPlatforms || "no app changes"));
+  console.log("Platform OK: " + (changedPlatforms || "no app changes"));
 }
 
 try {
