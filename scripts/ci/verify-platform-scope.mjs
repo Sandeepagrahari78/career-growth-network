@@ -30,10 +30,8 @@ function main() {
     process.exitCode = 1;
     return;
   }
-  console.log(
-    "Platform CI scope passed: " +
-      (platformsChanged(changed).join(", ") || "no app platform files changed"),
-  );
+  const changedPlatforms = platformsChanged(changed).join(", ");
+  console.log("Platform CI scope passed: " + (changedPlatforms || "no app changes"));
 }
 
 try {
