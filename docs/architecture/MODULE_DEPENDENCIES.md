@@ -34,3 +34,7 @@ This is a *navigation guide*. Authoritative ownership rules: `packages/contracts
 CGN-220 is **opportunity management and publish workflow** in Jira (To Do at authoring). It is not a completed app; current Admin/Opportunity runtime implementation is not verified. Tanvi's agent should inspect Jira scope, relevant approved contracts and existing code, then request Sandeep review for any backend authorization or data-contract change before inventing new service files.
 
 See [team instructions](AGENT_WORKFLOW.md) and [module notes](../modules/README.md).
+
+## Platform-specific PR enforcement (CGN-286)
+
+`apps/web/` belongs to **web/Next.js** tickets; `apps/mobile/` belongs to **Android/Expo React Native** tickets. Source-of-truth for per-ticket allowed platform files is the *reviewed Jira-derived* `config/ci/ticket-platform-scopes.v1.json`, used by `scripts/ci/verify-platform-scope.mjs` in PR CI. It is a file-scope guardrail, not a real-time Jira permission checker. See [web/Android workflow](WEB_ANDROID_AGENT_OWNERSHIP.md) and [Google Play readiness](../runbooks/android-play-release-checklist.md).
