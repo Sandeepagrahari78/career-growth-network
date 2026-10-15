@@ -24,8 +24,8 @@ function removeContainer(name) {
 async function expectHttp(path, status) {
   for (let attempt = 0; attempt < 40; attempt += 1) {
     try {
-      const response = await fetch(baseUrl + path, {
-        signal: AbortSignal.timeout(1500),
+      const response = await globalThis.fetch(baseUrl + path, {
+        signal: globalThis.AbortSignal.timeout(1500),
       });
       if (response.status === status) {
         return response.json();
