@@ -1,10 +1,10 @@
 # CGN project flow — navigation map
 
-> **Source of truth:** Jira defines planned work and dependencies; \`main\` + versioned contracts define implemented behavior. This drawing is a **target architecture / ownership map**, not proof that all services are running. Refresh it after architectural changes.
+> **Source of truth:** Jira defines planned work and dependencies; `main` + versioned contracts define implemented behavior. This drawing is a **target architecture / ownership map**, not proof that all services are running. Refresh it after architectural changes.
 
 ## Product journey (intended, Jira-scoped)
 
-\`\`\`mermaid
+```mermaid
 flowchart LR
     A["Identity & consent"] --> B["Career goal / diagnostic"]
     B --> C["180-day roadmap / missions"]
@@ -16,15 +16,15 @@ flowchart LR
     G --> I["Next best action"]
     H --> I
     I --> C
-\`\`\`
+```
 
 - Signed-in Home is **social-first**; My Career is **execution-first**. AI is an internal orchestration layer, not a separate source of truth.
-- The arrows depict *intended business progression*, not existing HTTP endpoint or event implementations. Contracts are frozen at boundary level in \`packages/contracts/architecture/bounded-contexts.v1.json\`; detailed interfaces need their owning Jira tickets.
+- The arrows depict *intended business progression*, not existing HTTP endpoint or event implementations. Contracts are frozen at boundary level in `packages/contracts/architecture/bounded-contexts.v1.json`; detailed interfaces need their owning Jira tickets.
 - Privacy: Identity owns consent; Social Graph owns connections/blocks; projections must not grant access denied by owning services.
 
 ## Service boundaries and integration model
 
-\`\`\`mermaid
+```mermaid
 flowchart TB
     WEB["apps/web (shell)"] --> GATE["Gateway / BFF (boundary)"]
     MOBILE["apps/mobile (shell)"] --> GATE
@@ -41,13 +41,13 @@ flowchart TB
     SOCIAL["Social Graph"] -. "block / eligibility policy" .-> FEED
     SOCIAL -. "eligibility" .-> COMM["Communities / Messaging"]
     GR -. "approved read / event contract" .-> OPP
-\`\`\`
+```
 
-**Important:** Dotted relationships are architectural policy and contract intentions, *not evidence that code or Kafka topics already exist*. Services in \`services/\` apart from \`health-demo\` are presently workspace package skeletons until the corresponding feature tickets land. The repository has no \`services/opportunities\` implementation at the time this map was authored. No service may read another service's database directly.
+**Important:** Dotted relationships are architectural policy and contract intentions, *not evidence that code or Kafka topics already exist*. Services in `services/` apart from `health-demo` are presently workspace package skeletons until the corresponding feature tickets land. The repository has no `services/opportunities` implementation at the time this map was authored. No service may read another service's database directly.
 
 ## Delivery and verification
 
-\`\`\`mermaid
+```mermaid
 flowchart TD
     J["Jira ticket + dependencies"] --> M["Fetch latest main + make CGN-NNN branch"]
     M --> C["Read AGENTS.md, context pack, contracts, previous handoffs"]
@@ -62,7 +62,7 @@ flowchart TD
     RV --> MAIN["Main CI revalidation"]
     MAIN --> STAGE["Ephemeral staging smoke after green main"]
     STAGE --> NEXT["Next agent reads new main and handoff"]
-\`\`\`
+```
 
 **PRs are checked after a developer pushes code.** GitHub Actions does not author commits or technically prevent direct main writes on the current GitHub Free private plan. Production release/rollback is dry-run only, and 5,000 registered-beta capacity has not been proven by the health-demo smoke test.
 
