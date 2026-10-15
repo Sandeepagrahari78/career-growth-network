@@ -98,7 +98,7 @@ test("rejects invalid keys, platform names and duplicate platform values", () =>
       "CGN-11": { platforms: ["web", "web"], note: "duplicate" },
     },
   };
-  assert.equal(checkRegistry(bad).length, 3);
+  assert.equal(checkRegistry(bad).length, 4);
   assert.equal(ticketFromBranch("CGN-128-expo-shell"), "CGN-128");
   assert.equal(ticketFromBranch("CGN-128"), null);
 });
