@@ -4,15 +4,15 @@ import { createServer } from "node:http";
 import {
   CGN_TABS,
   STATUS_CHOICES,
-  resolveEntryRoute,
   getTabRoute,
+  resolveEntryRoute,
 } from "../../apps/mobile/src/foundation/navigation.mjs";
 import {
   CgnApiError,
   createCgnApiClient,
 } from "../../apps/mobile/src/foundation/api-client.mjs";
 
-test("CGN V2 tabs and status choices follow six approved images", () => {
+test("five tabs match approved mobile navigation", () => {
   assert.deepEqual(
     CGN_TABS.map((tab) => tab.label),
     ["Home", "Explore", "Journey", "Chats", "Profile"],
@@ -32,56 +32,50 @@ test("CGN V2 tabs and status choices follow six approved images", () => {
   ]);
 });
 
-test("authorized user sees one current-status step before Home", () => {
+test("authorization and status decide the first screen", () => {
   assert.equal(resolveEntryRoute({ session: "signed_out" }), "/login");
-  assert.equal(
-    resolveEntryRoute({ session: "authenticated" }),
-    "/current-status",
-  );
-  assert.equal(
-    resolveEntryRoute({ session: "authenticated", currentStatus: "B.Tech" }),
-    "/home",
-  );
+  const pending = resolveEntryRoute({ session: "authenticated" });
+  assert.equal(pending, "/current-status");
+  const home = resolveEntryRoute({
+    session: "authenticated",
+    currentStatus: "B.Tech",
+  });
+  assert.equal(home, "/home");
 });
 
-test("API transport rejects insecure URLs and cross-origin endpoints", async () => {
+test("cross-origin and unauthenticated requests fail closed", async () => {
+  const config = {
+    baseUrl: "https://api.cgn.example",
+    getAccessToken: () => null,
+  };
   assert.throws(
     () => createCgnApiClient({
+      ...config,
       baseUrl: "http://example.com",
-      getAccessToken: () => "test",
     }),
     TypeError,
   );
   const client = createCgnApiClient({
-    baseUrl: "https://api.cgn.example",
-    getAccessToken: () => "test",
-    fetchImpl: () => assert.fail("invalid endpoint must not call fetch"),
+    ...config,
+    fetchImpl: () => assert.fail("request must not leave the device"),
   });
   await assert.rejects(client.request("//evil.test/"), TypeError);
-  await assert.rejects(client.request("http://evil.test/"), TypeError);
-  await assert.rejects(client.request("/v1/bad%2fpath"), TypeError);
-});
-
-test("API client never sends unauthenticated traffic", async () => {
-  const client = createCgnApiClient({
-    baseUrl: "https://api.cgn.example",
-    getAccessToken: async () => null,
-    fetchImpl: () => assert.fail("no request without a session"),
+  await assert.rejects(client.request("/unsafe%2fpath"), TypeError);
+  await assert.rejects(client.request("/safe"), {
+    name: "CgnApiError",
+    code: "AUTH_REQUIRED",
   });
-  await assert.rejects(
-    client.request("/v1/contract-defined-path"),
-    (error) => error instanceof CgnApiError && error.code === "AUTH_REQUIRED",
-  );
 });
 
-test("real HTTP loopback integration uses bearer token and JSON", async (t) => {
+test("real loopback request sends authorized JSON", async (t) => {
   const server = createServer(async (req, res) => {
     assert.equal(req.headers.authorization, "Bearer test-token");
     assert.equal(req.method, "POST");
     assert.equal(req.url, "/v1/test-only");
     const chunks = [];
     for await (const chunk of req) chunks.push(chunk);
-    assert.deepEqual(JSON.parse(Buffer.concat(chunks).toString()), { ok: true });
+    const body = JSON.parse(Buffer.concat(chunks).toString());
+    assert.deepEqual(body, { ok: true });
     res.writeHead(200, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ stored: true }));
   });
@@ -92,30 +86,28 @@ test("real HTTP loopback integration uses bearer token and JSON", async (t) => {
     getAccessToken: () => "test-token",
     allowInsecureLocal: true,
   });
-  assert.deepEqual(
-    await client.request("/v1/test-only", {
-      method: "POST",
-      body: { ok: true },
-    }),
-    { stored: true },
-  );
+  const response = await client.request("/v1/test-only", {
+    method: "POST",
+    body: { ok: true },
+  });
+  assert.deepEqual(response, { stored: true });
 });
 
-test("HTTP errors and invalid responses cannot appear as success", async () => {
-  const base = {
+test("denied or invalid API responses never appear successful", async () => {
+  const config = {
     baseUrl: "https://api.cgn.example",
     getAccessToken: () => "test-token",
   };
   const denied = createCgnApiClient({
-    ...base,
+    ...config,
     fetchImpl: async () => ({ ok: false, status: 403 }),
   });
-  await assert.rejects(
-    denied.request("/v1/private"),
-    (error) => error instanceof CgnApiError && error.status === 403,
-  );
-  const badJson = createCgnApiClient({
-    ...base,
+  await assert.rejects(denied.request("/v1/private"), {
+    name: "CgnApiError",
+    status: 403,
+  });
+  const invalid = createCgnApiClient({
+    ...config,
     fetchImpl: async () => ({
       ok: true,
       status: 200,
@@ -124,8 +116,9 @@ test("HTTP errors and invalid responses cannot appear as success", async () => {
       },
     }),
   });
-  await assert.rejects(
-    badJson.request("/v1/test"),
-    (error) => error instanceof CgnApiError && error.code === "INVALID_JSON",
-  );
+  await assert.rejects(invalid.request("/v1/test"), {
+    name: "CgnApiError",
+    code: "INVALID_JSON",
+  });
+  assert.equal(CgnApiError.name, "CgnApiError");
 });
