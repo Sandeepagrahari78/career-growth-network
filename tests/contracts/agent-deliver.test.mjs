@@ -1,12 +1,42 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
+  codexInvocation,
   doctor,
   hasJiraMcp,
   parseArgs,
   promptFor,
   validRemote,
 } from "../../scripts/ci/agent-deliver.mjs";
+
+test("Windows launches a native binary or npm JS through Node without cmd.exe", () => {
+  const native = "C:\\Tools\\codex.exe";
+  assert.deepEqual(
+    codexInvocation("win32", "C:\\Tools", (p) => p === native),
+    { executable: native, prefix: [] },
+  );
+  const script =
+    "C:\\Users\\A B\\npm\\node_modules\\@openai\\codex\\bin\\codex.js";
+  const result = codexInvocation(
+    "win32",
+    "C:\\Users\\A B\\npm",
+    (p) => p === script,
+  );
+  assert.equal(result.executable, process.execPath);
+  assert.deepEqual(result.prefix, [script]);
+  assert.throws(
+    () => codexInvocation("win32", ".;relative", () => true),
+    /No shell-free/,
+  );
+  assert.throws(
+    () => codexInvocation("win32", "C:\\Tools", (p) => p.endsWith(".cmd")),
+    /No shell-free/,
+  );
+  assert.deepEqual(
+    codexInvocation("linux", "", () => false),
+    { executable: "codex", prefix: [] },
+  );
+});
 
 test("launcher validates one exact ticket and explicit resume", () => {
   assert.deepEqual(parseArgs(["--check"]), { check: true });

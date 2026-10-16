@@ -1,6 +1,6 @@
 import { execFileSync, spawn } from "node:child_process";
 import { existsSync, mkdirSync, realpathSync, writeFileSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { join, resolve, win32 } from "node:path";
 import { pathToFileURL } from "node:url";
 
 const REPO = "Sandeepagrahari78/career-growth-network";
@@ -61,19 +61,59 @@ If merge has already been explicitly authorized and required review is recorded,
 Return one clear status: BLOCKED, REVIEW_REQUIRED, CI_FAILED or DONE, plus ticket, branch, PR link, tested SHA/run links, staging evidence and remaining action. CLI success alone is not DONE. Respect quota, credential and automatic-approval rejections; report them without bypassing controls. No paid services or API billing setup. No changes to other tickets' implementation scope.`;
 }
 
+export function codexInvocation(
+  platform = process.platform,
+  searchPath = process.env.PATH ?? "",
+  exists = existsSync,
+) {
+  if (platform !== "win32") {
+    return { executable: "codex", prefix: [] };
+  }
+  for (const entry of searchPath.split(";").filter(Boolean)) {
+    const directory = entry.replace(/^"|"$/g, "");
+    if (!win32.isAbsolute(directory)) {
+      continue;
+    }
+    const native = win32.join(directory, "codex.exe");
+    if (exists(native)) {
+      return { executable: native, prefix: [] };
+    }
+    // npm's global JS entry can be invoked with Node directly, avoiding cmd.exe.
+    const script = win32.join(
+      directory,
+      "node_modules",
+      "@openai",
+      "codex",
+      "bin",
+      "codex.js",
+    );
+    if (exists(script)) {
+      return { executable: process.execPath, prefix: [script] };
+    }
+  }
+  throw new Error(
+    "No shell-free Codex executable found on PATH. Install official @openai/codex or codex.exe and reopen the terminal.",
+  );
+}
+
 function command(program, args, cwd, timeout = 30000) {
-  // Only Codex's static arguments use the Windows .cmd shim. No ticket, prompt
-  // or filesystem path is interpolated into a shell command.
-  const shim = process.platform === "win32" && program === "codex";
+  const invocation =
+    program === "codex"
+      ? codexInvocation()
+      : { executable: program, prefix: [] };
   try {
-    return execFileSync(shim ? "codex.cmd" : program, args, {
-      cwd,
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "pipe"],
-      timeout,
-      shell: shim,
-      maxBuffer: 4 * 1024 * 1024,
-    }).trim();
+    return execFileSync(
+      invocation.executable,
+      [...invocation.prefix, ...args],
+      {
+        cwd,
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "pipe"],
+        timeout,
+        shell: false,
+        maxBuffer: 4 * 1024 * 1024,
+      },
+    ).trim();
   } catch {
     throw new Error(
       `${program} ${args.slice(0, 2).join(" ")} failed. Check installation/login/connectivity; credentials and raw output were not logged.`,
@@ -168,11 +208,12 @@ async function main() {
     console.log(
       `Starting ${ticket} in ${directory}. Final report: .local/agent-result.md. Laptop must stay awake.`,
     );
-    const windows = process.platform === "win32";
+    const invocation = codexInvocation();
     const exitCode = await new Promise((resolveExit, reject) => {
       const child = spawn(
-        windows ? "codex.cmd" : "codex",
+        invocation.executable,
         [
+          ...invocation.prefix,
           "exec",
           "--approve-for-me",
           "--output-last-message",
@@ -181,7 +222,7 @@ async function main() {
         ],
         {
           cwd: directory,
-          shell: windows,
+          shell: false,
           stdio: ["pipe", "inherit", "inherit"],
         },
       );
