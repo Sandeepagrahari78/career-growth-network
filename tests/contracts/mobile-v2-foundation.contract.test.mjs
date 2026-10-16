@@ -122,4 +122,4 @@ test("denied or invalid API responses never appear successful", async () => {
     code: "INVALID_JSON",
   });
   assert.equal(CgnApiError.name, "CgnApiError");
-})ÿÿ
+});
