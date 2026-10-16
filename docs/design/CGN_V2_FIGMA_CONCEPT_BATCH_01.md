@@ -1,6 +1,6 @@
 # CGN V2 — Figma Concept Batch 01 · Actual editable frames
 
-> **Design review status: DRAFT — NOT APPROVED FOR IMPLEMENTATION.**
+> **Design review status: DRAFT — NOT APPROVED FOR IMPLEMENTATION.** This is the **historical first 14-frame batch**, not the current total. The Figma file now contains **92 native Android prototype screens** (76 base + 16 Industrial Experts). See [new expert Figma frame catalog](CGN_V2_INDUSTRIAL_EXPERT_NETWORK_FIGMA.md) and [full navigation inventory](CGN_V2_76_SCREEN_NAVIGATION_PLAN.md).
 >
 > Owner: Prachi · [Jira CGN-291](https://sandeepagrahari1.atlassian.net/browse/CGN-291) · Created 2026-10-16 in connected Figma. These are *real editable design frames* with fictional sample data, not deployed UI, Google Stitch exports, production components, approved API schemas, or independently approved UX.
 
