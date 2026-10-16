@@ -225,10 +225,7 @@ export async function run(env = process.env) {
   }
   const event = JSON.parse(readFileSync(env.GITHUB_EVENT_PATH, "utf8"));
   const api = apiClient(env);
-  if (
-    env.GITHUB_EVENT_NAME === "create" ||
-    env.GITHUB_EVENT_NAME === "push"
-  ) {
+  if (env.GITHUB_EVENT_NAME === "create" || env.GITHUB_EVENT_NAME === "push") {
     const ticket = ticketFromBranchEvent(env.GITHUB_EVENT_NAME, event);
     return ticket
       ? transition(api, ticket, "In Progress")
