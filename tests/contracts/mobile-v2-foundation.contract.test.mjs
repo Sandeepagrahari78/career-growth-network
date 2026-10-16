@@ -49,10 +49,11 @@ test("cross-origin and unauthenticated requests fail closed", async () => {
     getAccessToken: () => null,
   };
   assert.throws(
-    () => createCgnApiClient({
-      ...config,
-      baseUrl: "http://example.com",
-    }),
+    () =>
+      createCgnApiClient({
+        ...config,
+        baseUrl: "http://example.com",
+      }),
     TypeError,
   );
   const client = createCgnApiClient({
@@ -121,4 +122,4 @@ test("denied or invalid API responses never appear successful", async () => {
     code: "INVALID_JSON",
   });
   assert.equal(CgnApiError.name, "CgnApiError");
-});
+})ÿÿ
