@@ -8,6 +8,7 @@ CGN is a Career Growth **Social Network** under active development. On 2026-10-1
 - [31-Epic feature audit and gap matrix](docs/product/CGN_V2_FEATURE_GAP_AUDIT.md)
 - [V2 architecture/contract impact review (pending technical decisions)](docs/product/CGN_V2_ARCHITECTURE_REVIEW.md)
 - [V2 design-system, screen inventory and Google Stitch handoff (draft frames, not approved Figma)](docs/design/CGN_V2_DESIGN_HANDOFF.md)
+- [CGN V2 six original approved UI screenshots and linked editable Figma drafts (CGN-297)](docs/design/CGN_V2_FINAL_SIX_APPROVED_UI.md) — binaries verified by hashes, final visual QA / APIs pending
 
 - [CGN product flow, architecture and CI/CD diagrams](docs/architecture/PROJECT_FLOW.md)
 - [Module and file ownership / dependencies](docs/architecture/MODULE_DEPENDENCIES.md)
