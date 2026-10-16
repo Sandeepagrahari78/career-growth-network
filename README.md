@@ -79,14 +79,22 @@ Jira is planning truth. Latest merged `main` is implementation truth. Contracts/
 
 Repository is private on GitHub Free, where desired branch protection is not enforced. Sandeep's PR-based approval and post-merge audit are compensating process controls, not a technical block on direct pushes.
 
-## CGN V2 — Student Ecosystem direction (product planning, 2026-10)
+## CGN V2 — Student Ecosystem approved direction (2026-10)
 
-The team-approved **direction** expands CGN from a mainly college-career growth network into an evolving education, competitive-exam preparation, social and career-growth ecosystem. This is **product planning**, not evidence of new deployed product features, active exam catalogs or approved privacy contracts. Existing code, Jira scope, Figma authority and versioned contracts remain binding until their respective change tickets and approvals.
+The **team-approved direction** expands CGN from mainly college/career growth into a continuous post-Class-10 student education, exam-preparation, social and career-growth ecosystem. This is **planning/approved vision**, not evidence of implemented exam services, active verified mentors, ready-made syllabus content or approved privacy contracts.
 
-- [CGN V2 Product Vision / PRD](docs/product/CGN_STUDENT_ECOSYSTEM_V2_PRD.md)
-- [31 existing Epic feature-gap audit](docs/product/CGN_V2_FEATURE_GAP_MATRIX.md)
-- [Student Journey architecture and safety contract RFC questions](docs/product/CGN_V2_ARCHITECTURE_DECISION_BRIEF.md)
-- [Google Stitch → Figma UX screen inventory and master design prompt](docs/product/CGN_V2_DESIGN_HANDOFF.md)
-- [V2 execution sequence and Jira workstreams](docs/product/CGN_V2_EXECUTION_ROADMAP.md)
+**Canonical source-of-truth planning documents for CGN-288:**
 
-**Next:** [CGN-293](https://sandeepagrahari1.atlassian.net/browse/CGN-293) (architecture), [CGN-294](https://sandeepagrahari1.atlassian.net/browse/CGN-294) (UX) and [CGN-295](https://sandeepagrahari1.atlassian.net/browse/CGN-295) (pilot research). No app implementation until relevant contracts, age protections, approved Figma frames and per-ticket acceptance are ready.
+- [V2 Product Vision / official PRD](docs/product/CGN_V2_PRODUCT_VISION.md)
+- [All 31 existing Jira Epics — official gap audit](docs/product/CGN_V2_FEATURE_GAP_AUDIT.md)
+- [Existing service/contract impact review](docs/product/CGN_V2_ARCHITECTURE_REVIEW.md)
+- [Google Stitch → Figma UX screen catalog and prompt](docs/design/CGN_V2_DESIGN_HANDOFF.md)
+- [V2 execution roadmap, owners and approval checkpoints](docs/product/CGN_V2_EXECUTION_ROADMAP.md)
+
+**Supporting deep-dive reference notes (not alternate specifications):**
+[Detailed pilot PRD](docs/product/CGN_STUDENT_ECOSYSTEM_V2_PRD.md),
+[31-Epic extended impact table](docs/product/CGN_V2_FEATURE_GAP_MATRIX.md),
+[contract RFC questions](docs/product/CGN_V2_ARCHITECTURE_DECISION_BRIEF.md),
+[expanded UX screen/states handoff](docs/product/CGN_V2_DESIGN_HANDOFF.md).
+
+**Canonical next Jira:** [CGN-290](https://sandeepagrahari1.atlassian.net/browse/CGN-290) (Sandeep architecture and safety), [CGN-291](https://sandeepagrahari1.atlassian.net/browse/CGN-291) (Prachi web/Android approved Figma), [CGN-292](https://sandeepagrahari1.atlassian.net/browse/CGN-292) (Tanvi student pilot validation). No app implementation until relevant approved versioned contracts, minor-safety policy, real Figma frame IDs and per-ticket acceptance criteria are ready. No existing 31 product Epics were silently rewritten.

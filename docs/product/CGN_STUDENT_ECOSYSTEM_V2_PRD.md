@@ -1,3 +1,5 @@
+> **Document precedence:** Detailed **supporting extension** of the canonical [V2 Product Vision / PRD](CGN_V2_PRODUCT_VISION.md). If scope conflicts, use the canonical PRD, Jira and approved contracts. This deep dive proposes pilot scenarios only.
+
 # CGN Student Ecosystem V2 — Product Requirements Document
 
 > **Decision status:** The **direction** toward a continuous student ecosystem was team-approved as reported by the product owner on 2026-10-16. **The detailed MVP, individual screens, API contracts, resource estimates and content commitments are proposals pending their owning tickets and reviews.**

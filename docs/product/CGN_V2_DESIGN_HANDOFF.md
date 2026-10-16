@@ -1,3 +1,5 @@
+> **Document precedence:** **Supporting expanded UX specification and copy-ready Stitch prompt**, not existing Figma screens. Canonical screen IDs, design scope and approval handoff live at [docs/design/CGN_V2_DESIGN_HANDOFF.md](../design/CGN_V2_DESIGN_HANDOFF.md). [CGN-291](https://sandeepagrahari1.atlassian.net/browse/CGN-291) owns actual editable design frames.
+
 # CGN V2 — Product UX and Design Handoff
 
 **Status:** Design brief approved as an execution direction, **screens not automatically approved**. No claim that design frames exist in Figma yet.  

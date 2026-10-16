@@ -1,3 +1,5 @@
+> **Document precedence:** **Supporting detailed audit**, not a second source of truth. Canonical all-31-Epic audit is [CGN_V2_FEATURE_GAP_AUDIT.md](CGN_V2_FEATURE_GAP_AUDIT.md); Jira remains live status/acceptance authority.
+
 # CGN V2 — Existing vs New Feature Gap Audit
 
 > **Snapshot:** Jira project CGN, reviewed 2026-10-16, **31 existing Epics**, baseline merged GitHub main \`1352de4f598041ca2865c36e838c8c06306e631e\`. Jira is the **live work truth**, so statuses below are a **snapshot** and may change. A feature being in an Epic does not imply implementation.

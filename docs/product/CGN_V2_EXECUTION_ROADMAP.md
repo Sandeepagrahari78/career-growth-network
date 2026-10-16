@@ -1,7 +1,8 @@
 # CGN V2 — Team Execution Roadmap and Decision Register
 
-**Vision direction:** approved by team as reported by product owner (2026-10-16).  
-**Requirements and UI detail:** accepted only through subsequent per-ticket review.  
+**Vision direction:** approved by team as reported by product owner (2026-10-16).
+**Canonical Jira workstreams:** CGN-290, CGN-291 and CGN-292. CGN-293/294/295 were redundant overlapping planning tickets and are explicitly closed as duplicates.  
+**Requirements and UI detail:** accepted only through subsequent per-ticket review. Use canonical [Product Vision](CGN_V2_PRODUCT_VISION.md), [Epic Audit](CGN_V2_FEATURE_GAP_AUDIT.md), [Architecture Review](CGN_V2_ARCHITECTURE_REVIEW.md) and [Figma design scope](../design/CGN_V2_DESIGN_HANDOFF.md).  
 **Product-code status:** V2 not yet implemented; prior GitHub Engineering Memory and CI remain source of truth.
 
 ## Workstreams created on Jira
@@ -9,17 +10,17 @@
 | Jira | Owner | Scope | Gate |
 | --- | --- | --- | --- |
 | [CGN-288](https://sandeepagrahari1.atlassian.net/browse/CGN-288) | Sandeep | Vision PRD, gap audit, technical and design handoff planning | Planning documents are traceable and PR-reviewed |
-| [CGN-293](https://sandeepagrahari1.atlassian.net/browse/CGN-293) | Sandeep | **RFC:** Journey/goal owner, exam data contracts, cross-service events, minors' consent and mentor eligibility | Signed ADR, schema proposal + privacy/contract tests BEFORE backend code |
-| [CGN-294](https://sandeepagrahari1.atlassian.net/browse/CGN-294) | Prachi | Preserve/review old Figma; new component library, UX flows and web+Android screen variants using Stitch drafts | Human-approved Figma file/frame/version URLs + interactive prototypes |
-| [CGN-295](https://sandeepagrahari1.atlassian.net/browse/CGN-295) | Tanvi | Validate NEET and B.Tech pilot, real interviews, mentor/community safety and meaningful retention | Documented evidence, consent process, revised MVP definition |
+| [CGN-290](https://sandeepagrahari1.atlassian.net/browse/CGN-290) | Sandeep | **RFC:** Journey/goal owner, exam data contracts, cross-service events, minors' consent and mentor eligibility | Signed ADR, schema proposal + privacy/contract tests BEFORE backend code |
+| [CGN-291](https://sandeepagrahari1.atlassian.net/browse/CGN-291) | Prachi | Preserve/review old Figma; new component library, UX flows and web+Android screen variants using Stitch drafts | Human-approved Figma file/frame/version URLs + interactive prototypes |
+| [CGN-292](https://sandeepagrahari1.atlassian.net/browse/CGN-292) | Tanvi | Validate NEET and B.Tech pilot, real interviews, mentor/community safety and meaningful retention | Documented evidence, consent process, revised MVP definition |
 
 ## Recommended order
 
 \`\`\`mermaid
 flowchart TD
- A["CGN-288: V2 PRD + gap audit (vision direction approved)"] --> B["CGN-293: Journey architecture + safety RFC"]
- A --> C["CGN-294: Stitch/Figma design exploration"]
- A --> D["CGN-295: Pilot and research validation"]
+ A["CGN-288: V2 PRD + gap audit (vision direction approved)"] --> B["CGN-290: Journey architecture + safety RFC"]
+ A --> C["CGN-291: Stitch/Figma design exploration"]
+ A --> D["CGN-292: Pilot and research validation"]
  D --> E["Select and freeze pilot MVP"]
  B --> E
  C --> F["Figma approved frames/components"]
@@ -67,7 +68,7 @@ No guarantees of 100% retention, 1% Indian market share, exam rank, career outco
 ## What is NOT authorized by the reported approval
 
 - Editing or closing the existing 31 product Epics en masse.
-- Modifying \`packages/contracts/architecture/bounded-contexts.v1.json\` or inventing API/event fields without CGN-293.
+- Modifying \`packages/contracts/architecture/bounded-contexts.v1.json\` or inventing API/event fields without CGN-290.
 - Turning a Stitch-generated draft into authoritative Figma design without approval.
 - Registering minors or enabling unrestricted DMs before consent and safety review.
 - A paid cloud plan, real public launch, Apple App Store support or Google Play registration.
