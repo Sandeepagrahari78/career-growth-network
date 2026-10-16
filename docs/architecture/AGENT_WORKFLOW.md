@@ -25,8 +25,8 @@ AI agents act *for* the ticket owner, not as independent owners of architecture.
 5. Read relevant source code, package boundaries, contract ownership, existing tests and `git log`; submit a small exact-file impact plan. Stop when dependencies/contract details are missing.
 6. Implement only approved files, update source/test/contract/module docs together. Never directly read another service DB.
 7. Update `docs/handoffs/CGN-NNN.md` using [template](../handoffs/TEMPLATE.md): changed files, behavior, contracts/events, tests and results, risks, next agent instruction, rollback.
-8. Push branch and open PR. Run CI; on failure fix and push new commit. **A green PR does not automatically merge itself.**
-9. Sandeep reviews integration/security/architecture-impacting changes; merge through PR into main; verify post-merge Main CI and staging. Update Jira to Done only after acceptance evidence.
+8. Inspect/stage only ticket files, commit, push the branch and open/update the PR without another routine permission request. Inspect Linux CI; fix failures introduced by this change and push the fix. Report unrelated baseline failures with evidence. Local tests alone are not a completed agent handoff. **A green PR does not automatically merge itself.**
+9. Sandeep reviews integration/security/architecture-impacting changes; merge through PR into main; verify post-merge Main CI and required staging. Sandeep records acceptance for the exact merge SHA using the [delivery runbook](../runbooks/agent-delivery-automation.md). Once activated, Jira Delivery Sync moves the ticket to Done only when its evidence checks pass. Until activation, status updates remain explicit, evidence-based actions.
 10. The next agent starts at step 1 against **new** main and predecessor handoffs, not prior chat memory.
 
 ## CGN-220 concrete example
@@ -53,3 +53,4 @@ Run `pnpm demo:three-agents` after `pnpm install` to verify a deterministic Sand
 ## Before an agent edits web or Android files
 
 Read [platform ownership rules](WEB_ANDROID_AGENT_OWNERSHIP.md) and the ticket entry in `config/ci/ticket-platform-scopes.v1.json`. Mobile-only tickets must not edit `apps/web/`; web-only tickets must not edit `apps/mobile/`. For an unregistered ticket, verify the live Jira scope and get Sandeep approval to register it. The PR CI file-scope gate enforces this against changed files. A single monorepo preserves the shared contract layer; this path check alone does not validate actual Play Store deployment.
+

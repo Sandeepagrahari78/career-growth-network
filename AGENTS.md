@@ -66,7 +66,9 @@ pnpm memory:check
 - The [three-person synthetic handoff proof](docs/architecture/TEAM_ONBOARDING_DEMO.md) is not evidence of real feature implementation or live Jira status.
 - Show an exact-file impact plan + tests first; use the ticket-defined owning module. A conceptual diagram never authorizes creating API routes or database schemas.
 - Source/infra changes require a changed ticket-matched `docs/handoffs/CGN-NNN.md` with evidence and a meaningful next-agent trail. CI checks it on PRs.
-- Agents may commit to their feature branches after review of scope, but GitHub Actions does not create commits; technical review by Sandeep precedes merging main. No automatic production deploy.
+- Once ticket scope is authorized, agents must finish delivery: inspect the diff, stage only ticket files, commit, push the feature branch, open/update the PR, inspect Linux PR CI, and fix failures caused by their change. Do not stop after local validation or ask again for routine commit/push/PR permission. Never include local `.cgn/` caches, tokens or unrelated user changes. If authentication or an enforced approval blocks delivery, report the exact blocker and preserve the work.
+- GitHub Actions validates pushed code and syncs Jira; it does not author commits or retrieve uncommitted laptop files. Sandeep technical review still precedes merge to main. No automatic production deploy. See [delivery automation](docs/runbooks/agent-delivery-automation.md).
+- Agents must never post `CGN-ACCEPTED` on behalf of a human or claim acceptance based only on passing tests. Only Sandeep records final acceptance after inspecting the merged SHA, Jira criteria and required staging evidence. Automated Jira Done requires that acceptance and successful CI.
 
 ## CGN-286 platform file-scope gate (monorepo)
 
@@ -93,3 +95,4 @@ pnpm memory:check
 - The historical 92-screen Figma native prototype is **supporting** detail, NOT authority to override any conflicting one of the new six approved visual screens; Prachi must align and approve a versioned Figma frame before coding.
 - **Asset gate:** the six original binary PNG files have NOT yet been uploaded to GitHub. Their exact filenames and SHA-256 hashes are in the visual spec; use the owner's full-resolution image package, verify hashes, then set assetStatus accordingly before claiming exact pixel fidelity. Do not substitute placeholders or assume missing paths exist.
 - This is a visual intent contract **not** a REST/DB/event contract. Respect existing owning-service contracts, CGN-290 approval, consent, moderated adult/minor mentorship and backend authorization. Names, company logos, badges, metrics and fake chat entries in examples are not production assertions.
+
