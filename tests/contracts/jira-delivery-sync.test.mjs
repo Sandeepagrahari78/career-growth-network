@@ -8,6 +8,7 @@ import {
   list,
   syncPR,
   ticketFromBranch,
+  ticketFromBranchEvent,
   transition,
 } from "../../scripts/ci/jira-delivery-sync.mjs";
 
@@ -44,6 +45,37 @@ test("only canonical ticket branches are recognized", () => {
   ]) {
     assert.equal(ticketFromBranch(ref), undefined);
   }
+});
+
+test("ticket branch create and push events identify only head branches", () => {
+  assert.equal(
+    ticketFromBranchEvent("create", {
+      ref_type: "branch",
+      ref: "CGN-299-agent-delivery",
+    }),
+    "CGN-299",
+  );
+  assert.equal(
+    ticketFromBranchEvent("push", {
+      ref: "refs/heads/CGN-299-agent-delivery",
+    }),
+    "CGN-299",
+  );
+  assert.equal(
+    ticketFromBranchEvent("push", { ref: "refs/tags/CGN-299-release" }),
+    undefined,
+  );
+  assert.equal(
+    ticketFromBranchEvent("create", {
+      ref_type: "tag",
+      ref: "CGN-299-agent-delivery",
+    }),
+    undefined,
+  );
+  assert.equal(
+    ticketFromBranchEvent("push", { ref: "refs/heads/main" }),
+    undefined,
+  );
 });
 
 test("every completion gate is required; forks and unmerged closure never complete", () => {

@@ -11,6 +11,16 @@ export function ticketFromBranch(branch = "") {
   return /^(CGN-[1-9][0-9]*)-[A-Za-z0-9._-]+$/.exec(branch)?.[1];
 }
 
+export function ticketFromBranchEvent(eventName, event = {}) {
+  let branch = "";
+  if (eventName === "create" && event.ref_type === "branch") {
+    branch = event.ref;
+  } else if (eventName === "push") {
+    branch = /^refs\/heads\/(.+)$/.exec(event.ref ?? "")?.[1] ?? "";
+  }
+  return ticketFromBranch(branch);
+}
+
 export function desiredStatus(pr, evidence = {}) {
   if (pr.base?.ref !== "main" || pr.head?.repo?.full_name !== REPO) {
     return null;
@@ -215,8 +225,11 @@ export async function run(env = process.env) {
   }
   const event = JSON.parse(readFileSync(env.GITHUB_EVENT_PATH, "utf8"));
   const api = apiClient(env);
-  if (env.GITHUB_EVENT_NAME === "create") {
-    const ticket = event.ref_type === "branch" && ticketFromBranch(event.ref);
+  if (
+    env.GITHUB_EVENT_NAME === "create" ||
+    env.GITHUB_EVENT_NAME === "push"
+  ) {
+    const ticket = ticketFromBranchEvent(env.GITHUB_EVENT_NAME, event);
     return ticket
       ? transition(api, ticket, "In Progress")
       : "Ignored non-ticket ref";
