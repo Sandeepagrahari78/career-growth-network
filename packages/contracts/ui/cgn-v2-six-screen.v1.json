@@ -32,7 +32,10 @@
       "description": "Google or email sign-in (identity flow), then one required current-status page. Select 11th, 12th, B.Tech, B.Sc, NEET, JEE, UPSC or Other; continue directly to personalized Home. Returning users with saved stage go directly to Home.",
       "primaryPlatform": "Android",
       "webAdaptation": "responsive—same API semantics, desktop-appropriate layout",
-      "verifiedGitBlobSha1": "bc5e6767fd1520226662dbd2fcc9dc30099ab665"
+      "verifiedGitBlobSha1": "bc5e6767fd1520226662dbd2fcc9dc30099ab665",
+      "editableFigmaFrameId": "28:2",
+      "editableFigmaFrameUrl": "https://www.figma.com/design/9lliKy1wnK8QFfTuBHmsZJ?node-id=28-2",
+      "figmaReviewStatus": "DRAFT_PRIMARY_LAYOUT__PRACHI_VISUAL_QA_PENDING"
     },
     {
       "screenId": "UI-02",
@@ -49,7 +52,10 @@
       "description": "Personalized social Home, upper story/status row relevant to education stage/goal, peer posts, author follow/request, like, comment, save, share, and opted-in growth proof. 15–40 status bubbles are not an initial content supply promise; horizontally scroll and show an honest empty state.",
       "primaryPlatform": "Android",
       "webAdaptation": "responsive—same API semantics, desktop-appropriate layout",
-      "verifiedGitBlobSha1": "d1a81d92eb61e4caaa67c59e75efcae576d1f063"
+      "verifiedGitBlobSha1": "d1a81d92eb61e4caaa67c59e75efcae576d1f063",
+      "editableFigmaFrameId": "28:54",
+      "editableFigmaFrameUrl": "https://www.figma.com/design/9lliKy1wnK8QFfTuBHmsZJ?node-id=28-54",
+      "figmaReviewStatus": "DRAFT_PRIMARY_LAYOUT__PRACHI_VISUAL_QA_PENDING"
     },
     {
       "screenId": "UI-03",
@@ -67,7 +73,10 @@
       "description": "Search/status filters, relevant industrial experts, same-stage peers, communities, follow, private-account follow requests and accept/decline notifications. Expert verify claim must come from approved Admin/Experts system, not hardcoded badges.",
       "primaryPlatform": "Android",
       "webAdaptation": "responsive—same API semantics, desktop-appropriate layout",
-      "verifiedGitBlobSha1": "ea8f6152c6a01514baab8c35d9eed166f69ed9ff"
+      "verifiedGitBlobSha1": "ea8f6152c6a01514baab8c35d9eed166f69ed9ff",
+      "editableFigmaFrameId": "28:125",
+      "editableFigmaFrameUrl": "https://www.figma.com/design/9lliKy1wnK8QFfTuBHmsZJ?node-id=28-125",
+      "figmaReviewStatus": "DRAFT_PRIMARY_LAYOUT__PRACHI_VISUAL_QA_PENDING"
     },
     {
       "screenId": "UI-04",
@@ -84,7 +93,10 @@
       "description": "Goal header, personal progress, tasks, weekly schedule, optional AI-editable suggestions, context-specific roadmap, evidence and project/placement preparation; NEET/JEE users receive preparation-appropriate cards instead of B.Tech-only milestones.",
       "primaryPlatform": "Android",
       "webAdaptation": "responsive—same API semantics, desktop-appropriate layout",
-      "verifiedGitBlobSha1": "8d25ed683a568ee82af407fdc97c1a97a3d9299d"
+      "verifiedGitBlobSha1": "8d25ed683a568ee82af407fdc97c1a97a3d9299d",
+      "editableFigmaFrameId": "29:2",
+      "editableFigmaFrameUrl": "https://www.figma.com/design/9lliKy1wnK8QFfTuBHmsZJ?node-id=29-2",
+      "figmaReviewStatus": "DRAFT_PRIMARY_LAYOUT__PRACHI_VISUAL_QA_PENDING"
     },
     {
       "screenId": "UI-05",
@@ -101,7 +113,10 @@
       "description": "Inbox tabs All/Peers/Experts/Groups, real unread counts, conversation/message previews, notifications and server-side block/report/request state. Adult–minor private expert messaging is restricted until approved policy.",
       "primaryPlatform": "Android",
       "webAdaptation": "responsive—same API semantics, desktop-appropriate layout",
-      "verifiedGitBlobSha1": "091071ab2f52b44819e2794cf8d2dcaabcd1cf2c"
+      "verifiedGitBlobSha1": "091071ab2f52b44819e2794cf8d2dcaabcd1cf2c",
+      "editableFigmaFrameId": "29:71",
+      "editableFigmaFrameUrl": "https://www.figma.com/design/9lliKy1wnK8QFfTuBHmsZJ?node-id=29-71",
+      "figmaReviewStatus": "DRAFT_PRIMARY_LAYOUT__PRACHI_VISUAL_QA_PENDING"
     },
     {
       "screenId": "UI-06",
@@ -118,7 +133,10 @@
       "description": "Profile header, bio, posts, followers/following/connections, own achievements, saved/activity tabs, status switch, edit/create post and personal Career Growth summary linked to Journey.",
       "primaryPlatform": "Android",
       "webAdaptation": "responsive—same API semantics, desktop-appropriate layout",
-      "verifiedGitBlobSha1": "d133640dc7587dd67dc26056ed20cd02c1c6b020"
+      "verifiedGitBlobSha1": "d133640dc7587dd67dc26056ed20cd02c1c6b020",
+      "editableFigmaFrameId": "29:148",
+      "editableFigmaFrameUrl": "https://www.figma.com/design/9lliKy1wnK8QFfTuBHmsZJ?node-id=29-148",
+      "figmaReviewStatus": "DRAFT_PRIMARY_LAYOUT__PRACHI_VISUAL_QA_PENDING"
     }
   ],
   "scopeExclusions": [
@@ -134,5 +152,9 @@
     "proofCommit": "6ec5b4a4e5caee52468e8aaad11446b61f758b1b",
     "verifiedOn": "2026-10-16",
     "binaryCount": 6
-  }
+  },
+  "figmaDesignFile": "https://www.figma.com/design/9lliKy1wnK8QFfTuBHmsZJ",
+  "editableFigmaLayoutStatus": "SIX_NEW_EDITABLE_PRIMARY_FRAMES_CREATED_78_LINKS__PIXEL_POLISH_AND_OWNER_QA_PENDING",
+  "legacyFigmaDetailScreensPreserved": 92,
+  "figmaNotes": "Six new editable semantic-layer design frames derived from the six approved original image layouts. They are approximate first-pass reconstructions, not flattened screenshots nor approved pixel-perfect Figma matches. Figma tool call Starter quota prevented final independent full-file QA."
 }
