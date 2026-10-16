@@ -90,6 +90,7 @@ The **team-approved direction** expands CGN from mainly college/career growth in
 - [Existing service/contract impact review](docs/product/CGN_V2_ARCHITECTURE_REVIEW.md)
 - [Google Stitch → Figma UX screen catalog and prompt](docs/design/CGN_V2_DESIGN_HANDOFF.md)
 - [Actual CGN V2 Figma draft frames (6 desktop + 8 Android) — pending Prachi review](docs/design/CGN_V2_FIGMA_CONCEPT_BATCH_01.md)
+- [Complete native Figma prototype (92 Android screens; 16 Industrial Expert networking screens)](docs/design/CGN_V2_INDUSTRIAL_EXPERT_NETWORK_FIGMA.md) — design still requires final owner sign-off
 - [V2 execution roadmap, owners and approval checkpoints](docs/product/CGN_V2_EXECUTION_ROADMAP.md)
 
 **Supporting deep-dive reference notes (not alternate specifications):**
