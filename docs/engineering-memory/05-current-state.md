@@ -3,6 +3,7 @@
 Last updated: 2026-10-15 after CGN-61 and staging rollback rehearsal merges.
 
 ## Repository
+- CGN-288/289: on 2026-10-16, the team-approved *product direction* expanded to a continuous post-Class-10 Student Ecosystem V2, retaining social-first Home, the existing social/growth loop, and shared web+Android architecture. PR #29 merged Product Vision PRD, 31-Epic gap audit, bounded-context **impact review only**, screen inventory/Stitch design handoff and updated agent-context sources: https://github.com/Sandeepagrahari78/career-growth-network/pull/29 ; merge SHA `6018f3e5c799841e71df1213dcae507a59bf53c9`. There are **no new implemented preparation APIs, Figma frames, exam catalog, database schemas or signed contracts** in that change. Further technical contract decisions [CGN-290](https://sandeepagrahari1.atlassian.net/browse/CGN-290), reviewed UX/Figma frames [CGN-291](https://sandeepagrahari1.atlassian.net/browse/CGN-291), and real pilot user research [CGN-292](https://sandeepagrahari1.atlassian.net/browse/CGN-292) remain pending.
 - Shared Engineering Memory and agent synchronization: established.
 - CI/CD foundation: established; PR CI, Main CI, Docker Images, Staging Validation, release/rollback dry runs and path-scoped local infrastructure validations are active.
 - CGN-39: zero-budget Terraform bootstrap merged via PR #6 / `e9fe0cb945eabe9f4bf86eefd144642455641089`.
