@@ -20,3 +20,8 @@
 Build the real Expo React Native entrypoint, install/pin SDK dependencies and regenerate \`pnpm-lock.yaml\`, render accessible interactive views rather than flat screenshot PNGs, add status/login states, five-tab navigation, safe-area / Android device QA, and platform tests. These runtime tasks are **not complete** in this commit.
 
 Use approved Identity session and stage/goal schemas from CGN-68/290/71/129, and separate Feed/Network/Roadmap/Messaging service contracts. Never make fake sample data look like real account state. The protected main source of truth includes only merged tested work.
+
+- `src/foundation/status-gate.mjs`: UI-only status-save guard. It validates the approved visual choice and session twice, blocks duplicate submissions, and opens Home ONLY after an injected, approved owning-service adapter confirms persistence. It defines no API route, token format, Career schema, or backend implementation.
+- `tests/contracts/mobile-v2-status-gate.contract.test.mjs`: eight fail-closed success/denial/race tests. Run `node --test tests/contracts/mobile-v2-status-gate.contract.test.mjs`.
+
+**Still blocked:** The adapter must not return `true` until the Identity/Career owning service actually confirms the authorized, persisted stage/goal state. This module alone is not a working sign-in or production status-save flow.
