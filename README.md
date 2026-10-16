@@ -78,3 +78,15 @@ Jira is planning truth. Latest merged `main` is implementation truth. Contracts/
 **Current stage:** infrastructure and health-demo CI baseline are validated; production remains dry-run only, persistent live staging is not proven, and 5,000-user product workload is untested until real features exist. A green CI run is **not** a production launch.
 
 Repository is private on GitHub Free, where desired branch protection is not enforced. Sandeep's PR-based approval and post-merge audit are compensating process controls, not a technical block on direct pushes.
+
+## CGN V2 — Student Ecosystem direction (product planning, 2026-10)
+
+The team-approved **direction** expands CGN from a mainly college-career growth network into an evolving education, competitive-exam preparation, social and career-growth ecosystem. This is **product planning**, not evidence of new deployed product features, active exam catalogs or approved privacy contracts. Existing code, Jira scope, Figma authority and versioned contracts remain binding until their respective change tickets and approvals.
+
+- [CGN V2 Product Vision / PRD](docs/product/CGN_STUDENT_ECOSYSTEM_V2_PRD.md)
+- [31 existing Epic feature-gap audit](docs/product/CGN_V2_FEATURE_GAP_MATRIX.md)
+- [Student Journey architecture and safety contract RFC questions](docs/product/CGN_V2_ARCHITECTURE_DECISION_BRIEF.md)
+- [Google Stitch → Figma UX screen inventory and master design prompt](docs/product/CGN_V2_DESIGN_HANDOFF.md)
+- [V2 execution sequence and Jira workstreams](docs/product/CGN_V2_EXECUTION_ROADMAP.md)
+
+**Next:** [CGN-293](https://sandeepagrahari1.atlassian.net/browse/CGN-293) (architecture), [CGN-294](https://sandeepagrahari1.atlassian.net/browse/CGN-294) (UX) and [CGN-295](https://sandeepagrahari1.atlassian.net/browse/CGN-295) (pilot research). No app implementation until relevant contracts, age protections, approved Figma frames and per-ticket acceptance are ready.
