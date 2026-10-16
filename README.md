@@ -8,6 +8,7 @@ CGN is a Career Growth **Social Network** under active development. On 2026-10-1
 - [31-Epic feature audit and gap matrix](docs/product/CGN_V2_FEATURE_GAP_AUDIT.md)
 - [V2 architecture/contract impact review (pending technical decisions)](docs/product/CGN_V2_ARCHITECTURE_REVIEW.md)
 - [V2 design-system, screen inventory and Google Stitch handoff (draft frames, not approved Figma)](docs/design/CGN_V2_DESIGN_HANDOFF.md)
+- [CGN V2 six original approved UI screenshots and linked editable Figma drafts (CGN-297)](docs/design/CGN_V2_FINAL_SIX_APPROVED_UI.md) — binaries verified by hashes, final visual QA / APIs pending
 
 - [CGN product flow, architecture and CI/CD diagrams](docs/architecture/PROJECT_FLOW.md)
 - [Module and file ownership / dependencies](docs/architecture/MODULE_DEPENDENCIES.md)
@@ -98,3 +99,10 @@ The **team-approved direction** expands CGN from mainly college/career growth in
 [expanded UX screen/states handoff](docs/product/CGN_V2_DESIGN_HANDOFF.md).
 
 **Canonical next Jira:** [CGN-290](https://sandeepagrahari1.atlassian.net/browse/CGN-290) (Sandeep architecture and safety), [CGN-291](https://sandeepagrahari1.atlassian.net/browse/CGN-291) (Prachi web/Android approved Figma), [CGN-292](https://sandeepagrahari1.atlassian.net/browse/CGN-292) (Tanvi student pilot validation). No app implementation until relevant approved versioned contracts, minor-safety policy, real Figma frame IDs and per-ticket acceptance criteria are ready. No existing 31 product Epics were silently rewritten.
+
+
+## CGN-297 — Six approved primary UI screens
+
+Product owner approved the **six exact CGN V2 generated Android mockups** as the desired visual direction. [Visual specification, exact six filenames and checksums](docs/design/CGN_V2_FINAL_SIX_APPROVED_UI.md) and [UI-intent JSON contract](packages/contracts/ui/cgn-v2-six-screen.v1.json) identify Current Status, Home, Explore, Journey, Chats and Profile. See [Jira CGN-297](https://sandeepagrahari1.atlassian.net/browse/CGN-297).
+
+**Visual image binary upload pending:** these documents are versioned in GitHub but the six original PNG bytes are not yet in this branch. No backend/API implementation or merged Figma design is implied; old 92-screen prototype is preserved pending Prachi review.
