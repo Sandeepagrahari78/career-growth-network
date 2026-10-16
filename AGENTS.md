@@ -84,3 +84,12 @@ pnpm memory:check
 - Treat stage-aware exam catalog, syllabus and study evidence as *planned*, not existing services/endpoints. Existing `career.activity.v1` is not authority for fabricated study events. Do not invent a `services/preparation` service before an ADR.
 - For minors, do not expose marks, personal timetable or study hours by default; no automatic 30-peer contacts, forced leaderboards, unverified mentor access, inappropriate adult messaging or social-pressure notifications. Enforce privacy at owning services and consumer projections.
 - Retain web/Android ticket-path gate and no-iOS release scope. Approved designs belong in Figma after review; code truth remains latest main. Missing approval or cross-source conflicts stop implementation.
+
+
+## CGN-297 — Six approved primary UI visual references
+
+- Product owner approved **six exact generated CGN V2 Android UI screenshots** as the fixed visual direction on 2026-10-16. See [approved six-screen intent](docs/design/CGN_V2_FINAL_SIX_APPROVED_UI.md) and [machine-readable UI visual spec](packages/contracts/ui/cgn-v2-six-screen.v1.json).
+- **Six primary screens only:** current-status selection after email/Google sign-in, then social Home, Explore, Journey, Chats and Profile with five persistent bottom tabs. Avoid inserting compulsory interests/goal/peer wizard before Home. Stages and individual exam goals must still be modeled distinctly at backend contract level.
+- The historical 92-screen Figma native prototype is **supporting** detail, NOT authority to override any conflicting one of the new six approved visual screens; Prachi must align and approve a versioned Figma frame before coding.
+- **Asset gate:** the six original binary PNG files have NOT yet been uploaded to GitHub. Their exact filenames and SHA-256 hashes are in the visual spec; use the owner's full-resolution image package, verify hashes, then set assetStatus accordingly before claiming exact pixel fidelity. Do not substitute placeholders or assume missing paths exist.
+- This is a visual intent contract **not** a REST/DB/event contract. Respect existing owning-service contracts, CGN-290 approval, consent, moderated adult/minor mentorship and backend authorization. Names, company logos, badges, metrics and fake chat entries in examples are not production assertions.
