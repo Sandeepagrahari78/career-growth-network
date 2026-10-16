@@ -2,7 +2,7 @@
 
 > **Approved visual direction by product owner:** 2026-10-16. **Jira:** [CGN-297](https://sandeepagrahari1.atlassian.net/browse/CGN-297), parent [CGN-289](https://sandeepagrahari1.atlassian.net/browse/CGN-289). **Design owner:** Prachi.
 >
-> **Asset state:** The **six exact original image files** are approved and preserved in the exported reference ZIP provided to the product owner. Binary upload of those six originals to this GitHub branch is **PENDING**; do not treat a named PNG file path in the JSON contract as an existing GitHub download until the file and SHA-256 checksum can be verified in GitHub. The connector in this session cannot upload arbitrary local binary bytes to GitHub or Jira. Visual-intent metadata is committed; completion requires binary upload and reviewed Figma alignment.
+> **Asset state: VERIFIED IN GITHUB.** Six exact approved original PNGs are now tracked under canonical filenames in `docs/design/approved-six-v1/images/` on the CGN-297 branch. The six originally uploaded `ChatGPT Image…` Git blobs matched the local approved originals (file sizes and Git blob SHA-1), and the approved original local SHA-256 values matched this specification; commit [`6ec5b4a`](https://github.com/Sandeepagrahari78/career-growth-network/commit/6ec5b4a4e5caee52468e8aaad11446b61f758b1b) created canonical filenames from those exact binary objects. The contract contains the verified Git blob IDs, with automated byte-for-byte validation in `tests/contracts/cgn-v2-six-screen-assets.contract.test.mjs`. Figma editable reconstruction / design review and owning API/safety approvals are **still pending**.
 >
 > **Precedence:** Six user-approved images define the intended appearance of the six primary Android screens. Existing 92-screen Figma native prototype is preserved as supporting detailed journeys, **not automatically an approved match** to the new appearance. Versioned service API contracts, security and Jira remain independent and enforceable.
 
@@ -78,8 +78,24 @@ After entering the app, **five persistent bottom navigation tabs** exactly: **Ho
 - [x] Visual direction and specific six filenames/checksums documented.
 - [x] UI-intent JSON contract created under GitHub version control (not an API specification).
 - [x] Jira task CGN-297 maps each UI to existing feature ownership; do not duplicate each old Epic.
-- [ ] Upload and verify all six **original PNG binary assets** to the stated GitHub location or attach to canonical Jira issue, and link them here.
+- [x] Upload and verify all six **original PNG binary assets** in GitHub canonical paths; original SHA-256 and Git blob identity checked, CI regression test added.
 - [ ] Prachi reconciles exact approved image appearance against native Figma frames and explicitly stamps design version.
 - [ ] Review responsive web variants, low connectivity, loading/error/accessibility and minor-safety states; actual backend implementation is separately ticketed.
 
 **Do not mark the whole design or backend "Done" until these unresolved items are verified.**
+
+
+## GitHub verified images (CGN-297 branch)
+
+All six files can now be opened via GitHub preview, keeping filenames stable for coding-agent retrieval. **Binary hashes are frozen**, but these are **visual** references only; screenshots do not specify live API paths or implementation.
+
+| Screen | Exact GitHub image |
+| --- | --- |
+| UI-01 Current Status | [Approved PNG](approved-six-v1/images/cgn_career_status_onboarding.png) |
+| UI-02 Home | [Approved PNG](approved-six-v1/images/cgn_student_social_feed_mockup.png) |
+| UI-03 Explore | [Approved PNG](approved-six-v1/images/cgn_explore_connect_and_grow.png) |
+| UI-04 Journey | [Approved PNG](approved-six-v1/images/cgn_journey_dashboard_ui.png) |
+| UI-05 Chats | [Approved PNG](approved-six-v1/images/cgn_chats_connect_learn_grow.png) |
+| UI-06 Profile | [Approved PNG](approved-six-v1/images/cgn_profile_aanya_s_growth_journey.png) |
+
+**Next design gate:** Prachi aligns editable Figma primary screen frames, preserves earlier 92-frame navigation as supporting journeys, links reviewed Figma version/frames in Jira; Sandeep/Tanvi approve contract boundaries and safeguards. Full product code is not implied by this manifest.
