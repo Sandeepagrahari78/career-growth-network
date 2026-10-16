@@ -89,6 +89,7 @@ The **team-approved direction** expands CGN from mainly college/career growth in
 - [All 31 existing Jira Epics — official gap audit](docs/product/CGN_V2_FEATURE_GAP_AUDIT.md)
 - [Existing service/contract impact review](docs/product/CGN_V2_ARCHITECTURE_REVIEW.md)
 - [Google Stitch → Figma UX screen catalog and prompt](docs/design/CGN_V2_DESIGN_HANDOFF.md)
+- [Actual CGN V2 Figma draft frames (6 desktop + 8 Android) — pending Prachi review](docs/design/CGN_V2_FIGMA_CONCEPT_BATCH_01.md)
 - [V2 execution roadmap, owners and approval checkpoints](docs/product/CGN_V2_EXECUTION_ROADMAP.md)
 
 **Supporting deep-dive reference notes (not alternate specifications):**
