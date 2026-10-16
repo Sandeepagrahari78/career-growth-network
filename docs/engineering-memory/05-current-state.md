@@ -74,3 +74,9 @@ Jira is the work source of truth. Figma defines the approved product flow for us
 
 ## Update rule
 After each merged PR, record the ticket, PR/merge reference, modules/contracts changed, operational status, risks and exact next dependency.
+
+## CGN-299 delivery automation merged baseline (2026-10-17)
+
+PR #37 merged at `5c803011e9ea30c4cacd82b704d4e3b9859c8c1e`: local ticket launcher and GitHub-to-Jira sync are on main. Main CI 38970986386, Docker 38970986433, Helm 38970986415 and staging 38971322220 passed. Sync 38971322332 ran and left Jira unchanged pending the original owner-comment gate. Local Windows doctor/OAuth/live Jira access and repository secret names were verified by the local agent. No end-to-end automatic Done transition has been observed yet.
+
+Owner authorized a follow-up replacing the comment with owner-reviewed merge approval and exact-candidate staging checks. Treat that change as pending until its own merge/run evidence exists. Human technical/business review before merge remains required; no autonomous merge or production hosting claim.

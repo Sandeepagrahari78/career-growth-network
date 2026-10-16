@@ -68,7 +68,7 @@ pnpm memory:check
 - Source/infra changes require a changed ticket-matched `docs/handoffs/CGN-NNN.md` with evidence and a meaningful next-agent trail. CI checks it on PRs.
 - Once ticket scope is authorized, agents must finish delivery: inspect the diff, stage only ticket files, commit, push the feature branch, open/update the PR, inspect Linux PR CI, and fix failures caused by their change. Do not stop after local validation or ask again for routine commit/push/PR permission. Never include local `.cgn/` caches, tokens or unrelated user changes. If authentication or an enforced approval blocks delivery, report the exact blocker and preserve the work.
 - GitHub Actions validates pushed code and syncs Jira; it does not author commits or retrieve uncommitted laptop files. Sandeep technical review still precedes merge to main. No automatic production deploy. See [delivery automation](docs/runbooks/agent-delivery-automation.md).
-- Agents must never post `CGN-ACCEPTED` on behalf of a human or claim acceptance based only on passing tests. Only Sandeep records final acceptance after inspecting the merged SHA, Jira criteria and required staging evidence. Automated Jira Done requires that acceptance and successful CI.
+- Sandeep's reviewed merge is the approval signal for automated Jira Done; no separate acceptance comment is required. Before merging, the owner verifies Jira/business acceptance and any ticket-specific checks beyond the standard staging smoke. Automation requires successful latest PR CI, Main CI and exact-candidate Staging Validation, changed handoff and completed Jira blockers/subtasks. Agents must not invent human review or merge without explicit authorization.
 
 ## CGN-286 platform file-scope gate (monorepo)
 

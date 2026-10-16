@@ -1,4 +1,5 @@
 name: Staging Validation
+run-name: "Staging Validation: ${{ github.event.workflow_run.head_sha || github.sha }}"
 
 on:
   workflow_run:

@@ -7,10 +7,8 @@ on:
   pull_request_target:
     branches: [main]
     types: [opened, reopened, synchronize, ready_for_review, closed]
-  issue_comment:
-    types: [created, edited]
   workflow_run:
-    workflows: ["Main CI"]
+    workflows: ["Main CI", "Staging Validation"]
     types: [completed]
   workflow_dispatch:
     inputs:
@@ -28,9 +26,7 @@ permissions:
 jobs:
   sync:
     if: >-
-      github.repository == 'Sandeepagrahari78/career-growth-network' &&
-      (github.event_name != 'issue_comment' ||
-       (github.event.issue.pull_request && github.event.comment.user.login == 'Sandeepagrahari78'))
+      github.repository == 'Sandeepagrahari78/career-growth-network'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     # Serialize writes. Reconcile manually if GitHub replaces a pending run.
