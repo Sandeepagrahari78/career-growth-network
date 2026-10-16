@@ -1,6 +1,6 @@
 # CGN V2 — 76 Screen Navigation & Prototype Build Map
 
-**STATUS:** navigation content and standalone HTML demonstration implemented; **complete native Figma prototype remains pending**. User supplied an older CGN UI flow and Instagram feed/bottom-nav reference on 2026-10-16, and reports Prachi approved the updated five-tab direction. Neither the uploaded screenshots nor this document authorizes unsafe peer or mentor behavior.
+**STATUS (updated 2026-10-16): all initial 76 native Figma prototype frames and 5-tab click routing have been built. The Industrial Expert Networking expansion adds another 16 native frames: **92 total**. These are interactive design concepts, NOT product features or final UX approvals. See [live expert frame catalog](CGN_V2_INDUSTRIAL_EXPERT_NETWORK_FIGMA.md). User supplied an older CGN UI flow and Instagram feed/bottom-nav reference on 2026-10-16, and reports Prachi approved the updated five-tab direction. Neither the uploaded screenshots nor this document authorizes unsafe peer or mentor behavior.
 
 **Live editable Figma draft:** https://www.figma.com/design/9lliKy1wnK8QFfTuBHmsZJ  
 **Owner:** [CGN-291 — Prachi](https://sandeepagrahari1.atlassian.net/browse/CGN-291)  
@@ -42,10 +42,11 @@ Home screen must feel familiar to users of story/feed platforms: story rings, so
 - Narratives/stories/reels: user-generated content needs moderation/reporting and consent; original Instagram screenshot is **layout inspiration only**, not content/logo to copy.
 - AI suggestions: editable, labeled as uncertain; actual API/contract ownership pending [CGN-290](https://sandeepagrahari1.atlassian.net/browse/CGN-290).
 
-## Exact delivery honesty and next handoff
+## Verified Figma native prototype status — updated 2026-10-16
 
-- Figma currently includes **20 new native Android prototype-target frames** (8 onboarding and 12 Home/social) created in the connected file *in addition* to the previous 14 draft concepts. These 20 are **NOT yet linked with functional Figma prototype reactions**.
-- Additional Figma writes to generate remaining Explore/Journey/Chats/Profile screens failed with the Figma editing tool reporting an internal error. Read-only metadata verified 20 newly created frames and no failed-batch duplicates.
-- A separate **76-route standalone HTML/CSS/JS interactive preview** was built and browser-tested with Home/Explore/Journey/Chats/Profile navigation, like, task completion and example chats, plus screen-map JSON and ZIP. The preview was delivered as conversation artifacts; **it is not the native editable Figma prototype** and has no real production backend.
-- Keep [CGN-291](https://sandeepagrahari1.atlassian.net/browse/CGN-291) **In Progress**, and PR documentation in review. Do not assert Figma full completion, approved Figma link per 76 screens or deployed feature parity.
-- To resume: restore Figma writing; build missing 56 native frames in small safe batches, wire `ON_CLICK/NAVIGATE` for all five tab targets plus each feature CTA; configure onboarding prototype starting point; test reachable flows in Figma Present, accessibility and screen-state variants; get Prachi's final 76-frame signoff before treating links as implementation authority.
+- Original 76-screen native Android prototype was completed using the user's imported Figma development plugin. Existing 8 onboarding, 12 social, 15 Explore, 19 Journey, 9 Chats and 13 Profile screens are visible in the editable Figma file.
+- Added 16 industrial expert/mentorship frames directly using Figma design APIs: [exact frame links and safety/contract handoff](CGN_V2_INDUSTRIAL_EXPERT_NETWORK_FIGMA.md).
+- Connected Figma structural QA: **92 unique prototype screens**, **862 linked click actions**, **zero broken destination IDs**. Six optional hotspots are current-tab/current-screen self-references with no navigation reaction; they do not link to a missing screen.
+- Sample states, experts, requests and bookings are *fictional and illustrative*. No external services, API/DB connection, expert verifications, payments or actual sessions exist on these screens.
+- **Human Present-mode walkthrough, original brand comparison, web parity, accessibility/responsive/translation coverage and final Prachi/Tanvi/Sandeep design/safety approvals remain pending**.
+- The standalone 76-route HTML preview still exists as an additional conceptual prototype; Figma now has an independently verified native 92-screen design.
