@@ -1,8 +1,13 @@
 # Career Growth Network — CGN
 
-CGN is a Career Growth **Social Network** under active development. The goal → diagnostic → 180-day plan → missions → evidence → Growth Identity → Feed/Community → Experts/Opportunities loop is the **approved product direction**, not proof that each service is already running.
+CGN is a Career Growth **Social Network** under active development. On 2026-10-16 the team approved a wider **Student Ecosystem V2 product direction**: a continuous journey after Class 10 through exam preparation, college and career, combining social life, peer support, individual goals and meaningful growth. The existing diagnostic → plan → missions → evidence → Growth Identity → social/experts/opportunities loop remains foundational. **Neither the V2 features nor all prior product services are necessarily implemented**; design and contract changes need separate approval.
 
 ## Start here — visual guide
+
+- [Approved V2 product vision / PRD](docs/product/CGN_V2_PRODUCT_VISION.md)
+- [31-Epic feature audit and gap matrix](docs/product/CGN_V2_FEATURE_GAP_AUDIT.md)
+- [V2 architecture/contract impact review (pending technical decisions)](docs/product/CGN_V2_ARCHITECTURE_REVIEW.md)
+- [V2 design-system, screen inventory and Google Stitch handoff (draft frames, not approved Figma)](docs/design/CGN_V2_DESIGN_HANDOFF.md)
 
 - [CGN product flow, architecture and CI/CD diagrams](docs/architecture/PROJECT_FLOW.md)
 - [Module and file ownership / dependencies](docs/architecture/MODULE_DEPENDENCIES.md)
@@ -41,7 +46,7 @@ pnpm agent:context --ticket CGN-220 --domain admin
 ```
 
 5. (Optional) With locally configured Jira READ credentials (`CGN_JIRA_EMAIL` and `CGN_JIRA_API_TOKEN`), use `pnpm agent:context --ticket CGN-220 --domain admin --jira-live`. It fails closed without credentials and only reads from the approved Jira site.
-6. Read `AGENTS.md`, generated `.cgn/context-CGN-220.md`, linked Jira ticket, module source, contracts and previous relevant handoffs. **The script does not fetch Jira live**.
+6. Read `AGENTS.md`, generated `.cgn/context-CGN-220.md`, linked Jira ticket, module source, contracts and previous relevant handoffs. **The default command does not fetch Jira live; optional `--jira-live` requires local Jira credentials**.
 7. Propose exact changed files and tests, implement only owning scope; update `docs/handoffs/CGN-NNN.md` using [handoff template](docs/handoffs/TEMPLATE.md).
 8. Verify locally when tools are available:
 
