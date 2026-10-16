@@ -1,0 +1,19 @@
+name: Temporary CGN-128 Prettier Probe
+on:
+  push:
+    branches:
+      - CGN-128-v2-mobile-navigation-and-api-transport
+
+permissions:
+  contents: read
+
+jobs:
+  format-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Print exact formatted test to logs
+        run: |
+          npx --yes prettier@3.6.2 tests/contracts/mobile-v2-foundation.contract.test.mjs | base64 -w 0
+          echo
