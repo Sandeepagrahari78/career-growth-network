@@ -11,6 +11,7 @@ export default [
       ecmaVersion: "latest",
       sourceType: "module",
       globals: {
+        AbortController: "readonly",
         console: "readonly",
         fetch: "readonly",
         process: "readonly",
