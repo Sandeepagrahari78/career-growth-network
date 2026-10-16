@@ -99,3 +99,19 @@ All six files can now be opened via GitHub preview, keeping filenames stable for
 | UI-06 Profile | [Approved PNG](approved-six-v1/images/cgn_profile_aanya_s_growth_journey.png) |
 
 **Next design gate:** Prachi aligns editable Figma primary screen frames, preserves earlier 92-frame navigation as supporting journeys, links reviewed Figma version/frames in Jira; Sandeep/Tanvi approve contract boundaries and safeguards. Full product code is not implied by this manifest.
+
+
+## Editable Figma primary screen alignment (first-pass implementation)
+
+Six **new editable semantic-layer Android primary layouts** were created within the existing CGN V2 Figma file (without rasterizing the screenshots or deleting the existing **92** native detail/prototype screens). The six have **78 successful navigation connections** to each other and the older detail journeys; five current-tab self-links correctly do not navigate to a separate screen. The Home draft's Figma screenshot was inspected. Final full visual/pixel, accessibility and Present-mode sign-off are **pending**, and Starter-plan MCP tool quota blocked additional screenshot/structure calls. **The six exact approved PNGs remain the visual design authority if the editable draft differs.**
+
+| Screen | Binary visual authority | First-pass editable Figma |
+| --- | --- | --- |
+| UI-01 Current Status | [Approved exact PNG](approved-six-v1/images/cgn_career_status_onboarding.png) | [Editable Figma draft](https://www.figma.com/design/9lliKy1wnK8QFfTuBHmsZJ?node-id=28-2) |
+| UI-02 Home | [Approved exact PNG](approved-six-v1/images/cgn_student_social_feed_mockup.png) | [Editable Figma draft](https://www.figma.com/design/9lliKy1wnK8QFfTuBHmsZJ?node-id=28-54) |
+| UI-03 Explore | [Approved exact PNG](approved-six-v1/images/cgn_explore_connect_and_grow.png) | [Editable Figma draft](https://www.figma.com/design/9lliKy1wnK8QFfTuBHmsZJ?node-id=28-125) |
+| UI-04 Journey | [Approved exact PNG](approved-six-v1/images/cgn_journey_dashboard_ui.png) | [Editable Figma draft](https://www.figma.com/design/9lliKy1wnK8QFfTuBHmsZJ?node-id=29-2) |
+| UI-05 Chats | [Approved exact PNG](approved-six-v1/images/cgn_chats_connect_learn_grow.png) | [Editable Figma draft](https://www.figma.com/design/9lliKy1wnK8QFfTuBHmsZJ?node-id=29-71) |
+| UI-06 Profile | [Approved exact PNG](approved-six-v1/images/cgn_profile_aanya_s_growth_journey.png) | [Editable Figma draft](https://www.figma.com/design/9lliKy1wnK8QFfTuBHmsZJ?node-id=29-148) |
+
+Prachi's next action is to compare these *editable* layouts against each approved original at full resolution, address typography/media/space and interactive detail, and record frame version approval in CGN-297 and the scoped implementation tickets. The images alone do not authorize backend routes, student or expert contact rules.
