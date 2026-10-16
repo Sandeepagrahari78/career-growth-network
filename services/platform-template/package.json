@@ -1,0 +1,31 @@
+{
+  "name": "@cgn/platform-template",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/main.js",
+    "start:dev": "tsc -p tsconfig.json --watch",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test:unit": "pnpm build && node --test test/unit/*.test.mjs",
+    "test:integration": "node --test test/integration/*.test.mjs",
+    "test:docker": "node test/docker-smoke.mjs",
+    "test": "pnpm build && pnpm test:unit && pnpm test:integration"
+  },
+  "dependencies": {
+    "@nestjs/common": "12.1.2",
+    "@nestjs/core": "12.1.2",
+    "@nestjs/platform-express": "12.1.2",
+    "reflect-metadata": "0.2.2",
+    "rxjs": "7.8.2"
+  },
+  "devDependencies": {
+    "@types/express": "5.0.3",
+    "@types/node": "20.13.0",
+    "typescript": "5.9.3"
+  }
+}

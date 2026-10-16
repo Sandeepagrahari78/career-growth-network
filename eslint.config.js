@@ -4,13 +4,16 @@ export default [
       "scripts/ci/**/*.mjs",
       "scripts/infra/**/*.mjs",
       "services/health-demo/**/*.mjs",
+      "services/platform-template/test/**/*.mjs",
       "eslint.config.js",
     ],
     languageOptions: {
       ecmaVersion: "latest",
       sourceType: "module",
       globals: {
+        AbortController: "readonly",
         console: "readonly",
+        fetch: "readonly",
         process: "readonly",
         setTimeout: "readonly",
       },

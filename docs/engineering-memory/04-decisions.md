@@ -3,6 +3,7 @@
 Use this file for short accepted decisions. Large decisions get an ADR under `docs/adr/`.
 
 ## Accepted baseline decisions
+
 - Monorepo uses pnpm workspaces.
 - Cross-service DB access is forbidden.
 - Contracts are versioned and centralized.
@@ -20,6 +21,8 @@ Use this file for short accepted decisions. Large decisions get an ADR under `do
 - 2026-10-05 / CGN-33: all established apps/services/shared packages are explicit private pnpm workspace packages; app/service implementations may depend on shared packages, but direct app-to-service and service-to-service workspace dependencies are forbidden.
 
 - 2026-10-06 / CGN-227: production merge and production deployment remain separate manual decisions; PR/Main/Staging gates fail closed, release/rollback use owner-confirmed immutable SHAs, and real deployment remains disabled until a production target is explicitly approved.
+- 2026-10-17 / CGN-34: `services/platform-template/` is the reusable NestJS + TypeScript platform reference (`@cgn/platform-template`), not a business service. It adds only validated configuration, privacy-safe structured logging, request correlation, graceful shutdown and health/readiness behavior. It reuses the approved Helm chart and local k3d; the temporary namespace smoke is acceptance evidence, not a production deployment. Business APIs, databases, authentication and domain events remain out of scope; CGN-35 and CGN-36 retain their separate contract work.
 
 ## Template
+
 Date | Ticket | Decision | Why | Impacted domains | Supersedes
