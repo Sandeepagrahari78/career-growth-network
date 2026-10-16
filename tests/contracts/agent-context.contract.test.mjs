@@ -18,6 +18,9 @@ test("offline context includes ticket, latest source maps and freshness warning"
   const bundle = readFileSync(join(root, out), "utf8");
   assert.match(bundle, /Ticket: CGN-285/);
   assert.match(bundle, /PROJECT_FLOW\.md/);
+  assert.match(bundle, /CGN_V2_PRODUCT_VISION\.md/);
+  assert.match(bundle, /CGN_V2_FEATURE_GAP_AUDIT\.md/);
+  assert.match(bundle, /CGN_V2_DESIGN_HANDOFF\.md/);
   assert.match(bundle, /Jira source freshness/);
   assert.match(bundle, /verify Jira status/i);
   assert.match(bundle, /## Required agent preflight/);
