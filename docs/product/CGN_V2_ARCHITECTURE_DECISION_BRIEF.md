@@ -1,3 +1,5 @@
+> **Document precedence:** **Supporting technical-question list**, not an approved contract. Canonical scope analysis is [CGN_V2_ARCHITECTURE_REVIEW.md](CGN_V2_ARCHITECTURE_REVIEW.md). [CGN-290](https://sandeepagrahari1.atlassian.net/browse/CGN-290) owns the future ADR and contract decision.
+
 # CGN V2 — Architecture / Contract Design Review Brief
 
 **Document class:** RFC questions and recommended boundaries, **not an approved product API schema**.  
