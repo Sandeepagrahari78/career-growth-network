@@ -7,7 +7,10 @@ import { resolve, sep } from "node:path";
 
 const repoRoot = fileURLToPath(new URL("../../", import.meta.url));
 const contract = JSON.parse(
-  readFileSync(resolve(repoRoot, "packages/contracts/ui/cgn-v2-six-screen.v1.json"), "utf8"),
+  readFileSync(
+    resolve(repoRoot, "packages/contracts/ui/cgn-v2-six-screen.v1.json"),
+    "utf8",
+  ),
 );
 const expectedIds = ["UI-01", "UI-02", "UI-03", "UI-04", "UI-05", "UI-06"];
 const expectedTabs = ["Home", "Explore", "Journey", "Chats", "Profile"];
@@ -16,10 +19,19 @@ const assetDir = resolve(repoRoot, "docs/design/approved-six-v1/images");
 test("six-screen visual-intent contract keeps the exact approved screen set", () => {
   assert.equal(contract.contractType, "ui-visual-intent-only");
   assert.equal(contract.assetsRequireVerifiedHash, true);
-  assert.equal(contract.status, "VISUAL_DIRECTION_APPROVED_ASSETS_VERIFIED_IN_GITHUB__FIGMA_REVIEW_PENDING");
+  assert.equal(
+    contract.status,
+    "VISUAL_DIRECTION_APPROVED_ASSETS_VERIFIED_IN_GITHUB__FIGMA_REVIEW_PENDING",
+  );
   assert.deepEqual(contract.bottomTabs, expectedTabs);
-  assert.deepEqual(contract.screens.map((screen) => screen.screenId), expectedIds);
-  assert.equal(new Set(contract.screens.map((screen) => screen.visualFile)).size, 6);
+  assert.deepEqual(
+    contract.screens.map((screen) => screen.screenId),
+    expectedIds,
+  );
+  assert.equal(
+    new Set(contract.screens.map((screen) => screen.visualFile)).size,
+    6,
+  );
 });
 
 for (const screen of contract.screens) {
@@ -33,9 +45,15 @@ for (const screen of contract.screens) {
       absolute.startsWith(assetDir + sep),
       "approved visual must remain in canonical images directory",
     );
-    assert.match(relative, /^docs\/design\/approved-six-v1\/images\/cgn_[a-z0-9_]+\.png$/);
+    assert.match(
+      relative,
+      /^docs\/design\/approved-six-v1\/images\/cgn_[a-z0-9_]+\.png$/,
+    );
     const bytes = readFileSync(absolute);
-    assert.deepEqual([...bytes.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);
+    assert.deepEqual(
+      [...bytes.subarray(0, 8)],
+      [137, 80, 78, 71, 13, 10, 26, 10],
+    );
     assert.equal(
       createHash("sha256").update(bytes).digest("hex"),
       screen.originalSha256,
@@ -51,7 +69,17 @@ for (const screen of contract.screens) {
 }
 
 test("visual mockups cannot claim implemented API/domain contracts", () => {
-  assert.ok(contract.scopeExclusions.includes("No backend REST routes inferred from screenshot"));
-  assert.equal(contract.authenticationOwnership, "Identity service (existing domain)");
-  assert.equal(contract.onboarding, "google-or-email-auth → choose-one-current-status → Home");
+  assert.ok(
+    contract.scopeExclusions.includes(
+      "No backend REST routes inferred from screenshot",
+    ),
+  );
+  assert.equal(
+    contract.authenticationOwnership,
+    "Identity service (existing domain)",
+  );
+  assert.equal(
+    contract.onboarding,
+    "google-or-email-auth → choose-one-current-status → Home",
+  );
 });
