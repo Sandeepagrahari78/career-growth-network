@@ -12,6 +12,7 @@ FROM node:22-alpine
 ENV NODE_ENV=production
 ENV PORT=3000
 WORKDIR /app
+RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx
 COPY --from=build --chown=node:node /prod/ ./
 USER node
 EXPOSE 3000

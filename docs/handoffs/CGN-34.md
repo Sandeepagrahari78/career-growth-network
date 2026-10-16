@@ -12,6 +12,8 @@ Implemented the reusable `@cgn/platform-template` NestJS service with validated 
 
 During continuation, tightened structured logging so free-form framework messages cannot pass through merely because they contain plain characters, corrected the README k3d command, fixed the Docker smoke's repo-root context, and made Docker/k3d readiness polling use an event-loop-safe timeout so cleanup runs on connection failures.
 
+CI follow-up fixed the Docker matrix job's missing Node 22/pinned pnpm setup. Trivy then identified 10 high severity vulnerabilities in npm bundled by the Node base image; npm/npx are unused in the production container and are removed from the runtime stage. The rebuilt image and Docker acceptance pass locally. Linux PR CI is rerunning this final image change.
+
 ## Files/modules changed
 
 - `services/platform-template/` (NestJS source, tests, Dockerfile, package manifest, TypeScript config and README)
@@ -40,6 +42,9 @@ No database or migration. Added service runtime defaults in Helm values and CI/l
 - `pnpm --filter @cgn/platform-template test`: passed, including build, 6 unit tests and 2 HTTP integration tests.
 - `pnpm --filter @cgn/platform-template test:docker`: passed; checks health, readiness, unknown-route response, invalid configuration and clean SIGTERM shutdown.
 - `docker build -f services/platform-template/Dockerfile -t cgn-platform-template:cgn34 .`: passed.
+- `docker build -f services/platform-template/Dockerfile -t cgn-platform-template:cgn34-check .`: passed after removing npm/npx from the runtime image.
+- `pnpm --filter @cgn/platform-template test:docker` against `cgn-platform-template:cgn34-check`: passed.
+- Linux PR CI on the final commit: pending; prior run exposed missing pnpm setup and base-image npm vulnerabilities, both addressed in the branch.
 - `node scripts/infra/k3d-platform-template-smoke.mjs`: passed on existing `cgn-local`; deployment rolled out with `/health` startup/liveness and `/ready` readiness probes, both health routes returned 200, the unknown route returned 404, and temporary namespace `cgn-cgn34-staging-21784` was deleted.
 - Root `pnpm lint` and `pnpm typecheck`: passed.
 - Targeted Prettier check for all CGN-34 files and `node --check` on both smoke scripts: passed.
@@ -50,14 +55,14 @@ No database or migration. Added service runtime defaults in Helm values and CI/l
 
 ## Known limitations / risks
 
-- CGN-34 remains To Do in live Jira until PR CI, technical review, merge and post-merge checks are complete.
+- CGN-34 remains To Do in live Jira until technical review, merge and post-merge checks are complete.
 - Current Windows checkout line endings trigger false negatives in several existing YAML text validators; Ubuntu CI reads LF files and remains the authoritative CI result.
 - The local `pnpm` wrapper is in `.cgn/bin`; nested pnpm scripts require that directory on `PATH` in this shell.
 - Local Docker configuration/tool cache files under `.cgn/` are workstation artifacts and must not be committed.
 
 ## Exact next step for next agent
 
-Run the full PR CI on Linux (or repair the legacy YAML assertions to normalize CRLF without weakening their checks), then review the diff, push the feature branch and open a PR for Sandeep's review. Keep CGN-35/36 contract work separate.
+Confirm the final Linux PR CI and Local Helm Validation runs pass, then complete Sandeep's technical review before merge. Keep CGN-35/36 contract work separate.
 
 ## Rollback note
 
