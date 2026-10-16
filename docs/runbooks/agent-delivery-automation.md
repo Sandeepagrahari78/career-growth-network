@@ -7,7 +7,7 @@ Ticket: CGN-299. Activation requires this PR to merge, repository secrets and a 
 ## Everyday workflow
 
 1. The coding agent reads the live Jira ticket and latest main, implements approved scope, tests, writes the ticket handoff, commits only ticket files, pushes its `CGN-NNN-description` branch and opens a PR. It continues through Linux CI and fixes its failures without asking again about routine delivery.
-2. A ticket branch creation or push moves Jira to **In Progress**, including pushes to branches created before activation. A ready PR moves it to **In Review**. Draft PRs remain In Progress. The sync never moves a ticket backwards.
+2. After this workflow is merged, a ticket branch creation or push moves Jira to **In Progress**, including pushes to branches created before activation. Before merge, push events safely skip because only trusted `main` code is checked out. A ready PR moves Jira to **In Review**. Draft PRs remain In Progress. The sync never moves a ticket backwards.
 3. Sandeep performs the technical review before merging. The agent must not merge on a green build alone.
 4. After merge, Sandeep checks the ticket acceptance criteria, successful Main CI and required staging evidence for that merged candidate. In a PR comment, Sandeep records the evidence links and this exact line, replacing the placeholder with the full 40-character merge SHA:
 
