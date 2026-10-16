@@ -1,5 +1,7 @@
 # Agent delivery and automatic Jira updates
 
+For local Windows tool/login checks and starting a ticket agent, use [single-ticket setup](single-ticket-agent-setup.md). The launcher and the Actions status sync are separate components; neither is claimed activated until its live test succeeds.
+
 Ticket: CGN-299. Activation requires this PR to merge, repository secrets and a verified live round trip. A branch containing this workflow is not an active installation.
 
 ## Everyday workflow

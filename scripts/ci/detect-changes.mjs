@@ -59,10 +59,14 @@ const flags = {
       file === "scripts/ci/integration-stack-smoke.mjs" ||
       file === ".github/workflows/pr-ci.yml",
   ),
+  platformTemplate: changed.some((file) =>
+    file.startsWith("services/platform-template/"),
+  ),
   e2e: changed.some(
     (file) =>
       file.startsWith("apps/web/") ||
       file.startsWith("services/health-demo/") ||
+      file.startsWith("services/platform-template/") ||
       file.startsWith("tests/e2e/") ||
       file === ".github/workflows/pr-ci.yml",
   ),
