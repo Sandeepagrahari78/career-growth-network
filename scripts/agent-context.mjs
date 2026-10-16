@@ -53,6 +53,10 @@ async function run() {
 
   const sources = [
     "AGENTS.md",
+    "docs/product/CGN_V2_PRODUCT_VISION.md",
+    "docs/product/CGN_V2_FEATURE_GAP_AUDIT.md",
+    "docs/product/CGN_V2_ARCHITECTURE_REVIEW.md",
+    "docs/design/CGN_V2_DESIGN_HANDOFF.md",
     "docs/architecture/PROJECT_FLOW.md",
     "docs/architecture/MODULE_DEPENDENCIES.md",
     "docs/architecture/AGENT_WORKFLOW.md",
