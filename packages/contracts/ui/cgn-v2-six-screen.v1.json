@@ -4,7 +4,7 @@
   "release": "CGN-V2-FINAL-SIX-2026-10-16",
   "decision": "Product owner approved these exact six generated screenshot visuals. UI layout precedence established; owner/API/privacy approval continues.",
   "canonicalDoc": "docs/design/CGN_V2_FINAL_SIX_APPROVED_UI.md",
-  "status": "DESIGN-DIRECTION_APPROVED__BINARY_ASSET_UPLOAD_PENDING",
+  "status": "VISUAL_DIRECTION_APPROVED_ASSETS_VERIFIED_IN_GITHUB__FIGMA_REVIEW_PENDING",
   "assetsRequireVerifiedHash": true,
   "bottomTabs": [
     "Home",
@@ -23,7 +23,7 @@
       "name": "Current Status",
       "visualFile": "docs/design/approved-six-v1/images/cgn_career_status_onboarding.png",
       "originalSha256": "66c38a0ebd672dfb81c487ee3031e2ead494dcbb7f0abe5c9999907c1fa4e70c",
-      "assetStatus": "BINARY_UPLOAD_PENDING",
+      "assetStatus": "VERIFIED_IN_GITHUB",
       "jiraTickets": [
         "CGN-11",
         "CGN-70",
@@ -31,14 +31,15 @@
       ],
       "description": "Google or email sign-in (identity flow), then one required current-status page. Select 11th, 12th, B.Tech, B.Sc, NEET, JEE, UPSC or Other; continue directly to personalized Home. Returning users with saved stage go directly to Home.",
       "primaryPlatform": "Android",
-      "webAdaptation": "responsive—same API semantics, desktop-appropriate layout"
+      "webAdaptation": "responsive—same API semantics, desktop-appropriate layout",
+      "verifiedGitBlobSha1": "bc5e6767fd1520226662dbd2fcc9dc30099ab665"
     },
     {
       "screenId": "UI-02",
       "name": "Home",
       "visualFile": "docs/design/approved-six-v1/images/cgn_student_social_feed_mockup.png",
       "originalSha256": "0276eb4a1fc7e9a5dd5174a3a6ef890b2fcc6b91da510868bf5167f4a9fee8c1",
-      "assetStatus": "BINARY_UPLOAD_PENDING",
+      "assetStatus": "VERIFIED_IN_GITHUB",
       "jiraTickets": [
         "CGN-262",
         "CGN-266",
@@ -47,14 +48,15 @@
       ],
       "description": "Personalized social Home, upper story/status row relevant to education stage/goal, peer posts, author follow/request, like, comment, save, share, and opted-in growth proof. 15–40 status bubbles are not an initial content supply promise; horizontally scroll and show an honest empty state.",
       "primaryPlatform": "Android",
-      "webAdaptation": "responsive—same API semantics, desktop-appropriate layout"
+      "webAdaptation": "responsive—same API semantics, desktop-appropriate layout",
+      "verifiedGitBlobSha1": "d1a81d92eb61e4caaa67c59e75efcae576d1f063"
     },
     {
       "screenId": "UI-03",
       "name": "Explore",
       "visualFile": "docs/design/approved-six-v1/images/cgn_explore_connect_and_grow.png",
       "originalSha256": "ef219983e0945ed1da2ff16d961b8f670fcf0bbc87d1796ada0c4548c5b333f1",
-      "assetStatus": "BINARY_UPLOAD_PENDING",
+      "assetStatus": "VERIFIED_IN_GITHUB",
       "jiraTickets": [
         "CGN-21",
         "CGN-23",
@@ -64,14 +66,15 @@
       ],
       "description": "Search/status filters, relevant industrial experts, same-stage peers, communities, follow, private-account follow requests and accept/decline notifications. Expert verify claim must come from approved Admin/Experts system, not hardcoded badges.",
       "primaryPlatform": "Android",
-      "webAdaptation": "responsive—same API semantics, desktop-appropriate layout"
+      "webAdaptation": "responsive—same API semantics, desktop-appropriate layout",
+      "verifiedGitBlobSha1": "ea8f6152c6a01514baab8c35d9eed166f69ed9ff"
     },
     {
       "screenId": "UI-04",
       "name": "Journey",
       "visualFile": "docs/design/approved-six-v1/images/cgn_journey_dashboard_ui.png",
       "originalSha256": "e9d55a4de9e4c11e4f8079281f6bab09a09153e0473828209a17a61639bed542",
-      "assetStatus": "BINARY_UPLOAD_PENDING",
+      "assetStatus": "VERIFIED_IN_GITHUB",
       "jiraTickets": [
         "CGN-15",
         "CGN-16",
@@ -80,14 +83,15 @@
       ],
       "description": "Goal header, personal progress, tasks, weekly schedule, optional AI-editable suggestions, context-specific roadmap, evidence and project/placement preparation; NEET/JEE users receive preparation-appropriate cards instead of B.Tech-only milestones.",
       "primaryPlatform": "Android",
-      "webAdaptation": "responsive—same API semantics, desktop-appropriate layout"
+      "webAdaptation": "responsive—same API semantics, desktop-appropriate layout",
+      "verifiedGitBlobSha1": "8d25ed683a568ee82af407fdc97c1a97a3d9299d"
     },
     {
       "screenId": "UI-05",
       "name": "Chats",
       "visualFile": "docs/design/approved-six-v1/images/cgn_chats_connect_learn_grow.png",
       "originalSha256": "aff80c71b37c1ab3315f409e8511d1d96bcf094c6567b7fa64e02c2b46b622d8",
-      "assetStatus": "BINARY_UPLOAD_PENDING",
+      "assetStatus": "VERIFIED_IN_GITHUB",
       "jiraTickets": [
         "CGN-264",
         "CGN-274",
@@ -96,14 +100,15 @@
       ],
       "description": "Inbox tabs All/Peers/Experts/Groups, real unread counts, conversation/message previews, notifications and server-side block/report/request state. Adult–minor private expert messaging is restricted until approved policy.",
       "primaryPlatform": "Android",
-      "webAdaptation": "responsive—same API semantics, desktop-appropriate layout"
+      "webAdaptation": "responsive—same API semantics, desktop-appropriate layout",
+      "verifiedGitBlobSha1": "091071ab2f52b44819e2794cf8d2dcaabcd1cf2c"
     },
     {
       "screenId": "UI-06",
       "name": "Profile",
       "visualFile": "docs/design/approved-six-v1/images/cgn_profile_aanya_s_growth_journey.png",
       "originalSha256": "89ea3e1b8313544aa03846b50c877e7e56d15f579aba8fc5d155ddbdaef1cdaf",
-      "assetStatus": "BINARY_UPLOAD_PENDING",
+      "assetStatus": "VERIFIED_IN_GITHUB",
       "jiraTickets": [
         "CGN-15",
         "CGN-105",
@@ -112,7 +117,8 @@
       ],
       "description": "Profile header, bio, posts, followers/following/connections, own achievements, saved/activity tabs, status switch, edit/create post and personal Career Growth summary linked to Journey.",
       "primaryPlatform": "Android",
-      "webAdaptation": "responsive—same API semantics, desktop-appropriate layout"
+      "webAdaptation": "responsive—same API semantics, desktop-appropriate layout",
+      "verifiedGitBlobSha1": "d133640dc7587dd67dc26056ed20cd02c1c6b020"
     }
   ],
   "scopeExclusions": [
@@ -122,5 +128,11 @@
     "No fabricated student marks/streaks/followers/chats",
     "No forced peer following or unrestricted adult-minor DM",
     "No iOS release"
-  ]
+  ],
+  "assetVerification": {
+    "method": "Original local binary SHA-256 and Git SHA-1 blob ID matched to remote GitHub blobs, then canonical paths created reusing those exact Git objects",
+    "proofCommit": "6ec5b4a4e5caee52468e8aaad11446b61f758b1b",
+    "verifiedOn": "2026-10-16",
+    "binaryCount": 6
+  }
 }
