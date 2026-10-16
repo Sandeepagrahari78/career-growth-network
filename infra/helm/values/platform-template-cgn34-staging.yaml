@@ -1,0 +1,50 @@
+nameOverride: cgn-platform-template
+replicaCount: 1
+
+image:
+  repository: cgn-platform-template
+  tag: cgn34
+  pullPolicy: IfNotPresent
+
+container:
+  port: 3000
+
+service:
+  type: ClusterIP
+  port: 3000
+
+podLabels:
+  cgn.io/environment: staging
+  cgn.io/ticket: CGN-34
+
+env:
+  - name: PORT
+    value: "3000"
+  - name: NODE_ENV
+    value: production
+
+resources: {}
+
+probes:
+  enabled: true
+  startup:
+    path: /health
+    initialDelaySeconds: 0
+    periodSeconds: 2
+    timeoutSeconds: 2
+    failureThreshold: 30
+    successThreshold: 1
+  readiness:
+    path: /ready
+    initialDelaySeconds: 0
+    periodSeconds: 2
+    timeoutSeconds: 2
+    failureThreshold: 3
+    successThreshold: 1
+  liveness:
+    path: /health
+    initialDelaySeconds: 0
+    periodSeconds: 10
+    timeoutSeconds: 2
+    failureThreshold: 3
+    successThreshold: 1

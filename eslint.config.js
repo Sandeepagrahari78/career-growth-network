@@ -4,6 +4,7 @@ export default [
       "scripts/ci/**/*.mjs",
       "scripts/infra/**/*.mjs",
       "services/health-demo/**/*.mjs",
+      "services/platform-template/test/**/*.mjs",
       "eslint.config.js",
     ],
     languageOptions: {
@@ -11,6 +12,7 @@ export default [
       sourceType: "module",
       globals: {
         console: "readonly",
+        fetch: "readonly",
         process: "readonly",
         setTimeout: "readonly",
       },
