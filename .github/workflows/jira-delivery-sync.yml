@@ -1,0 +1,54 @@
+name: Jira Delivery Sync
+
+on:
+  create:
+  push:
+    branches: ["CGN-*"]
+  pull_request_target:
+    branches: [main]
+    types: [opened, reopened, synchronize, ready_for_review, closed]
+  workflow_run:
+    workflows: ["Main CI", "Staging Validation"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: PR number to reconcile after setup or a transient failure
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  pull-requests: read
+  issues: read
+  actions: read
+
+jobs:
+  sync:
+    if: >-
+      github.repository == 'Sandeepagrahari78/career-growth-network'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Serialize writes. Reconcile manually if GitHub replaces a pending run.
+    concurrency:
+      group: jira-delivery-sync
+      cancel-in-progress: false
+    steps:
+      # Privileged metadata workflow: NEVER checkout PR code or download artifacts.
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22
+      - name: Reconcile delivery status
+        if: ${{ hashFiles('scripts/ci/jira-delivery-sync.mjs') != '' }}
+        run: node scripts/ci/jira-delivery-sync.mjs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          CGN_JIRA_EMAIL: ${{ secrets.CGN_JIRA_EMAIL }}
+          CGN_JIRA_API_TOKEN: ${{ secrets.CGN_JIRA_API_TOKEN }}
+      - name: Skip until trusted implementation is on main
+        if: ${{ hashFiles('scripts/ci/jira-delivery-sync.mjs') == '' }}
+        run: echo "Jira delivery sync is not merged to main yet; no Jira transition attempted."

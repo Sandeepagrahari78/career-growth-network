@@ -28,6 +28,7 @@ jobs:
       docsOnly: ${{ steps.detect.outputs.docsOnly }}
       integration: ${{ steps.detect.outputs.integration }}
       e2e: ${{ steps.detect.outputs.e2e }}
+      platformTemplate: ${{ steps.detect.outputs.platformTemplate }}
       performance: ${{ steps.detect.outputs.performance }}
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -280,6 +281,31 @@ jobs:
       - name: Prove service discovery and NetworkPolicy enforcement
         run: bash scripts/infra/k3d-smoke.sh
 
+      - name: Install pinned Helm
+        shell: bash
+        env:
+          HELM_VERSION: v3.18.6
+        run: |
+          archive="helm-$HELM_VERSION-linux-amd64.tar.gz"
+          curl --fail --location --silent --show-error \
+            -o "/tmp/$archive" \
+            "https://get.helm.sh/$archive"
+          curl --fail --location --silent --show-error \
+            -o "/tmp/$archive.sha256sum" \
+            "https://get.helm.sh/$archive.sha256sum"
+          expected_sha="$(awk '{print $1}' "/tmp/$archive.sha256sum")"
+          test -n "$expected_sha"
+          echo "$expected_sha  /tmp/$archive" | sha256sum --check -
+          tar -xzf "/tmp/$archive" -C /tmp
+          sudo install -m 0755 /tmp/linux-amd64/helm /usr/local/bin/helm
+          helm version
+
+      - name: Build platform-template image
+        run: docker build -f services/platform-template/Dockerfile -t cgn-platform-template:cgn34 .
+
+      - name: Deploy platform-template into temporary local staging namespace
+        run: node scripts/infra/k3d-platform-template-smoke.mjs
+
       - name: Destroy CGN local cluster
         if: always()
         shell: bash
@@ -352,6 +378,15 @@ jobs:
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22
+
+      - name: Enable pinned pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@11.25.0 --activate
+
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
 
@@ -410,6 +445,12 @@ jobs:
           docker logs cgn-health-demo
           exit 1
 
+      - name: Run platform-template Docker acceptance
+        if: matrix.service == 'platform-template'
+        env:
+          CGN_TEMPLATE_IMAGE: cgn-platform-template:${{ github.sha }}
+        run: pnpm --filter @cgn/platform-template test:docker
+
       - name: Enforce container security gate
         if: always()
         shell: bash
@@ -461,6 +502,15 @@ jobs:
           done
           docker logs cgn-e2e
           exit 1
+
+      - name: Build and run platform-template Docker acceptance
+        if: needs.changes.outputs.platformTemplate == 'true'
+        shell: bash
+        env:
+          CGN_TEMPLATE_IMAGE: cgn-platform-template:e2e
+        run: |
+          docker build -f services/platform-template/Dockerfile -t cgn-platform-template:e2e .
+          node services/platform-template/test/docker-smoke.mjs
 
   performance-smoke:
     name: Controlled k6 performance smoke
