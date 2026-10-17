@@ -45,7 +45,7 @@ export function desiredStatus(pr, evidence = {}) {
 // candidate. The trusted staging workflow names every run with its resolved SHA.
 export function stagingCandidate(run = {}) {
   if (
-    run.name !== "Staging Validation" ||
+    run.path !== ".github/workflows/staging.yml" ||
     run.head_branch !== "main" ||
     !["workflow_run", "workflow_dispatch"].includes(run.event)
   ) {
@@ -245,14 +245,19 @@ export async function syncPR(api, number) {
 
 export async function syncWorkflowRun(api, run) {
   if (
-    !["Main CI", "Staging Validation"].includes(run.name) ||
+    ![
+      ".github/workflows/main-ci.yml",
+      ".github/workflows/staging.yml",
+    ].includes(run.path) ||
     run.head_branch !== "main" ||
     run.conclusion !== "success"
   ) {
     return "Waiting for successful Main CI or staging";
   }
   const candidate =
-    run.name === "Staging Validation" ? stagingCandidate(run) : run.head_sha;
+    run.path === ".github/workflows/staging.yml"
+      ? stagingCandidate(run)
+      : run.head_sha;
   if (!/^[a-f0-9]{40}$/.test(candidate ?? "")) {
     return "Ignored unknown candidate";
   }
