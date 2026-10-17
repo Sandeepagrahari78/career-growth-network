@@ -131,7 +131,8 @@ function fixture({
         workflow_runs: [
           {
             id: 4,
-            name: "Staging Validation",
+            name: `Staging Validation: ${sha}`,
+            path: ".github/workflows/staging.yml",
             event: "workflow_run",
             head_branch: "main",
             display_title: `Staging Validation: ${sha}`,
@@ -283,7 +284,8 @@ test("credentials stay out of errors and redirect following is disabled", async 
 
 test("staging resolves tested SHA independently of default branch SHA", () => {
   const run = {
-    name: "Staging Validation",
+    name: `Staging Validation: ${sha}`,
+    path: ".github/workflows/staging.yml",
     head_branch: "main",
     event: "workflow_run",
     head_sha: "c".repeat(40),
@@ -294,7 +296,7 @@ test("staging resolves tested SHA independently of default branch SHA", () => {
     { display_title: "Staging Validation" },
     { head_branch: "feature" },
     { event: "pull_request" },
-    { name: "Other" },
+    { path: ".github/workflows/other.yml" },
   ])
     assert.equal(stagingCandidate({ ...run, ...change }), null);
 });
@@ -302,7 +304,8 @@ test("staging resolves tested SHA independently of default branch SHA", () => {
 test("latest exact-candidate staging wins; unrelated green and expired artifacts never qualify", async () => {
   const good = {
     id: 1,
-    name: "Staging Validation",
+    name: `Staging Validation: ${sha}`,
+    path: ".github/workflows/staging.yml",
     head_branch: "main",
     event: "workflow_run",
     display_title: `Staging Validation: ${sha}`,
@@ -335,14 +338,15 @@ test("latest exact-candidate staging wins; unrelated green and expired artifacts
   }
 });
 
-test("staging completion reconciles candidate PR even when default branch moved", async () => {
+test("real GitHub custom run name reconciles staging candidate even when main moved", async () => {
   const { api, writes } = fixture();
   const wrapped = async (service, path, body) => {
     if (path.startsWith(`/commits/${sha}/pulls?`)) return [pr];
     return api(service, path, body);
   };
   const eventRun = {
-    name: "Staging Validation",
+    name: `Staging Validation: ${sha}`,
+    path: ".github/workflows/staging.yml",
     event: "workflow_run",
     head_branch: "main",
     head_sha: "c".repeat(40),
