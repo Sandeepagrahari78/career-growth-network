@@ -29,10 +29,11 @@ export function desiredStatus(pr, evidence = {}) {
     return null;
   }
   if (pr.merged) {
-    return pr.merged_by?.login === OWNER &&
+    return /^[a-f0-9]{40}$/.test(pr.merge_commit_sha ?? "") &&
+      pr.merged_by?.login === OWNER &&
       evidence.prCI &&
       evidence.mainCI &&
-      evidence.accepted &&
+      evidence.staging &&
       evidence.handoff
       ? "Done"
       : null;
@@ -40,19 +41,42 @@ export function desiredStatus(pr, evidence = {}) {
   return pr.state === "open" ? (pr.draft ? "In Progress" : "In Review") : null;
 }
 
-// Exact immutable merge SHA: owner attests technical review, all acceptance
-// criteria and required staging after merge. Agents must never post this marker.
-export function accepted(pr, comments) {
-  if (!/^[a-f0-9]{40}$/.test(pr.merge_commit_sha ?? "")) {
+// workflow_run.head_sha can describe the default branch rather than the tested
+// candidate. The trusted staging workflow names every run with its resolved SHA.
+export function stagingCandidate(run = {}) {
+  if (
+    run.name !== "Staging Validation" ||
+    run.head_branch !== "main" ||
+    !["workflow_run", "workflow_dispatch"].includes(run.event)
+  ) {
+    return null;
+  }
+  return (
+    /^Staging Validation: ([a-f0-9]{40})$/.exec(run.display_title ?? "")?.[1] ??
+    null
+  );
+}
+
+export async function stagingPassed(api, sha) {
+  const runs = await list(
+    api,
+    "/actions/workflows/staging.yml/runs",
+    "workflow_runs",
+  );
+  const latest = runs
+    .filter((r) => stagingCandidate(r) === sha)
+    .sort((a, b) => b.id - a.id)[0];
+  if (latest?.status !== "completed" || latest.conclusion !== "success") {
     return false;
   }
-  return comments.some(
-    (c) =>
-      c.user?.login === OWNER &&
-      Date.parse(c.created_at) >= Date.parse(pr.merged_at) &&
-      c.body
-        ?.split(/\r?\n/)
-        .some((line) => line.trim() === `CGN-ACCEPTED: ${pr.merge_commit_sha}`),
+  // Read metadata only; never download or execute an artifact in this privileged job.
+  const artifacts = await list(
+    api,
+    `/actions/runs/${latest.id}/artifacts`,
+    "artifacts",
+  );
+  return artifacts.some(
+    (a) => a.name === `staging-evidence-${sha}` && a.expired === false,
   );
 }
 
@@ -197,16 +221,16 @@ export async function syncPR(api, number) {
   }
   let evidence = {};
   if (pr.merged) {
-    const [comments, files, prCI, mainCI] = await Promise.all([
-      list(api, `/issues/${number}/comments`),
+    const [files, prCI, mainCI, staging] = await Promise.all([
       list(api, `/pulls/${number}/files`),
       ciPassed(api, "pr-ci.yml", pr.head.sha, "pull_request", pr.number),
       ciPassed(api, "main-ci.yml", pr.merge_commit_sha, "push"),
+      stagingPassed(api, pr.merge_commit_sha),
     ]);
     evidence = {
       prCI,
       mainCI,
-      accepted: accepted(pr, comments),
+      staging,
       handoff: files.some(
         (f) =>
           f.filename === `docs/handoffs/${ticket}.md` && f.status !== "removed",
@@ -216,7 +240,30 @@ export async function syncPR(api, number) {
   const target = desiredStatus(pr, evidence);
   return target
     ? transition(api, ticket, target)
-    : "Waiting for reviewed merge, CI and owner acceptance; Jira unchanged";
+    : "Waiting for owner merge, PR/Main CI and exact-candidate staging; Jira unchanged";
+}
+
+export async function syncWorkflowRun(api, run) {
+  if (
+    !["Main CI", "Staging Validation"].includes(run.name) ||
+    run.head_branch !== "main" ||
+    run.conclusion !== "success"
+  ) {
+    return "Waiting for successful Main CI or staging";
+  }
+  const candidate =
+    run.name === "Staging Validation" ? stagingCandidate(run) : run.head_sha;
+  if (!/^[a-f0-9]{40}$/.test(candidate ?? "")) {
+    return "Ignored unknown candidate";
+  }
+  const prs = await list(api, `/commits/${candidate}/pulls`);
+  const results = [];
+  for (const pr of prs.filter(
+    (p) => p.merged_at && p.merge_commit_sha === candidate,
+  )) {
+    results.push(await syncPR(api, pr.number));
+  }
+  return results.join("\n") || "No merged ticket PR for this SHA";
 }
 
 export async function run(env = process.env) {
@@ -232,32 +279,10 @@ export async function run(env = process.env) {
       : "Ignored non-ticket ref";
   }
   if (env.GITHUB_EVENT_NAME === "workflow_run") {
-    const run = event.workflow_run;
-    if (
-      run.name !== "Main CI" ||
-      run.head_branch !== "main" ||
-      run.conclusion !== "success"
-    ) {
-      return "Waiting for successful Main CI";
-    }
-    const prs = await list(api, `/commits/${run.head_sha}/pulls`);
-    const results = [];
-    for (const pr of prs.filter(
-      (p) => p.merged_at && p.merge_commit_sha === run.head_sha,
-    )) {
-      results.push(await syncPR(api, pr.number));
-    }
-    return results.join("\n") || "No merged ticket PR for this SHA";
+    return syncWorkflowRun(api, event.workflow_run);
   }
-  if (env.GITHUB_EVENT_NAME === "issue_comment" && !event.issue?.pull_request) {
-    return "Ignored non-PR comment";
-  }
-  return syncPR(
-    api,
-    event.pull_request?.number ??
-      event.issue?.number ??
-      event.inputs?.pr_number,
-  );
+
+  return syncPR(api, event.pull_request?.number ?? event.inputs?.pr_number);
 }
 
 if (

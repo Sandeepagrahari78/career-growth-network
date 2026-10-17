@@ -2,11 +2,13 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   REPO,
-  accepted,
+  stagingCandidate,
+  stagingPassed,
   apiClient,
   desiredStatus,
   list,
   syncPR,
+  syncWorkflowRun,
   ticketFromBranch,
   ticketFromBranchEvent,
   transition,
@@ -27,12 +29,7 @@ const pr = {
     repo: { full_name: REPO },
   },
 };
-const comment = {
-  user: { login: "Sandeepagrahari78" },
-  created_at: "2026-10-16T12:01:00Z",
-  body: `Reviewed technical changes and staging evidence.\nCGN-ACCEPTED: ${sha}`,
-};
-const evidence = { prCI: true, mainCI: true, accepted: true, handoff: true };
+const evidence = { prCI: true, mainCI: true, staging: true, handoff: true };
 
 test("only canonical ticket branches are recognized", () => {
   assert.equal(ticketFromBranch("CGN-299-agent-delivery"), "CGN-299");
@@ -109,23 +106,12 @@ test("every completion gate is required; forks and unmerged closure never comple
   );
 });
 
-test("acceptance is owner-authored, after merge and bound to exact merge SHA", () => {
-  assert.equal(accepted(pr, [comment]), true);
-  for (const change of [
-    { user: { login: "coding-agent" } },
-    { body: `CGN-ACCEPTED: ${"b".repeat(40)}` },
-    { body: `> CGN-ACCEPTED: ${sha}` },
-    { created_at: "2026-10-16T11:59:59Z" },
-  ]) {
-    assert.equal(accepted(pr, [{ ...comment, ...change }]), false);
-  }
-});
-
 function fixture({
   status = "In Review",
   blocked = false,
   ci = "success",
-  comments = [comment],
+  staging = "success",
+  artifact = true,
   files = [{ filename: "docs/handoffs/CGN-299.md", status: "modified" }],
 } = {}) {
   const writes = [];
@@ -137,12 +123,30 @@ function fixture({
     if (path === "/pulls/37") {
       return pr;
     }
-    if (path.includes("/comments?")) {
-      return comments;
-    }
     if (path.includes("/files?")) {
       return files;
     }
+    if (path.includes("/actions/workflows/staging.yml/")) {
+      return {
+        workflow_runs: [
+          {
+            id: 4,
+            name: "Staging Validation",
+            event: "workflow_run",
+            head_branch: "main",
+            display_title: `Staging Validation: ${sha}`,
+            status: staging === "pending" ? "in_progress" : "completed",
+            conclusion: staging,
+          },
+        ],
+      };
+    }
+    if (path.includes("/artifacts?"))
+      return {
+        artifacts: artifact
+          ? [{ name: `staging-evidence-${sha}`, expired: false }]
+          : [],
+      };
     if (path.includes("/actions/workflows/")) {
       const isPR = path.includes("pr-ci.yml");
       return {
@@ -193,7 +197,7 @@ function fixture({
   return { api, writes };
 }
 
-test("successful reconciliation posts exactly the discovered Jira transition", async () => {
+test("owner merge without any acceptance comment posts exactly the discovered Jira transition", async () => {
   const { api, writes } = fixture();
   assert.match(await syncPR(api, 37), /Transitioned CGN-299 to Done/);
   assert.deepEqual(writes, [
@@ -205,11 +209,14 @@ test("successful reconciliation posts exactly the discovered Jira transition", a
   ]);
 });
 
-test("failed latest CI, missing handoff, missing acceptance, blockers or Done make no write", async () => {
+test("failed CI, missing handoff, pending/failed staging, missing artifact, blockers or Done make no write", async () => {
   for (const options of [
     { ci: "failure" },
     { files: [] },
-    { comments: [] },
+    { staging: "failure" },
+    { staging: "pending" },
+    { staging: "skipped" },
+    { artifact: false },
     { blocked: true },
     { status: "Done" },
   ]) {
@@ -272,4 +279,86 @@ test("credentials stay out of errors and redirect following is disabled", async 
   await assert.rejects(failing("jira", "/issue/CGN-299"), {
     message: "jira request failed (network/timeout/redirect); rerun sync",
   });
+});
+
+test("staging resolves tested SHA independently of default branch SHA", () => {
+  const run = {
+    name: "Staging Validation",
+    head_branch: "main",
+    event: "workflow_run",
+    head_sha: "c".repeat(40),
+    display_title: `Staging Validation: ${sha}`,
+  };
+  assert.equal(stagingCandidate(run), sha);
+  for (const change of [
+    { display_title: "Staging Validation" },
+    { head_branch: "feature" },
+    { event: "pull_request" },
+    { name: "Other" },
+  ])
+    assert.equal(stagingCandidate({ ...run, ...change }), null);
+});
+
+test("latest exact-candidate staging wins; unrelated green and expired artifacts never qualify", async () => {
+  const good = {
+    id: 1,
+    name: "Staging Validation",
+    head_branch: "main",
+    event: "workflow_run",
+    display_title: `Staging Validation: ${sha}`,
+    status: "completed",
+    conclusion: "success",
+  };
+  for (const [runs, artifacts, expected] of [
+    [[good], [{ name: `staging-evidence-${sha}`, expired: false }], true],
+    [[good, { ...good, id: 2, conclusion: "failure" }], [], false],
+    [
+      [good, { ...good, id: 2, status: "in_progress", conclusion: null }],
+      [],
+      false,
+    ],
+    [
+      [{ ...good, display_title: `Staging Validation: ${"b".repeat(40)}` }],
+      [],
+      false,
+    ],
+    [[good], [{ name: `staging-evidence-${sha}`, expired: true }], false],
+    [
+      [good],
+      [{ name: `staging-evidence-${"b".repeat(40)}`, expired: false }],
+      false,
+    ],
+  ]) {
+    const api = async (_service, path) =>
+      path.includes("/artifacts?") ? { artifacts } : { workflow_runs: runs };
+    assert.equal(await stagingPassed(api, sha), expected);
+  }
+});
+
+test("staging completion reconciles candidate PR even when default branch moved", async () => {
+  const { api, writes } = fixture();
+  const wrapped = async (service, path, body) => {
+    if (path.startsWith(`/commits/${sha}/pulls?`)) return [pr];
+    return api(service, path, body);
+  };
+  const eventRun = {
+    name: "Staging Validation",
+    event: "workflow_run",
+    head_branch: "main",
+    head_sha: "c".repeat(40),
+    display_title: `Staging Validation: ${sha}`,
+    conclusion: "success",
+  };
+  assert.match(await syncWorkflowRun(wrapped, eventRun), /Transitioned/);
+  assert.equal(writes.length, 1);
+  for (const change of [
+    { conclusion: "failure" },
+    { head_branch: "feature" },
+    { display_title: "unknown" },
+  ]) {
+    const noReads = async () => {
+      throw new Error("must not reconcile invalid event");
+    };
+    await syncWorkflowRun(noReads, { ...eventRun, ...change });
+  }
 });

@@ -92,7 +92,7 @@ Resume starts a new agent turn in the same ticket worktree, using persisted code
 
 The local agent uses Jira OAuth. GitHub Actions needs the separate `CGN_JIRA_EMAIL` and `CGN_JIRA_API_TOKEN` repository secrets from [delivery automation](agent-delivery-automation.md). Neither authentication is copied into the other system. Configure those secrets in GitHub's UI; do not put them into this launcher. The status-sync workflow must be merged and verified before calling it active.
 
-For tickets with required human review, the agent should deliver a review-ready PR and one precise decision request. A generic desire for speed is not evidence that review occurred. PR #37 still requires human acceptance at the exact merge SHA for its automatic Done path. Remaining true-autopilot work includes executable ticket-readiness specifications, a reviewed automated-review/merge policy and integration tests for the whole live lifecycle.
+For tickets with required human review, the agent should deliver a review-ready PR and one precise decision request. A generic desire for speed is not evidence that review occurred. The owner-reviewed merge is the approval signal; latest PR/Main CI and exact-candidate staging must succeed before automatic Done. No extra acceptance comment is needed. Remaining true-autopilot work includes executable ticket-readiness specifications, a reviewed automated-review/merge policy and integration tests for the whole live lifecycle.
 
 ## Verified reference
 
