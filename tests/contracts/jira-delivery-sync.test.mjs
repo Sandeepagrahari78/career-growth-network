@@ -8,6 +8,7 @@ import {
   desiredStatus,
   list,
   syncPR,
+  matchesPRRun,
   syncWorkflowRun,
   ticketFromBranch,
   ticketFromBranchEvent,
@@ -156,7 +157,9 @@ function fixture({
             id: 2,
             head_sha: isPR ? pr.head.sha : sha,
             event: isPR ? "pull_request" : "push",
-            pull_requests: [{ number: 37 }],
+            pull_requests: [],
+            head_branch: pr.head.ref,
+            head_repository: { full_name: REPO },
             status: "completed",
             conclusion: ci,
           },
@@ -164,7 +167,9 @@ function fixture({
             id: 1,
             head_sha: isPR ? pr.head.sha : sha,
             event: isPR ? "pull_request" : "push",
-            pull_requests: [{ number: 37 }],
+            pull_requests: [],
+            head_branch: pr.head.ref,
+            head_repository: { full_name: REPO },
             status: "completed",
             conclusion: "success",
           },
@@ -365,4 +370,25 @@ test("real GitHub custom run name reconciles staging candidate even when main mo
     };
     await syncWorkflowRun(noReads, { ...eventRun, ...change });
   }
+});
+
+test("empty GitHub PR association requires exact SHA, branch and repository", () => {
+  const run = {
+    head_sha: pr.head.sha,
+    head_branch: pr.head.ref,
+    head_repository: { full_name: REPO },
+    pull_requests: [],
+  };
+  assert.equal(matchesPRRun(run, pr), true);
+  for (const change of [
+    { head_sha: sha },
+    { head_branch: "other" },
+    { head_repository: { full_name: "fork/repo" } },
+    { pull_requests: [{ number: 999 }] },
+  ])
+    assert.equal(matchesPRRun({ ...run, ...change }, pr), false);
+  assert.equal(
+    matchesPRRun({ ...run, pull_requests: [{ number: 37 }] }, pr),
+    true,
+  );
 });

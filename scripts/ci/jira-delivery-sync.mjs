@@ -146,7 +146,19 @@ export async function list(api, path, key) {
   );
 }
 
-async function ciPassed(api, workflow, sha, event, number) {
+export function matchesPRRun(run, pr) {
+  if (
+    run.head_sha !== pr.head.sha ||
+    run.head_branch !== pr.head.ref ||
+    run.head_repository?.full_name !== REPO
+  ) {
+    return false;
+  }
+  const linked = run.pull_requests ?? [];
+  return linked.length === 0 || linked.some((p) => p.number === pr.number);
+}
+
+async function ciPassed(api, workflow, sha, event, pr) {
   const runs = await list(
     api,
     `/actions/workflows/${workflow}/runs?head_sha=${sha}&event=${event}`,
@@ -155,9 +167,7 @@ async function ciPassed(api, workflow, sha, event, number) {
   const matching = runs
     .filter(
       (r) =>
-        r.head_sha === sha &&
-        r.event === event &&
-        (!number || r.pull_requests?.some((p) => p.number === number)),
+        r.head_sha === sha && r.event === event && (!pr || matchesPRRun(r, pr)),
     )
     .sort((a, b) => b.id - a.id);
   // Latest run wins: an old successful run cannot mask a failed rerun.
@@ -223,7 +233,7 @@ export async function syncPR(api, number) {
   if (pr.merged) {
     const [files, prCI, mainCI, staging] = await Promise.all([
       list(api, `/pulls/${number}/files`),
-      ciPassed(api, "pr-ci.yml", pr.head.sha, "pull_request", pr.number),
+      ciPassed(api, "pr-ci.yml", pr.head.sha, "pull_request", pr),
       ciPassed(api, "main-ci.yml", pr.merge_commit_sha, "push"),
       stagingPassed(api, pr.merge_commit_sha),
     ]);
