@@ -497,6 +497,8 @@ jobs:
 
       - name: Diagnose SeaweedFS startup failure
         if: failure()
+        env:
+          CGN_SEAWEEDFS_CONFIG_FILE: .cgn/seaweedfs/s3.json
         run: |
           docker compose -f infra/docker/docker-compose.seaweedfs.yml ps --all
           docker compose -f infra/docker/docker-compose.seaweedfs.yml logs --no-color --tail 100 seaweedfs

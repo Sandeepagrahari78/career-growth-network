@@ -60,8 +60,9 @@ credentials only; no cloud resources or paid services.
   CI suite is being rerun.
 - Integration run `229` showed the SeaweedFS container starts but the S3 port
   stays unavailable for 60 seconds. A failure-only Compose status/log step was
-  added to capture the container exit reason on the next run; root cause and
-  runtime acceptance remain pending.
+  added to capture the container exit reason; its first invocation lacked the
+  generated config path in the step environment and could not read logs. The
+  path is now set explicitly; root cause and runtime acceptance remain pending.
 - Main CI, exact-candidate staging validation and owner review: pending.
 
 ## Known limitations / risks
