@@ -159,7 +159,7 @@ export function getMetricRate(summary, name) {
     Number.isFinite(total) && total > 0 && Number.isFinite(values.fails),
     `k6 rate metric ${name} must report rate or pass/fail counts`,
   );
-  return values.fails / total;
+  return values.passes / total;
 }
 
 function runK6(name) {

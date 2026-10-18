@@ -78,7 +78,7 @@ test("k6 metric values accept wrapped and direct summary layouts", () => {
 test("k6 rate metrics derive error rate from pass/fail counts", () => {
   assert.equal(
     getMetricRate(
-      { metrics: { http_req_failed: { fails: 0, passes: 750 } } },
+      { metrics: { http_req_failed: { fails: 750, passes: 0 } } },
       "http_req_failed",
     ),
     0,
@@ -87,7 +87,7 @@ test("k6 rate metrics derive error rate from pass/fail counts", () => {
     getMetricRate(
       {
         metrics: {
-          http_req_failed: { values: { fails: 2, passes: 748 } },
+          http_req_failed: { values: { fails: 748, passes: 2 } },
         },
       },
       "http_req_failed",
