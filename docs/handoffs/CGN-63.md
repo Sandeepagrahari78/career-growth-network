@@ -65,6 +65,7 @@ are removed on exit.
 - The full `node --test tests/contracts/*.test.mjs` run had 3 failures in autoscaling, workload-identity and Kubernetes-probe validators. These Windows-checkout failures are line-ending-sensitive (`\n` assertions against CRLF files); those files are unchanged by CGN-63.
 - `pnpm` is not installed in this Windows environment, so `pnpm agent:context`, `pnpm ci:quick`, and `pnpm memory:check` could not run. Context was generated via the repository's direct Node script and the equivalent Node memory script passed; Linux PR CI is required for the full workspace suite and k3d runtime acceptance.
 - Local k3d acceptance was not run here because Helm, k3d and OpenSSL are unavailable. The exact-head Linux PR CI smoke must verify certificate trust, route responses, unknown-host/path handling, NetworkPolicy behavior and rollback.
+- GitHub Local Helm Validation run 39118866986 passed. PR CI run 39118866969 passed quality, SAST, Terraform/network, performance, E2E and dependency jobs on retry; its k3d ingress smoke passed HTTP/HTTPS, certificate, unknown-host/path and NetworkPolicy cases but timed out on the first rollback probe after deleting the HTTPS route. The rollback check now confirms Ingress deletion and the default HTTP 404; exact-head rerun is pending.
 
 ## Known limitations / risks
 

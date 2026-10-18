@@ -48,7 +48,7 @@ The smoke test verifies:
 7. a temporary explicit allow policy restores only the expected test path.
 8. the `health.cgn.localhost` HTTP and HTTPS routes reach the CGN health-demo service.
 9. the local TLS certificate matches the hostname and is trusted when passed as a CA file.
-10. an unknown host and path return 404, and deleting the route rolls back to the default 404.
+10. an unknown host and path return 404, and deleting the route restores the default HTTP 404.
 
 Smoke workloads, ingress, TLS Secret and temporary policies are removed automatically. The
 generated development certificate and key remain in the ignored `.local/k3d/tls/` directory

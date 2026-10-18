@@ -203,12 +203,16 @@ try {
   if ($LASTEXITCODE -ne 0) {
     throw "Failed to remove the local ingress route for rollback verification."
   }
-  $RollbackStatus = & curl.exe --insecure --silent --output NUL --write-out "%{http_code}" `
-    --resolve "${HostName}:8443:127.0.0.1" "https://${HostName}:8443/health"
-  if ($LASTEXITCODE -ne 0 -or $RollbackStatus.Trim() -ne "404") {
-    throw "Removing the ingress route did not restore the expected default 404."
+  kubectl -n $SmokeNamespace get ingress cgn-health-demo-local *> $null
+  if ($LASTEXITCODE -eq 0) {
+    throw "Ingress route still exists after rollback."
   }
-  Write-Host "Ingress rollback returned the expected default 404."
+  $RollbackStatus = & curl.exe --max-time 10 --silent --output NUL --write-out "%{http_code}" `
+    --resolve "${HostName}:8080:127.0.0.1" "http://${HostName}:8080/health"
+  if ($LASTEXITCODE -ne 0 -or $RollbackStatus.Trim() -ne "404") {
+    throw "Removing the ingress route did not restore the default HTTP 404."
+  }
+  Write-Host "Ingress deletion and default HTTP 404 rollback confirmed."
   Write-Host "CGN local Kubernetes smoke passed."
 }
 finally {

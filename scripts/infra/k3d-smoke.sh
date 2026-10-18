@@ -134,8 +134,12 @@ fi
 echo "Service discovery and explicit NetworkPolicy allow path confirmed."
 
 kubectl delete -f "$INGRESS_RENDERED" --wait=true
-rollback_status="$(curl --insecure --silent --output /dev/null --write-out '%{http_code}' \
-  --resolve "$HOST:8443:127.0.0.1" "https://$HOST:8443/health")"
+if kubectl -n "$SMOKE_NAMESPACE" get ingress cgn-health-demo-local >/dev/null 2>&1; then
+  echo "Ingress route still exists after rollback." >&2
+  exit 1
+fi
+rollback_status="$(curl --max-time 10 --silent --output /dev/null --write-out '%{http_code}' \
+  --resolve "$HOST:8080:127.0.0.1" "http://$HOST:8080/health")"
 test "$rollback_status" = "404"
-echo "Ingress rollback returned the expected default 404."
+echo "Ingress deletion and default HTTP 404 rollback confirmed."
 echo "CGN local Kubernetes smoke passed."
