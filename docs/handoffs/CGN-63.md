@@ -60,10 +60,10 @@ are removed on exit.
 - Passed: `node scripts/ci/validate-helm-base.mjs`.
 - Passed: `node scripts/ci/verify-workspace-boundaries.mjs`.
 - Passed: PowerShell parser check for `scripts/infra/k3d-smoke.ps1`.
-- Passed: `node scripts/memory-check.mjs` before this handoff was created; rerun the handoff gate after editing this file.
-- Passed: `git diff --check` before this handoff was created; rerun before commit.
-- The full `node --test tests/contracts/*.test.mjs` run had 3 unrelated existing failures in autoscaling, workload-identity and Kubernetes-probe validators. These Windows-checkout failures are line-ending-sensitive (`\n` assertions against CRLF files); those files are unchanged by CGN-63.
-- `pnpm` is not installed in this Windows environment, so `pnpm agent:context`, `pnpm ci:quick`, and `pnpm memory:check` could not run. Context was generated via the repository's direct Node script; Linux PR CI is required for the full workspace suite and k3d runtime acceptance.
+- Passed after the handoff was added: `node scripts/memory-check.mjs` and `git diff --check`.
+- Pending exact-head PR CI: `node scripts/ci/verify-agent-handoff.mjs` must validate this handoff against the branch diff.
+- The full `node --test tests/contracts/*.test.mjs` run had 3 failures in autoscaling, workload-identity and Kubernetes-probe validators. These Windows-checkout failures are line-ending-sensitive (`\n` assertions against CRLF files); those files are unchanged by CGN-63.
+- `pnpm` is not installed in this Windows environment, so `pnpm agent:context`, `pnpm ci:quick`, and `pnpm memory:check` could not run. Context was generated via the repository's direct Node script and the equivalent Node memory script passed; Linux PR CI is required for the full workspace suite and k3d runtime acceptance.
 - Local k3d acceptance was not run here because Helm, k3d and OpenSSL are unavailable. The exact-head Linux PR CI smoke must verify certificate trust, route responses, unknown-host/path handling, NetworkPolicy behavior and rollback.
 
 ## Known limitations / risks
