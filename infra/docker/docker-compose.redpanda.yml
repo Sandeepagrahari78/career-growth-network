@@ -30,7 +30,7 @@ services:
     volumes:
       - cgn-redpanda-data:/var/lib/redpanda/data
     healthcheck:
-      test: ["CMD", "rpk", "cluster", "health", "--brokers", "localhost:9092"]
+      test: ["CMD", "rpk", "cluster", "health"]
       interval: 5s
       timeout: 3s
       retries: 30

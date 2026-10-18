@@ -21,6 +21,7 @@ test("local Redpanda image is pinned and listeners bind only to loopback", () =>
   assert.match(compose, /127\.0\.0\.1:19644:9644/);
   assert.match(compose, /cgn-redpanda-data:\/var\/lib\/redpanda\/data/);
   assert.doesNotMatch(compose, /\n\s+- "(?:19092|19644):/);
+  assert.doesNotMatch(compose, /cluster health.*--brokers/);
 });
 
 test("smoke event uses the existing versioned domain event fixture", () => {
@@ -55,4 +56,5 @@ test("restart smoke proves a versioned event survives broker restart", () => {
   assert.match(script, /"topic",\s*"consume"/);
   assert.match(script, /assert\.equal\(record\.eventId, expected\.eventId\)/);
   assert.match(script, /assert\.equal\(record\.eventVersion, 1\)/);
+  assert.doesNotMatch(script, /--brokers/);
 });

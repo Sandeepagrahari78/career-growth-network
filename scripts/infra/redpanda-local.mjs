@@ -56,7 +56,7 @@ async function waitUntilReady() {
   let lastError;
   for (let attempt = 1; attempt <= 60; attempt += 1) {
     try {
-      rpk(["cluster", "health", "--brokers", "localhost:9092"]);
+      rpk(["cluster", "health"]);
       console.log("Local Redpanda is healthy.");
       return;
     } catch (error) {
@@ -71,7 +71,7 @@ async function waitUntilReady() {
 }
 
 function ensureSmokeTopic() {
-  const topics = rpk(["topic", "list", "--brokers", "localhost:9092"]);
+  const topics = rpk(["topic", "list"]);
   if (
     !topics
       .split(/\r?\n/)
@@ -85,8 +85,6 @@ function ensureSmokeTopic() {
       "1",
       "--replicas",
       "1",
-      "--brokers",
-      "localhost:9092",
     ]);
   }
 }
@@ -98,7 +96,7 @@ export async function up() {
 }
 
 export function verify() {
-  rpk(["cluster", "health", "--brokers", "localhost:9092"]);
+  rpk(["cluster", "health"]);
   ensureSmokeTopic();
   console.log(
     `Local Redpanda verification passed; ${smokeTopic} is available.`,
@@ -110,7 +108,7 @@ export async function restartSmoke() {
   ensureSmokeTopic();
 
   const expected = createSmokeEvent();
-  rpk(["topic", "produce", smokeTopic, "--brokers", "localhost:9092"], {
+  rpk(["topic", "produce", smokeTopic], {
     input: `${JSON.stringify(expected)}\n`,
   });
 
@@ -121,8 +119,6 @@ export async function restartSmoke() {
     "topic",
     "consume",
     smokeTopic,
-    "--brokers",
-    "localhost:9092",
     "--offset",
     "-1",
     "--num",
