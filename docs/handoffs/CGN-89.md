@@ -55,7 +55,10 @@ credentials only; no cloud resources or paid services.
   Linux PR CI is configured to run the full S3 and restart smoke.
 - Local Prettier could not run because Corepack failed resolving the Windows
   user directory (`EPERM: realpath C:\Users\Sandeep`); PR CI is authoritative.
-- PR CI, Main CI, exact-candidate staging validation and owner review: pending.
+- First PR CI run `39160657706` found missing explicit Node global imports and
+  an ESLint curly-brace error; the branch now contains those fixes and the full
+  CI suite is being rerun.
+- Main CI, exact-candidate staging validation and owner review: pending.
 
 ## Known limitations / risks
 

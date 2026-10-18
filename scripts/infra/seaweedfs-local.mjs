@@ -1,8 +1,9 @@
 import assert from "node:assert/strict";
+import { Buffer } from "node:buffer";
 import { createHash, createHmac, randomBytes, randomUUID } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, URL } from "node:url";
 import { execFileSync } from "node:child_process";
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
@@ -182,7 +183,7 @@ async function s3Request(method, path, body = "", credentials) {
         })
       : undefined,
     body: method === "GET" || method === "HEAD" ? undefined : body,
-    signal: AbortSignal.timeout(10000),
+    signal: globalThis.AbortSignal.timeout(10000),
   });
   return { response, body: await response.text() };
 }
@@ -373,7 +374,9 @@ export async function restartSmoke() {
 
 export function down({ purge = false } = {}) {
   const args = ["down"];
-  if (purge) args.push("--volumes");
+  if (purge) {
+    args.push("--volumes");
+  }
   compose(args, { capture: false });
   console.log(
     purge
