@@ -1,0 +1,11 @@
+# CGN Codex MCP bootstrap (project-scoped; no secrets).
+# Codex reads this when the repository is trusted and the project config is loaded.
+# Each developer authorizes their own Jira account separately via OAuth.
+# Authoritative official Atlassian MCP server: https://mcp.atlassian.com/v2/mcp
+
+[mcp_servers.atlassian]
+url = "https://mcp.atlassian.com/v2/mcp"
+enabled = true
+default_tools_approval_mode = "writes"
+startup_timeout_sec = 20
+tool_timeout_sec = 90
