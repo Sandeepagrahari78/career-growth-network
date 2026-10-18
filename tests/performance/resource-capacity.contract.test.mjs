@@ -7,6 +7,7 @@ import {
   parseMemoryMiB,
   parseResourcePair,
   resourceBudget,
+  getMetricRate,
   getMetricValues,
   getRequestCount,
 } from "./run-resource-capacity.mjs";
@@ -71,6 +72,27 @@ test("k6 metric values accept wrapped and direct summary layouts", () => {
       "http_req_failed",
     ),
     { rate: 0 },
+  );
+});
+
+test("k6 rate metrics derive error rate from pass/fail counts", () => {
+  assert.equal(
+    getMetricRate(
+      { metrics: { http_req_failed: { fails: 0, passes: 750 } } },
+      "http_req_failed",
+    ),
+    0,
+  );
+  assert.equal(
+    getMetricRate(
+      {
+        metrics: {
+          http_req_failed: { values: { fails: 2, passes: 748 } },
+        },
+      },
+      "http_req_failed",
+    ),
+    2 / 750,
   );
 });
 

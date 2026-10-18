@@ -149,6 +149,19 @@ export function getMetricValues(summary, name) {
   return metric?.values ?? metric;
 }
 
+export function getMetricRate(summary, name) {
+  const values = getMetricValues(summary, name);
+  if (Number.isFinite(values?.rate)) {
+    return values.rate;
+  }
+  const total = values?.passes + values?.fails;
+  assert.ok(
+    Number.isFinite(total) && total > 0 && Number.isFinite(values.fails),
+    `k6 rate metric ${name} must report rate or pass/fail counts`,
+  );
+  return values.fails / total;
+}
+
 function runK6(name) {
   const result = spawnSync(
     "docker",
@@ -188,11 +201,10 @@ function runK6(name) {
 function phaseMetrics(name, summary) {
   const matching = samples.filter((sample) => sample.phase === name);
   assert.ok(matching.length > 0, `No Docker resource samples for ${name}`);
-  const failedRequests = getMetricValues(summary, "http_req_failed");
   const requestDuration = getMetricValues(summary, "http_req_duration");
   return {
     requests: getRequestCount(summary),
-    errorRatePercent: failedRequests.rate * 100,
+    errorRatePercent: getMetricRate(summary, "http_req_failed") * 100,
     p95Ms: requestDuration["p(95)"],
     peakCpuMillicores: Math.max(
       ...matching.map((sample) => sample.cpuMillicores),
