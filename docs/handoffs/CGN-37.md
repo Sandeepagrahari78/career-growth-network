@@ -72,13 +72,13 @@ production configuration was added.
 - `pnpm memory:check` was attempted, but pnpm's dependency sync reached
   registry.npmjs.org and received `EACCES`; the direct Node check above
   completed.
-- Initial exact-head PR CI runs identified Prettier formatting and five ESLint
-  brace-rule findings in the integration harness. Both were fixed; the current
-  head must pass a fresh CI run before review.
-- The next PostgreSQL CI run passed the atomic commit/rollback case and exposed
-  psql's command tag in the two-worker and restart result parsing. The test now
-  runs psql in quiet mode; the updated real-database cases must pass on the
-  current head.
+- Exact-head GitHub Actions PR CI passed on source commit
+  `9c14659200d5bf6d873ef33e98f571049dda1e1a` (run
+  [39114132568](https://github.com/Sandeepagrahari78/career-growth-network/actions/runs/39114132568)).
+  The run completed successfully, including the PostgreSQL integration
+  scenarios for atomic commit/rollback, disjoint concurrent worker claims, and
+  same-ID redelivery after restart. Earlier Prettier, ESLint and psql parsing
+  findings were fixed before this successful run.
 - `pnpm ci:quick` could not complete locally because pnpm dependency sync
   received `EACCES` from registry.npmjs.org. Linux PR CI remains authoritative.
 
