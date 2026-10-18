@@ -39,7 +39,8 @@ None.
 - `node --check tests/contracts/domain-event-envelope-v1.test.mjs` — passed.
 - `pnpm test:contracts` — 114/117 passed. Three unrelated existing autoscaling, Kubernetes-probes and workload-identity checks fail because their validators compare LF-only strings against the Windows CRLF checkout.
 - `pnpm memory:check` — passed.
-- `pnpm lint`, `pnpm typecheck` and the targeted Prettier check were attempted. Their `pnpm dlx` step fails locally with `EPERM: operation not permitted, realpath 'C:\\Users\\Sandeep'`; run authoritative Linux PR CI after push.
+- `pnpm lint`, `pnpm typecheck` and root `pnpm format:check` were attempted. Their `pnpm dlx` step fails locally with `EPERM: operation not permitted, realpath 'C:\\Users\\Sandeep'`.
+- Targeted Prettier 3.6.2 check for the changed test passed when invoked from the local pnpm package cache.
 - `git diff --check` — passed.
 
 ## Known limitations / risks

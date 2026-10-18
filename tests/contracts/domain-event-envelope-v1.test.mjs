@@ -44,7 +44,10 @@ function validateEnvelope(event) {
         }
       }
     }
-    if (rule.type === "object" && (value === null || typeof value !== "object" || Array.isArray(value))) {
+    if (
+      rule.type === "object" &&
+      (value === null || typeof value !== "object" || Array.isArray(value))
+    ) {
       errors.push(`${field} must be an object`);
     }
   }
@@ -53,9 +56,10 @@ function validateEnvelope(event) {
 }
 
 function isRfc3339DateTime(value) {
-  const match = /^(\d{4})-(0[1-9]|1[0-2])-([0-2]\d|3[01])T([01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z|[+-]([01]\d|2[0-3]):[0-5]\d)$/.exec(
-    value,
-  );
+  const match =
+    /^(\d{4})-(0[1-9]|1[0-2])-([0-2]\d|3[01])T([01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z|[+-]([01]\d|2[0-3]):[0-5]\d)$/.exec(
+      value,
+    );
   if (!match || Number.isNaN(Date.parse(value))) return false;
 
   const [, year, month, day] = match.map(Number);
@@ -108,13 +112,23 @@ test("event fixtures cover valid, invalid, and additive-compatible envelopes", (
   );
 
   for (const { case: name, event } of fixtures.invalid) {
-    assert.notDeepEqual(validateEnvelope(event), [], `${name} must be rejected`);
+    assert.notDeepEqual(
+      validateEnvelope(event),
+      [],
+      `${name} must be rejected`,
+    );
   }
   assert.ok(
-    fixtures.invalid.some(({ case: name }) => name === "unsupported-envelope-version"),
+    fixtures.invalid.some(
+      ({ case: name }) => name === "unsupported-envelope-version",
+    ),
   );
-  assert.ok(fixtures.invalid.some(({ case: name }) => name === "invalid-occurred-at"));
   assert.ok(
-    fixtures.invalid.some(({ case: name }) => name === "nonexistent-calendar-date"),
+    fixtures.invalid.some(({ case: name }) => name === "invalid-occurred-at"),
+  );
+  assert.ok(
+    fixtures.invalid.some(
+      ({ case: name }) => name === "nonexistent-calendar-date",
+    ),
   );
 });
