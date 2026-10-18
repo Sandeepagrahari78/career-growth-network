@@ -14,7 +14,7 @@ pnpm --filter @cgn/platform-template start
 
 The process listens on `PORT` (default `3000`). `NODE_ENV` accepts `development`, `test`, or `production`. Invalid configuration exits with a non-zero status and does not log environment values.
 
-`GET /health` is the startup and liveness check. `GET /ready` succeeds only after the Nest application bootstrap lifecycle completes. Unknown paths use Nest's standard 404 response. All responses include an `x-request-id`; valid caller IDs are retained, while malformed values are replaced with a generated UUID. Structured request logs contain the ID, method, response status, and duration, but no URL, query, body, or headers.
+`GET /health` is the startup and liveness check. `GET /ready` succeeds only after the Nest application bootstrap lifecycle completes. Business APIs use the URL major-version policy in [the shared synchronous API contract](../../docs/contracts/synchronous-api-versioning.md); health routes remain unversioned. Errors use `http.error-envelope.v1`, including safe 404 responses for unknown paths. All responses include an `x-request-id`; valid caller IDs are retained, while malformed values are replaced with a generated UUID. Error bodies carry the same ID. Structured request logs contain the ID, method, response status, and duration, but no URL, query, body, or headers.
 
 Nest shutdown hooks handle `SIGTERM` and `SIGINT` so Kubernetes can stop the process gracefully.
 

@@ -96,7 +96,15 @@ try {
 
   const missing = await fetch(`${baseUrl}/not-a-business-route`);
   assert.equal(missing.status, 404);
-  assert.ok(missing.headers.get("x-request-id"));
+  const requestId = missing.headers.get("x-request-id");
+  assert.ok(requestId);
+  assert.deepEqual(await missing.json(), {
+    error: {
+      code: "NOT_FOUND",
+      message: "The requested resource was not found.",
+      requestId,
+    },
+  });
 
   const invalidConfig = spawnSync(
     "docker",
