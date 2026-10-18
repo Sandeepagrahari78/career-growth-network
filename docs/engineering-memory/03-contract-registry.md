@@ -16,6 +16,8 @@ All cross-domain contracts live under `packages/contracts` unless a ticket delib
 - `domain.event.envelope.v1` — common versioned event envelope.
 - `http.error-envelope.v1` — common synchronous error shape.
 
+`domain.event.envelope.v1` requires event ID, event type, envelope version, RFC 3339 occurrence timestamp, producer, and payload. Version 1 consumers reject other envelope versions; unknown optional envelope properties remain additive-compatible. The canonical TypeScript interface and JSON Schema live in `packages/contracts/src/events/domain-event-envelope.v1.ts` and `packages/contracts/schemas/domain-event-envelope.v1.schema.json`. Domain-specific payloads remain owned by their producer contracts.
+
 Synchronous HTTP APIs use URL major versions (`/v1/...`); additive changes retain a major path and breaking changes require an explicitly migrated major path. See [synchronous API versioning and error policy](../contracts/synchronous-api-versioning.md). Contract response fixtures live in `packages/contracts/fixtures/http/` and are exercised by shared contract and platform-template HTTP integration tests.
 
 ## Contract change policy

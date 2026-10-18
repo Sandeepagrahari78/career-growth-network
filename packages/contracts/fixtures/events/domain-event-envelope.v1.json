@@ -1,0 +1,73 @@
+{
+  "$contract": "domain.event.envelope.v1",
+  "valid": [
+    {
+      "eventId": "evt-123",
+      "eventType": "career.activity.recorded",
+      "eventVersion": 1,
+      "occurredAt": "2026-10-18T10:30:00Z",
+      "producer": "career",
+      "payload": { "activityId": "activity-123" }
+    },
+    {
+      "eventId": "evt-124",
+      "eventType": "career.activity.recorded",
+      "eventVersion": 1,
+      "occurredAt": "2026-10-18T10:30:00+05:30",
+      "producer": "career",
+      "subjectId": "user-123",
+      "correlationId": "request-456",
+      "payload": { "activityId": "activity-124", "newField": true },
+      "traceHint": "optional-additive-metadata"
+    }
+  ],
+  "invalid": [
+    {
+      "case": "missing-event-id",
+      "reason": "eventId is required",
+      "event": {
+        "eventType": "career.activity.recorded",
+        "eventVersion": 1,
+        "occurredAt": "2026-10-18T10:30:00Z",
+        "producer": "career",
+        "payload": {}
+      }
+    },
+    {
+      "case": "unsupported-envelope-version",
+      "reason": "version 1 consumers reject unknown envelope versions",
+      "event": {
+        "eventId": "evt-125",
+        "eventType": "career.activity.recorded",
+        "eventVersion": 2,
+        "occurredAt": "2026-10-18T10:30:00Z",
+        "producer": "career",
+        "payload": {}
+      }
+    },
+    {
+      "case": "invalid-occurred-at",
+      "reason": "occurredAt must be an RFC 3339 date-time",
+      "event": {
+        "eventId": "evt-126",
+        "eventType": "career.activity.recorded",
+        "eventVersion": 1,
+        "occurredAt": "18-10-2026",
+        "producer": "career",
+        "payload": {}
+      }
+    },
+    {
+      "case": "nonexistent-calendar-date",
+      "reason": "occurredAt must not roll an impossible calendar date forward",
+      "event": {
+        "eventId": "evt-127",
+        "eventType": "career.activity.recorded",
+        "eventVersion": 1,
+        "occurredAt": "2026-02-30T10:30:00Z",
+        "producer": "career",
+        "payload": {}
+      }
+    }
+  ]
+}
