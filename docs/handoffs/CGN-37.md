@@ -72,8 +72,9 @@ production configuration was added.
 - `pnpm memory:check` was attempted, but pnpm's dependency sync reached
   registry.npmjs.org and received `EACCES`; the direct Node check above
   completed.
-- The first exact-head PR CI run failed only Prettier on the three files above;
-  formatting was fixed and the updated head must pass CI before review.
+- Initial exact-head PR CI runs identified Prettier formatting and five ESLint
+  brace-rule findings in the integration harness. Both were fixed; the current
+  head must pass a fresh CI run before review.
 - `pnpm ci:quick` could not complete locally because pnpm dependency sync
   received `EACCES` from registry.npmjs.org. Linux PR CI remains authoritative.
 

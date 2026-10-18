@@ -87,9 +87,15 @@ async function psqlAsync(sql) {
 }
 
 function literal(value) {
-  if (value === null || value === undefined) return "NULL";
-  if (typeof value === "number") return String(value);
-  if (typeof value === "boolean") return value ? "TRUE" : "FALSE";
+  if (value === null || value === undefined) {
+    return "NULL";
+  }
+  if (typeof value === "number") {
+    return String(value);
+  }
+  if (typeof value === "boolean") {
+    return value ? "TRUE" : "FALSE";
+  }
   const text =
     typeof value === "object" ? JSON.stringify(value) : String(value);
   return `'${text.replaceAll("'", "''")}'${typeof value === "object" ? "::jsonb" : ""}`;
@@ -149,10 +155,14 @@ function makeOwningTransaction() {
   return {
     client,
     async commit() {
-      if (statements.length) psql(`BEGIN; ${statements.join("; ")}; COMMIT;`);
+      if (statements.length) {
+        psql(`BEGIN; ${statements.join("; ")}; COMMIT;`);
+      }
     },
     async rollback() {
-      if (statements.length) psql(`BEGIN; ${statements.join("; ")}; ROLLBACK;`);
+      if (statements.length) {
+        psql(`BEGIN; ${statements.join("; ")}; ROLLBACK;`);
+      }
     },
   };
 }
