@@ -56,9 +56,10 @@ DLQ handling expectations for future owning-service tickets.
   validator tests failed (CGN-60 autoscaling, CGN-45 probes, CGN-61 workload
   identity); Linux PR CI remains authoritative for these checks.
 - Local broker restart smoke could not run because this Windows environment has
-  no Docker daemon; the PR integration job runs the same smoke on Linux Docker.
-- PR CI integration job runs event recovery across a Redpanda restart and
-  removes only the dedicated local Redpanda volume.
+  no Docker daemon. The GitHub Linux Docker integration job passed the same
+  publish, broker restart, recovery, and scoped-volume cleanup smoke.
+- Full Linux PR CI quality gate (`pnpm ci:quick`), security scans, Terraform
+  validation, and integration stack passed for implementation commit `c20fc55`.
 
 ## Known limitations / risks
 
@@ -88,8 +89,8 @@ remove unrelated Docker volumes.
 
 ## Owner review and PR references
 
-- GitHub PR URL: pending
-- Commit / merge SHA: pending
+- GitHub PR URL: https://github.com/Sandeepagrahari78/career-growth-network/pull/45
+- Commit / merge SHA: implementation commit `c20fc55db3eb9df06f7d2a2d12aa103593fb306f`; merge pending
 - Jira live dependency/status verification: CGN-43 To Do, Sandeep, Highest;
   CGN-36 Done and its merge is present in fresh main.
 - Source and tests inspected on latest main: yes
