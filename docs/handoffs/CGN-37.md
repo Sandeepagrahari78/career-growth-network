@@ -107,8 +107,8 @@ before rolling back its migration.
 
 ## Owner review and PR references
 
-- GitHub PR URL: pending
-- Commit / merge SHA: pending
+- GitHub PR URL: https://github.com/Sandeepagrahari78/career-growth-network/pull/46
+- Implementation commit: `cfadba8c723bd4852a80ab3e9c9a7b1caa0d5ed3`; merge pending.
 - Jira live dependency/status verification: CGN-37 To Do, Sandeep; explicit
   blockers CGN-36, CGN-42, CGN-43 all Done on 2026-10-18. Jira Rank is priority,
   not an additional blocker.
