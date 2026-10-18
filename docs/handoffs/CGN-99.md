@@ -50,9 +50,10 @@ credential value is committed.
 - Passed: `node scripts/memory-check.mjs`.
 - Passed: `git diff --check`.
 - Passed: `git check-ignore -v infra/postgres/.env` confirms local secret file is ignored.
-- Initial PR CI run 39170408546 and follow-up run 39170766356: formatting gate failed on the new contract test. The repo-pinned Prettier 3.6.2 formatter has now been applied locally; neither failed run is treated as green evidence. Gitleaks and completed security subchecks passed.
-- Initial Local Helm Validation run 39170408510: static Helm checks passed; cluster smoke was still running when this handoff was updated.
-- Pending: rerun PR CI and Local Helm Validation on the Prettier-formatted final head; both must pass before merge.
+- Passed: PR CI run [39170939315](https://github.com/Sandeepagrahari78/career-growth-network/actions/runs/39170939315), successful retry of the failed quality job, on exact code head `72197062f997e247df6419dd85286ae101a6b19c`. Formatting, contract tests, build and security gates passed; runtime-only suites were correctly skipped for this docs/config change.
+- Passed: Local Helm Validation run [39170939217](https://github.com/Sandeepagrahari78/career-growth-network/actions/runs/39170939217) on the same exact head, including local-cluster install smoke.
+- Earlier PR CI attempts found and fixed the test formatting issue; one subsequent quality run hit a transient PostgreSQL shutdown during the unrelated workspace integration suite, then the failed job retry passed.
+- A documentation-only handoff update records these results. Verify fresh PR CI and Local Helm runs on that final head before merge.
 
 The standalone `pnpm` command is unavailable in this Windows environment. `corepack
 pnpm` in the isolated clone attempted package synchronization and failed because
@@ -73,10 +74,10 @@ installing packages. Linux PR CI remains authoritative.
 
 ## Exact next step for next agent
 
-Review the PR on its exact head; require separate successful PR CI and Local Helm
-Validation workflows twice as separate pipeline checks before merge. Then verify
-the merged main SHA and main CI, and transition CGN-99 to Done only after the
-merged implementation and dependency status are live-verified.
+After the documentation-only handoff update, verify fresh PR CI and Local Helm
+Validation on the final head, then merge. Verify the merged main SHA and main CI;
+transition CGN-99 to Done only after the merged implementation and dependency
+status are live-verified.
 
 ## Rollback note
 
@@ -93,7 +94,7 @@ Existing CI Gitleaks behavior is preserved.
 ## Owner review and PR references
 
 - GitHub PR URL: https://github.com/Sandeepagrahari78/career-growth-network/pull/54
-- Commit / merge SHA: final merge pending; first published head `f696cbc3a09c26e214e0b96f88461e17fa7ecb33` is superseded by the formatting fix.
+- Commit / merge SHA: validated code head `72197062f997e247df6419dd85286ae101a6b19c`; final merge pending.
 - Jira live dependency/status verification (2026-10-19): CGN-99 To Do, assigned to
   Sandeep Agrahari; explicit hard prerequisite CGN-66 is Done. GitHub PR #48 is
   merged at `ee0a80a1da90de3467d35028ee3bbc165cbe07d1`.
