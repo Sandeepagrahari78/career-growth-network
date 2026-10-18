@@ -495,6 +495,12 @@ jobs:
       - name: Prove SeaweedFS S3 access and restart persistence
         run: node scripts/infra/seaweedfs-local.mjs restart-smoke
 
+      - name: Diagnose SeaweedFS startup failure
+        if: failure()
+        run: |
+          docker compose -f infra/docker/docker-compose.seaweedfs.yml ps --all
+          docker compose -f infra/docker/docker-compose.seaweedfs.yml logs --no-color --tail 100 seaweedfs
+
       - name: Remove only the local SeaweedFS Compose volume
         if: always()
         run: node scripts/infra/seaweedfs-local.mjs reset
