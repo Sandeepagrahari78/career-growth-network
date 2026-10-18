@@ -58,6 +58,10 @@ pnpm memory:check
 
 9. Push branch → PR → affected-path checks + ticket handoff gate → owner technical review → merge main → post-merge Main CI/staging.
 
+## Recommend the next work for all three owners
+
+After configuring read-only Jira and GitHub credentials in the current VS Code terminal, run `corepack pnpm recommend:next` to print the live Sandeep, Prachi and Tanvi queues. The scheduler preserves each owner's current work, follows linked blockers and keeps its suggested priority separate from Jira Rank. See the [dependency-aware scheduler runbook](docs/runbooks/dependency-aware-scheduler.md) for setup, offline fixtures and JSON output.
+
 To demonstrate that Engineering Memory survives a two-agent simulation:
 
 ```bash
@@ -99,7 +103,6 @@ The **team-approved direction** expands CGN from mainly college/career growth in
 [expanded UX screen/states handoff](docs/product/CGN_V2_DESIGN_HANDOFF.md).
 
 **Canonical next Jira:** [CGN-290](https://sandeepagrahari1.atlassian.net/browse/CGN-290) (Sandeep architecture and safety), [CGN-291](https://sandeepagrahari1.atlassian.net/browse/CGN-291) (Prachi web/Android approved Figma), [CGN-292](https://sandeepagrahari1.atlassian.net/browse/CGN-292) (Tanvi student pilot validation). No app implementation until relevant approved versioned contracts, minor-safety policy, real Figma frame IDs and per-ticket acceptance criteria are ready. No existing 31 product Epics were silently rewritten.
-
 
 ## CGN-297 — Six approved primary UI screens
 
