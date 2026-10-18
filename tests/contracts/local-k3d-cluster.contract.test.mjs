@@ -44,33 +44,27 @@ test("local cluster config contains no cloud-specific infrastructure", () => {
   assert.doesNotMatch(config, /\b(?:aws|eks|azure|gcp|google)\b/i);
 });
 
-test(
-  "local Traefik ingress routes the CGN health service over development TLS",
-  () => {
-    assert.match(localIngress, /ingressClassName: traefik/);
-    assert.match(localIngress, /host: health\.cgn\.localhost/);
-    assert.match(localIngress, /secretName: cgn-local-development-tls/);
-    assert.match(localIngress, /name: cgn-health-demo/);
-    assert.match(localIngress, /number: 3001/);
-    assert.match(localIngress, /web,websecure/);
-    assert.doesNotMatch(localIngress, /LoadBalancer|aws|acme|letsencrypt/i);
-  },
-);
+test("local Traefik ingress routes the CGN health service over development TLS", () => {
+  assert.match(localIngress, /ingressClassName: traefik/);
+  assert.match(localIngress, /host: health\.cgn\.localhost/);
+  assert.match(localIngress, /secretName: cgn-local-development-tls/);
+  assert.match(localIngress, /name: cgn-health-demo/);
+  assert.match(localIngress, /number: 3001/);
+  assert.match(localIngress, /web,websecure/);
+  assert.doesNotMatch(localIngress, /LoadBalancer|aws|acme|letsencrypt/i);
+});
 
-test(
-  "local ingress allow policy is scoped to Traefik namespace and app port",
-  () => {
-    assert.match(ingressNetworkPolicy, /kind: NetworkPolicy/);
-    assert.match(ingressNetworkPolicy, /namespace: cgn-apps/);
-    assert.match(
-      ingressNetworkPolicy,
-      /app\.kubernetes\.io\/name: cgn-health-demo/,
-    );
-    assert.match(
-      ingressNetworkPolicy,
-      /kubernetes\.io\/metadata\.name: kube-system/,
-    );
-    assert.match(ingressNetworkPolicy, /port: 3001/);
-    assert.doesNotMatch(ingressNetworkPolicy, /0\.0\.0\.0\/0/);
-  },
-);
+test("local ingress allow policy is scoped to Traefik namespace and app port", () => {
+  assert.match(ingressNetworkPolicy, /kind: NetworkPolicy/);
+  assert.match(ingressNetworkPolicy, /namespace: cgn-apps/);
+  assert.match(
+    ingressNetworkPolicy,
+    /app\.kubernetes\.io\/name: cgn-health-demo/,
+  );
+  assert.match(
+    ingressNetworkPolicy,
+    /kubernetes\.io\/metadata\.name: kube-system/,
+  );
+  assert.match(ingressNetworkPolicy, /port: 3001/);
+  assert.doesNotMatch(ingressNetworkPolicy, /0\.0\.0\.0\/0/);
+});
