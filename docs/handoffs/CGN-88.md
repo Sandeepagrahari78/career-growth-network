@@ -47,17 +47,20 @@ an optional `CGN_VALKEY_PASSWORD` environment value.
 - Full contract suite: 147 passed, 3 unrelated existing Windows newline-sensitive
   validators failed (CGN-45 probes, CGN-60 autoscaling, CGN-61 workload
   identity); the same baseline failures are recorded in the merged CGN-43
-  handoff.
+  handoff. The Linux PR CI contract suite passed.
 - Passed: `docker compose -f infra/docker/docker-compose.valkey.yml config`;
   Docker emitted a local config-file access warning, but rendered the Compose
   model successfully.
 - Passed: `node scripts/memory-check.mjs` after staging the 10 ticket files.
 - Blocked locally: `node scripts/infra/valkey-local.mjs restart-smoke`; Docker
   CLI is installed, but the daemon pipe `npipe:////./pipe/docker_engine` is not
-  available in this environment.
+  available in this environment. The Docker-backed Valkey TTL/restart smoke
+  passed in Linux PR CI.
 - `pnpm` is not available on this Windows PATH; equivalent repository Node
   scripts were used locally. PR CI installs the pinned pnpm version.
-- Linux PR CI must pass the full contract suite and Valkey restart smoke.
+- Passed: Linux PR CI run `39158003080` (run 226), including quality, security,
+  Docker, end-to-end, performance and integration jobs.
+- Passed: Local Helm Validation run `39158003197` (run 138).
 
 ## Known limitations / risks
 
@@ -86,7 +89,7 @@ local data volume, then revert the CGN-88 PR.
 ## Owner review and PR references
 
 - GitHub PR URL: https://github.com/Sandeepagrahari78/career-growth-network/pull/51
-- Branch head commit: `013a6ce930550e35922204caec6032f3d537bbd2`; merge pending
+- CI-verified branch head: `17208e8391ceb2568ce8b5160dc5b10396286d4c`; merge pending
 - Jira live dependency/status verification: CGN-43 Done; merged handoff and
   implementation are present on fetched `main` at `9bb6f7d`.
 - Source and tests inspected on latest main: yes
