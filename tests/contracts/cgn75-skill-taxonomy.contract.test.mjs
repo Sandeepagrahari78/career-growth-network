@@ -30,14 +30,25 @@ test("CGN-75 publishes the versioned shared shape and validates its catalog", as
 
   assert.equal(schema.title, "SkillCatalogV1");
   assert.equal(schema.additionalProperties, false);
-  assert.deepEqual(schema.required, ["schemaVersion", "catalogVersion", "skills"]);
+  assert.deepEqual(schema.required, [
+    "schemaVersion",
+    "catalogVersion",
+    "skills",
+  ]);
   assert.deepEqual(validateSkillCatalog(catalog), []);
-  const checkedInCatalog = (await readFile(catalogUrl, "utf8")).replace(/\r\n/g, "\n");
+  const checkedInCatalog = (await readFile(catalogUrl, "utf8")).replace(
+    /\r\n/g,
+    "\n",
+  );
   assert.equal(serializeSkillCatalog(catalog), checkedInCatalog);
 
   const invalidVersion = copyCatalog(catalog);
   invalidVersion.catalogVersion = "01.0.0";
-  assert.ok(validateSkillCatalog(invalidVersion).some((issue) => issue.includes("MAJOR.MINOR.PATCH")));
+  assert.ok(
+    validateSkillCatalog(invalidVersion).some((issue) =>
+      issue.includes("MAJOR.MINOR.PATCH"),
+    ),
+  );
 });
 
 test("canonical IDs are unique and never derived from display text", async () => {
@@ -59,7 +70,11 @@ test("canonical IDs are unique and never derived from display text", async () =>
   ];
   const duplicateId = copyCatalog(fixture);
   duplicateId.skills[1].id = duplicateId.skills[0].id;
-  assert.ok(validateSkillCatalog(duplicateId).some((issue) => issue.includes("duplicates")));
+  assert.ok(
+    validateSkillCatalog(duplicateId).some((issue) =>
+      issue.includes("duplicates"),
+    ),
+  );
 
   const renamed = copyCatalog(fixture);
   renamed.skills[0].displayName = "Flexible working";
@@ -85,11 +100,19 @@ test("normalized aliases and display names resolve to only one skill", async () 
   ];
   const duplicateAlias = copyCatalog(catalog);
   duplicateAlias.skills[1].aliases.push("  ADAPTIVENESS ");
-  assert.ok(validateSkillCatalog(duplicateAlias).some((issue) => issue.includes("conflicts")));
+  assert.ok(
+    validateSkillCatalog(duplicateAlias).some((issue) =>
+      issue.includes("conflicts"),
+    ),
+  );
 
   const duplicateWithinEntry = copyCatalog(catalog);
   duplicateWithinEntry.skills[0].aliases.push("adaptiveness");
-  assert.ok(validateSkillCatalog(duplicateWithinEntry).some((issue) => issue.includes("duplicate alias")));
+  assert.ok(
+    validateSkillCatalog(duplicateWithinEntry).some((issue) =>
+      issue.includes("duplicate alias"),
+    ),
+  );
 });
 
 test("deprecated skill replacements must reference a different active catalog ID", async () => {
@@ -110,10 +133,18 @@ test("deprecated skill replacements must reference a different active catalog ID
   ];
   const deprecated = copyCatalog(catalog);
   deprecated.skills[0].replacementId = "skill.missing";
-  assert.ok(validateSkillCatalog(deprecated).some((issue) => issue.includes("references missing")));
+  assert.ok(
+    validateSkillCatalog(deprecated).some((issue) =>
+      issue.includes("references missing"),
+    ),
+  );
 
   deprecated.skills[0].replacementId = deprecated.skills[0].id;
-  assert.ok(validateSkillCatalog(deprecated).some((issue) => issue.includes("cannot reference itself")));
+  assert.ok(
+    validateSkillCatalog(deprecated).some((issue) =>
+      issue.includes("cannot reference itself"),
+    ),
+  );
 
   deprecated.skills[0].replacementId = deprecated.skills[1].id;
   assert.deepEqual(validateSkillCatalog(deprecated), []);
@@ -139,7 +170,10 @@ test("canonical serialization is stable across input ordering", async () => {
   const reordered = copyCatalog(reversed);
   reordered.skills.reverse();
   reordered.skills[1].aliases.reverse();
-  assert.equal(serializeSkillCatalog(reversed), serializeSkillCatalog(reordered));
+  assert.equal(
+    serializeSkillCatalog(reversed),
+    serializeSkillCatalog(reordered),
+  );
   assert.deepEqual(
     canonicalizeSkillCatalog(reversed).skills.map((skill) => skill.id),
     ["skill.fixture_one", "skill.fixture_two"],
