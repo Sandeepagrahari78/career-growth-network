@@ -32,7 +32,8 @@ test("CGN-75 publishes the versioned shared shape and validates its catalog", as
   assert.equal(schema.additionalProperties, false);
   assert.deepEqual(schema.required, ["schemaVersion", "catalogVersion", "skills"]);
   assert.deepEqual(validateSkillCatalog(catalog), []);
-  assert.equal(serializeSkillCatalog(catalog), await readFile(catalogUrl, "utf8"));
+  const checkedInCatalog = (await readFile(catalogUrl, "utf8")).replace(/\r\n/g, "\n");
+  assert.equal(serializeSkillCatalog(catalog), checkedInCatalog);
 
   const invalidVersion = copyCatalog(catalog);
   invalidVersion.catalogVersion = "01.0.0";
