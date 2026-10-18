@@ -50,10 +50,9 @@ credential value is committed.
 - Passed: `node scripts/memory-check.mjs`.
 - Passed: `git diff --check`.
 - Passed: `git check-ignore -v infra/postgres/.env` confirms local secret file is ignored.
-- Passed: PR CI run [39170939315](https://github.com/Sandeepagrahari78/career-growth-network/actions/runs/39170939315), successful retry of the failed quality job, on exact code head `72197062f997e247df6419dd85286ae101a6b19c`. Formatting, contract tests, build and security gates passed; runtime-only suites were correctly skipped for this docs/config change.
-- Passed: Local Helm Validation run [39170939217](https://github.com/Sandeepagrahari78/career-growth-network/actions/runs/39170939217) on the same exact head, including local-cluster install smoke.
-- Earlier PR CI attempts found and fixed the test formatting issue; one subsequent quality run hit a transient PostgreSQL shutdown during the unrelated workspace integration suite, then the failed job retry passed.
-- A documentation-only handoff update records these results. Verify fresh PR CI and Local Helm runs on that final head before merge.
+- Passed: final-head [PR CI run 39171230033](https://github.com/Sandeepagrahari78/career-growth-network/actions/runs/39171230033) on `9ed1e234f2eb39ac1aca79838b16185e47d6507f`, including formatting, contract tests, build, security and Engineering Memory gates; runtime-only suites were skipped for this docs/config change.
+- Passed: [Local Helm Validation run 39171230106](https://github.com/Sandeepagrahari78/career-growth-network/actions/runs/39171230106) on the same final PR head, including local-cluster install smoke.
+- Passed after merge: Main CI run `39171391072` on attempt 3, Docker Images run `39171391080`, Local Helm run `39171391102`, and Staging Validation run `39171820354`, all on merge SHA `1f9b1bb0542d89c81ec457146e2890205e82266f`. Earlier Main CI attempts had PostgreSQL outbox test environment failures; the exact merge SHA passed on retry.
 
 The standalone `pnpm` command is unavailable in this Windows environment. `corepack
 pnpm` in the isolated clone attempted package synchronization and failed because
@@ -74,10 +73,12 @@ installing packages. Linux PR CI remains authoritative.
 
 ## Exact next step for next agent
 
-After the documentation-only handoff update, verify fresh PR CI and Local Helm
-Validation on the final head, then merge. Verify the merged main SHA and main CI;
-transition CGN-99 to Done only after the merged implementation and dependency
-status are live-verified.
+The next original ordered ticket is CGN-75. Its dated Jira execution spec lists
+CGN-32 as its only hard prerequisite, but live Jira links also mark CGN-144
+(To Do) as blocking CGN-75. CGN-144's dated spec, in turn, lists CGN-75 as a
+hard prerequisite. CGN-76 is downstream of CGN-75, not a blocker. This leaves a
+CGN-75 ↔ CGN-144 dependency cycle and a conflict between the dated prerequisite
+text and live issue links; reconcile those before implementation.
 
 ## Rollback note
 
@@ -94,9 +95,9 @@ Existing CI Gitleaks behavior is preserved.
 ## Owner review and PR references
 
 - GitHub PR URL: https://github.com/Sandeepagrahari78/career-growth-network/pull/54
-- Commit / merge SHA: validated code head `72197062f997e247df6419dd85286ae101a6b19c`; final merge pending.
-- Jira live dependency/status verification (2026-10-19): CGN-99 To Do, assigned to
-  Sandeep Agrahari; explicit hard prerequisite CGN-66 is Done. GitHub PR #48 is
-  merged at `ee0a80a1da90de3467d35028ee3bbc165cbe07d1`.
-- Source and tests inspected on latest main SHA: `f69a621d8e80a9ce87bc440a0fe148602cdd8a2a`.
+- Commit / merge SHA: PR #54 merged at `1f9b1bb0542d89c81ec457146e2890205e82266f`; verified PR head `9ed1e234f2eb39ac1aca79838b16185e47d6507f`.
+- Jira live dependency/status verification (2026-10-19): CGN-99 Done, assigned to
+  Sandeep Agrahari; explicit hard prerequisite CGN-66 is Done. Delivery Sync
+  transitioned CGN-99 after PR #54 merged.
+- Source and tests inspected on pre-implementation main SHA: `f69a621d8e80a9ce87bc440a0fe148602cdd8a2a`; post-merge main SHA: `1f9b1bb0542d89c81ec457146e2890205e82266f`.
 - Required Sandeep review: explicitly delegated merge and delivery to Codex for this run.
