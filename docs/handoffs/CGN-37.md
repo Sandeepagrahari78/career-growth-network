@@ -113,8 +113,10 @@ before rolling back its migration.
 
 - GitHub PR URL: https://github.com/Sandeepagrahari78/career-growth-network/pull/46
 - Implementation commit: `cfadba8c723bd4852a80ab3e9c9a7b1caa0d5ed3`; merge pending.
-- Jira live dependency/status verification: CGN-37 To Do, Sandeep; explicit
-  blockers CGN-36, CGN-42, CGN-43 all Done on 2026-10-18. Jira Rank is priority,
-  not an additional blocker.
+- Jira live dependency/status verification: CGN-37 In Review after the PR opened
+  and delivery sync ran; assignee remains Sandeep. Explicit blockers CGN-36,
+  CGN-42, CGN-43 were all Done on 2026-10-18. Jira Rank is priority, not an
+  additional blocker. No manual Jira status or assignee change was made.
 - Source and tests inspected on latest main: `d05d47df8c7e0877727c02d0ae1fe9d2eaa31a91`
 - Required Sandeep review: pending
+
