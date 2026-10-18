@@ -13,6 +13,7 @@ CGN uses k3d/K3s for the current ₹0 non-production Kubernetes environment.
 - local HTTPS ingress: `127.0.0.1:8443`
 
 Docker, k3d, kubectl and Node.js are prerequisites. No AWS account or cloud credential is required.
+The ingress acceptance smoke additionally requires Helm, OpenSSL, and curl.
 
 ## Windows / PowerShell
 
@@ -45,8 +46,31 @@ The smoke test verifies:
 5. a pod in `cgn-apps` can resolve a service in `cgn-data`.
 6. the default-deny NetworkPolicy blocks cross-namespace HTTP traffic.
 7. a temporary explicit allow policy restores only the expected test path.
+8. the `health.cgn.localhost` HTTP and HTTPS routes reach the CGN health-demo service.
+9. the local TLS certificate matches the hostname and is trusted when passed as a CA file.
+10. an unknown host and path return 404, and deleting the route rolls back to the default 404.
 
-Smoke resources are removed automatically. The permanent baseline remains deny-by-default.
+Smoke workloads, ingress, TLS Secret and temporary policies are removed automatically. The
+generated development certificate and key remain in the ignored `.local/k3d/tls/` directory
+for local trust setup; the smoke restricts the private key to the current user on Windows and
+to owner-only permissions on Unix. Never commit or share the private key. The permanent baseline remains
+deny-by-default, with a narrow local ingress policy for the health-demo selector and port.
+
+## Trust the local development certificate
+
+The first smoke run creates a self-signed certificate for `health.cgn.localhost`. The smoke
+uses `curl --cacert` so it verifies both the certificate chain and hostname without changing
+your machine-wide trust store. For browser testing, import
+`.local/k3d/tls/health.cgn.localhost.crt` into your **user** trust store only if desired:
+
+- Windows (Current User Root): `certutil -user -addstore Root .local\k3d\tls\health.cgn.localhost.crt`
+- macOS (login keychain): `security add-trusted-cert -r trustRoot -k ~/Library/Keychains/login.keychain-db .local/k3d/tls/health.cgn.localhost.crt`
+- Debian/Ubuntu system trust (requires sudo): copy the certificate to `/usr/local/share/ca-certificates/health-cgn-localhost.crt`, then run `sudo update-ca-certificates`.
+
+Remove a Windows user trust entry with `certutil -user -delstore Root health.cgn.localhost`.
+For macOS/Linux, remove the imported certificate from that same trust store. The hostname
+uses the reserved `.localhost` suffix and resolves locally; HTTPS is available on port 8443
+while the smoke's temporary health-demo workload is installed.
 
 ## Safety and portability
 
