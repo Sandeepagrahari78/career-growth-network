@@ -75,6 +75,10 @@ production configuration was added.
 - Initial exact-head PR CI runs identified Prettier formatting and five ESLint
   brace-rule findings in the integration harness. Both were fixed; the current
   head must pass a fresh CI run before review.
+- The next PostgreSQL CI run passed the atomic commit/rollback case and exposed
+  psql's command tag in the two-worker and restart result parsing. The test now
+  runs psql in quiet mode; the updated real-database cases must pass on the
+  current head.
 - `pnpm ci:quick` could not complete locally because pnpm dependency sync
   received `EACCES` from registry.npmjs.org. Linux PR CI remains authoritative.
 
@@ -119,4 +123,3 @@ before rolling back its migration.
   additional blocker. No manual Jira status or assignee change was made.
 - Source and tests inspected on latest main: `d05d47df8c7e0877727c02d0ae1fe9d2eaa31a91`
 - Required Sandeep review: pending
-
