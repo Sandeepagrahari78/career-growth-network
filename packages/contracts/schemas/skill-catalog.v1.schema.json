@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cgn.local/schemas/skill-catalog.v1.schema.json",
+  "title": "SkillCatalogV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "catalogVersion", "skills"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "catalogVersion": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+    },
+    "skills": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/skill" }
+    }
+  },
+  "$defs": {
+    "skill": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "displayName", "aliases", "lifecycle"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^skill\\.[a-z][a-z0-9]*(?:_[a-z0-9]+)*$"
+        },
+        "displayName": { "type": "string", "minLength": 1 },
+        "aliases": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "lifecycle": { "enum": ["active", "deprecated"] },
+        "replacementId": {
+          "type": "string",
+          "pattern": "^skill\\.[a-z][a-z0-9]*(?:_[a-z0-9]+)*$"
+        }
+      }
+    }
+  }
+}
