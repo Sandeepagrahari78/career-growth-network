@@ -1,11 +1,12 @@
 # 05 - Current Merged State
 
-Last updated: 2026-10-19 after CGN-99 merged; CGN-90 and CGN-99 are merged with verification evidence below.
+Last updated: 2026-10-19 after CGN-75 merged; CGN-90, CGN-99 and CGN-75 are merged with verification evidence below.
 
 ## Repository
 - CGN-288/289: on 2026-10-16, the team-approved *product direction* expanded to a continuous post-Class-10 Student Ecosystem V2, retaining social-first Home, the existing social/growth loop, and shared web+Android architecture. PR #29 merged Product Vision PRD, 31-Epic gap audit, bounded-context **impact review only**, screen inventory/Stitch design handoff and updated agent-context sources: https://github.com/Sandeepagrahari78/career-growth-network/pull/29 ; merge SHA `6018f3e5c799841e71df1213dcae507a59bf53c9`. There are **no new implemented preparation APIs, Figma frames, exam catalog, database schemas or signed contracts** in that change. Further technical contract decisions [CGN-290](https://sandeepagrahari1.atlassian.net/browse/CGN-290), reviewed UX/Figma frames [CGN-291](https://sandeepagrahari1.atlassian.net/browse/CGN-291), and real pilot user research [CGN-292](https://sandeepagrahari1.atlassian.net/browse/CGN-292) remain pending.
 - Shared Engineering Memory and agent synchronization: established.
 - CI/CD foundation: established; PR CI, Main CI, Docker Images, Staging Validation, release/rollback dry runs and path-scoped local infrastructure validations are active.
+- CGN-75: added the versioned `cgn.skill-catalog.v1` contract, JSON Schema, Career-owned validator and catalog migration rules via [PR #57](https://github.com/Sandeepagrahari78/career-growth-network/pull/57), merge SHA `6432d003bdd898422aca02f525e11e42c7ec9900`. The catalog has no skill rows until CGN-76/77/78 content owners submit reviewed content. Final-head PR CI `39173846216` and Local Helm `39173845995` each passed twice; Main CI `39174420420`, Docker `39174420408`, Local Helm `39174420423`, Staging Validation `39174551457`, and Jira Delivery Sync `39174600303` passed. Jira status is Done. No runtime API, event producer, database or deployment behavior was added.
 - CGN-39: zero-budget Terraform bootstrap merged via PR #6 / `e9fe0cb945eabe9f4bf86eefd144642455641089`.
 - CGN-40: local network/security baseline merged via PR #7 / `42499116c5e2d81552bf206585e3cae04f31ecf9`.
 - CGN-41: local k3d/K3s cluster merged via PR #8 / `797fbaf4144cf86919817dc61177870480ead5d9`; PR and post-merge local Kubernetes validation are green.
