@@ -142,7 +142,9 @@ export async function restartSmoke() {
 
 export function down({ purge = false } = {}) {
   const args = ["down"];
-  if (purge) args.push("--volumes");
+  if (purge) {
+    args.push("--volumes");
+  }
   compose(args);
   console.log(
     purge
