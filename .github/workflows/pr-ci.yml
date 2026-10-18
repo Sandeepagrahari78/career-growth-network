@@ -476,6 +476,13 @@ jobs:
       - name: Start and verify shared integration dependencies
         run: node scripts/ci/integration-stack-smoke.mjs
 
+      - name: Prove Redpanda event recovery after restart
+        run: node scripts/infra/redpanda-local.mjs restart-smoke
+
+      - name: Remove only the local Redpanda Compose volume
+        if: always()
+        run: node scripts/infra/redpanda-local.mjs reset
+
   e2e:
     name: End-to-end deployment smoke
     needs: [changes, quality]
