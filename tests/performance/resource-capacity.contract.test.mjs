@@ -32,14 +32,17 @@ test("health-demo staging resource profile is complete and ordered", () => {
 test(
   "Helm resource profile requires CPU and memory requests and limits as pairs",
   () => {
-  const pairSchema = schema.definitions.cpuMemoryPair;
-  assert.deepEqual(pairSchema.required, ["cpu", "memory"]);
-  assert.deepEqual(Object.keys(schema.properties.resources.properties), [
-    "requests",
-    "limits",
-  ]);
-  assert.equal(schema.properties.resources.allOf.length, 2);
-  assert.equal(schema.properties.resources.allOf[0].then.required[0], "limits");
+    const pairSchema = schema.definitions.cpuMemoryPair;
+    assert.deepEqual(pairSchema.required, ["cpu", "memory"]);
+    assert.deepEqual(Object.keys(schema.properties.resources.properties), [
+      "requests",
+      "limits",
+    ]);
+    assert.equal(schema.properties.resources.allOf.length, 2);
+    assert.equal(
+      schema.properties.resources.allOf[0].then.required[0],
+      "limits",
+    );
     assert.equal(
       schema.properties.resources.allOf[1].then.required[0],
       "requests",
