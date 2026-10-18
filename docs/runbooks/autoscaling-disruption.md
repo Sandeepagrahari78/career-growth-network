@@ -50,6 +50,22 @@ Local Helm Validation additionally proves:
 - PDB exists with `minAvailable: 1`;
 - health-demo still rolls out with CGN-45 probes.
 
+## Resource request/limit policy and evidence
+
+The health-demo staging profile declares CPU request/limit `50m/500m` and
+memory request/limit `64Mi/256Mi`. The Helm values schema requires CPU and
+memory together in both requests and limits whenever a service supplies a
+resource profile. This keeps the chart generic while rejecting incomplete
+profiles; services must use their own representative workload to size them.
+
+The PR performance job runs a shortened 25 RPS health-demo profile with a
+100-VU pool configured, then repeats it while a disposable process holds 64 MiB
+and consumes CPU inside the same container capped at the declared limits. Its
+GitHub Actions step summary reports request utilization and remaining limit
+headroom. This staging-only health-demo evidence does not exercise a
+5,000-account dataset or prove sustained HPA behavior or production capacity.
+CGN-284 remains responsible for full synthetic-user load and soak evidence.
+
 ## Observability
 
 Operational signals are Kubernetes-native:

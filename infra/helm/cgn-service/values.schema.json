@@ -1,5 +1,24 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "definitions": {
+    "cpuQuantity": {
+      "type": "string",
+      "pattern": "^(?:[0-9]+(?:\\.[0-9]+)?|[0-9]+(?:n|u|m))$"
+    },
+    "memoryQuantity": {
+      "type": "string",
+      "pattern": "^[1-9][0-9]*(?:Ki|Mi|Gi|Ti|Pi|Ei|K|M|G|T|P|E)?$"
+    },
+    "cpuMemoryPair": {
+      "type": "object",
+      "required": ["cpu", "memory"],
+      "properties": {
+        "cpu": { "$ref": "#/definitions/cpuQuantity" },
+        "memory": { "$ref": "#/definitions/memoryQuantity" }
+      },
+      "additionalProperties": true
+    }
+  },
   "type": "object",
   "required": [
     "replicaCount",
@@ -112,7 +131,22 @@
       }
     },
     "resources": {
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "requests": { "$ref": "#/definitions/cpuMemoryPair" },
+        "limits": { "$ref": "#/definitions/cpuMemoryPair" }
+      },
+      "allOf": [
+        {
+          "if": { "required": ["requests"] },
+          "then": { "required": ["limits"] }
+        },
+        {
+          "if": { "required": ["limits"] },
+          "then": { "required": ["requests"] }
+        }
+      ],
+      "additionalProperties": true
     },
     "probes": {
       "type": "object",

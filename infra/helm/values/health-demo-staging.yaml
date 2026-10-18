@@ -20,7 +20,13 @@ env:
   - name: PORT
     value: "3001"
 
-resources: {}
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
 
 probes:
   enabled: true
