@@ -555,11 +555,17 @@ jobs:
       - name: Build health-demo performance artifact
         run: docker build -f services/health-demo/Dockerfile -t cgn-health-demo:performance .
 
+      - name: Validate the resource request/limit policy
+        run: node --test tests/performance/resource-capacity.contract.test.mjs
+
       - name: Run k6 smoke against the deployment artifact
         shell: bash
         run: |
-          docker run -d --name cgn-performance -p 127.0.0.1:3001:3001 cgn-health-demo:performance
-          trap 'docker rm -f cgn-performance >/dev/null 2>&1 || true' EXIT
+          docker run -d --name cgn-performance \
+            --cpus=0.5 --memory=268435456b --memory-swap=268435456b \
+            -p 127.0.0.1:3001:3001 \
+            -v "$PWD/tests/performance/resource-pressure.mjs:/tmp/resource-pressure.mjs:ro" \
+            cgn-health-demo:performance
           for attempt in {1..30}; do
             if curl --fail --silent http://127.0.0.1:3001/ready >/dev/null; then
               docker run --rm --network host \
@@ -573,6 +579,16 @@ jobs:
           done
           docker logs cgn-performance
           exit 1
+
+      - name: Measure baseline and CPU/memory pressure headroom
+        env:
+          CGN_PERFORMANCE_CONTAINER: cgn-performance
+          BASE_URL: http://127.0.0.1:3001
+        run: node tests/performance/run-resource-capacity.mjs
+
+      - name: Remove the disposable performance container
+        if: always()
+        run: docker rm -f cgn-performance >/dev/null 2>&1 || true
 
   gate:
     name: PR quality gate summary
