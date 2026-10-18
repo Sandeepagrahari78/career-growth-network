@@ -1,6 +1,6 @@
 # Handoff - CGN-38
 
-- Ticket: CGN-38 — Create service ownership README and runbook template
+- Ticket: CGN-38 â€” Create service ownership README and runbook template
 - Branch: `CGN-38-service-ownership-runbook-template`
 - Base branch: `main` at `d05d47df8c7e0877727c02d0ae1fe9d2eaa31a91`
 - Agent/person: Codex implementing under Sandeep's delegation; Jira assignee remains Tanvi Ambre
@@ -40,15 +40,17 @@ service has no product database or migration. No runtime/configuration changes.
 
 ## Tests run
 
-- Passed: `node --test tests/contracts/service-ownership-docs.contract.test.mjs` — 4/4.
+- Passed: `node --test tests/contracts/service-ownership-docs.contract.test.mjs` â€” 4/4.
 - Passed: `pnpm memory:check` via the repo-local `.cgn/bin/pnpm.cmd` wrapper; the
   direct `node scripts/memory-check.mjs` check also passed. No merged
   Engineering Memory file needs updating for this docs-only change.
 - Passed: repo-pinned Prettier 3.6.2 on the added contract test.
 - Passed: `git diff --check`.
-- First exact-head CI run caught a formatting issue in the test; applied
-  Prettier 3.6.2 and updated the branch. Verify the rerun on the final PR head
-  for formatting, contract, security and repository gates before review.
+- Initial exact-head CI runs caught formatting issues in the test; applied
+  Prettier 3.6.2. PR CI run `39115133000` and Local Helm Validation run
+  `39115133102` passed on source head
+  `3a199debea1a87dc833dd8be3c0f1649e2eaa77a`. This handoff evidence update
+  makes a docs-only follow-up commit; confirm fresh CI on that final head.
 
 ## Known limitations / risks
 
@@ -73,10 +75,10 @@ data, migration or configuration was changed.
 
 ## Engineering Memory updated
 
-- [x] 03-contract-registry.md — no contract changed
-- [ ] 04-decisions.md / ADR — no decision changed
-- [ ] 05-current-state.md — docs are not merged runtime truth
-- [ ] 06-known-risks.md — no architecture/runtime risk changed
+- [x] 03-contract-registry.md â€” no contract changed
+- [ ] 04-decisions.md / ADR â€” no decision changed
+- [ ] 05-current-state.md â€” docs are not merged runtime truth
+- [ ] 06-known-risks.md â€” no architecture/runtime risk changed
 
 ## Owner review and PR references
 
@@ -88,3 +90,4 @@ data, migration or configuration was changed.
   assignee change was made.
 - Source and tests inspected on latest main: `d05d47df8c7e0877727c02d0ae1fe9d2eaa31a91`
 - Required Sandeep review: pending
+
