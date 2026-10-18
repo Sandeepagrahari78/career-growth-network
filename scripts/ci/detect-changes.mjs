@@ -58,8 +58,10 @@ const flags = {
       file === "infra/docker/docker-compose.test.yml" ||
       file === "infra/docker/docker-compose.redpanda.yml" ||
       file === "infra/docker/docker-compose.valkey.yml" ||
+      file === "infra/docker/docker-compose.seaweedfs.yml" ||
       file.startsWith("scripts/infra/redpanda-") ||
       file.startsWith("scripts/infra/valkey-") ||
+      file.startsWith("scripts/infra/seaweedfs-") ||
       file === "scripts/ci/integration-stack-smoke.mjs" ||
       file === ".github/workflows/pr-ci.yml",
   ),
