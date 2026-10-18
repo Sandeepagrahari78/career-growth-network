@@ -43,8 +43,18 @@ test("canonical IDs are unique and never derived from display text", async () =>
   const catalog = await readJson(catalogUrl);
   const fixture = copyCatalog(catalog);
   fixture.skills = [
-    { id: "skill.fixture_one", displayName: "Fixture One", aliases: [], lifecycle: "active" },
-    { id: "skill.fixture_two", displayName: "Fixture Two", aliases: [], lifecycle: "active" },
+    {
+      id: "skill.fixture_one",
+      displayName: "Fixture One",
+      aliases: [],
+      lifecycle: "active",
+    },
+    {
+      id: "skill.fixture_two",
+      displayName: "Fixture Two",
+      aliases: [],
+      lifecycle: "active",
+    },
   ];
   const duplicateId = copyCatalog(fixture);
   duplicateId.skills[1].id = duplicateId.skills[0].id;
@@ -59,8 +69,18 @@ test("canonical IDs are unique and never derived from display text", async () =>
 test("normalized aliases and display names resolve to only one skill", async () => {
   const catalog = await readJson(catalogUrl);
   catalog.skills = [
-    { id: "skill.fixture_one", displayName: "Fixture One", aliases: ["Adaptiveness"], lifecycle: "active" },
-    { id: "skill.fixture_two", displayName: "Fixture Two", aliases: [], lifecycle: "active" },
+    {
+      id: "skill.fixture_one",
+      displayName: "Fixture One",
+      aliases: ["Adaptiveness"],
+      lifecycle: "active",
+    },
+    {
+      id: "skill.fixture_two",
+      displayName: "Fixture Two",
+      aliases: [],
+      lifecycle: "active",
+    },
   ];
   const duplicateAlias = copyCatalog(catalog);
   duplicateAlias.skills[1].aliases.push("  ADAPTIVENESS ");
@@ -74,8 +94,18 @@ test("normalized aliases and display names resolve to only one skill", async () 
 test("deprecated skill replacements must reference a different active catalog ID", async () => {
   const catalog = await readJson(catalogUrl);
   catalog.skills = [
-    { id: "skill.fixture_one", displayName: "Fixture One", aliases: [], lifecycle: "deprecated" },
-    { id: "skill.fixture_two", displayName: "Fixture Two", aliases: [], lifecycle: "active" },
+    {
+      id: "skill.fixture_one",
+      displayName: "Fixture One",
+      aliases: [],
+      lifecycle: "deprecated",
+    },
+    {
+      id: "skill.fixture_two",
+      displayName: "Fixture Two",
+      aliases: [],
+      lifecycle: "active",
+    },
   ];
   const deprecated = copyCatalog(catalog);
   deprecated.skills[0].replacementId = "skill.missing";
@@ -92,8 +122,18 @@ test("canonical serialization is stable across input ordering", async () => {
   const catalog = await readJson(catalogUrl);
   const reversed = copyCatalog(catalog);
   reversed.skills = [
-    { id: "skill.fixture_two", displayName: "Fixture Two", aliases: ["Zed", "Beta"], lifecycle: "active" },
-    { id: "skill.fixture_one", displayName: "Fixture One", aliases: ["Alpha", "Able"], lifecycle: "active" },
+    {
+      id: "skill.fixture_two",
+      displayName: "Fixture Two",
+      aliases: ["Zed", "Beta"],
+      lifecycle: "active",
+    },
+    {
+      id: "skill.fixture_one",
+      displayName: "Fixture One",
+      aliases: ["Alpha", "Able"],
+      lifecycle: "active",
+    },
   ];
   const reordered = copyCatalog(reversed);
   reordered.skills.reverse();
