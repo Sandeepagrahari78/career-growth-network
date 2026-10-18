@@ -52,6 +52,7 @@ policy. No paid/cloud infrastructure was added.
 - `pnpm ci:quick` and `pnpm memory:check` could not start because pnpm is not installed in this Windows environment.
 - The local k3d network-policy smoke could not run because Docker and k3d are unavailable here. PR CI's Linux k3d smoke must provide this runtime acceptance evidence.
 - Passed on implementation head `490a6a9cc7a439799b3fa818c43365cbba045aef`: PR CI run 39116424578 (including local k3d denied/allowed network-policy smoke) and Local Helm Validation run 39116424576.
+- Passed on documentation-updated PR head `052daf5cd937f6ea579b5702816439a87c0ef406`: PR CI run 39116721385 and Local Helm Validation run 39116721367.
 
 ## Known limitations / risks
 
@@ -76,7 +77,7 @@ Revert the CGN-62 commit to restore the previous app/data-only policy baseline. 
 ## Owner review and PR references
 
 - GitHub PR URL: https://github.com/Sandeepagrahari78/career-growth-network/pull/49 (open; review/merge pending)
-- Commit / merge SHA: implementation head `490a6a9cc7a439799b3fa818c43365cbba045aef`; not merged
+- Commit / merge SHA: PR head `052daf5cd937f6ea579b5702816439a87c0ef406` (includes implementation commit `490a6a9cc7a439799b3fa818c43365cbba045aef`); not merged
 - Jira live verification (2026-10-18): CGN-62 In Progress after PR sync; assignee Sandeep Agrahari; only explicit blocker CGN-44 is Done; Rank 008 is sequence priority.
 - Source and tests inspected on latest main: `d05d47df8c7e0877727c02d0ae1fe9d2eaa31a91`
 - Required Sandeep technical review: pending
