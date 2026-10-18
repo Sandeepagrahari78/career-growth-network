@@ -1,0 +1,23 @@
+name: cgn-local-seaweedfs
+
+services:
+  seaweedfs:
+    image: chrislusf/seaweedfs:4.46
+    command:
+      - mini
+      - -dir=/data
+      - -ip=seaweedfs
+      - -ip.bind=0.0.0.0
+      - -s3
+      - -s3.config=/etc/seaweedfs/s3.json
+    ports:
+      - "127.0.0.1:18333:8333"
+    volumes:
+      - cgn-seaweedfs-data:/data
+      - type: bind
+        source: ${CGN_SEAWEEDFS_CONFIG_FILE:?run the SeaweedFS lifecycle command}
+        target: /etc/seaweedfs/s3.json
+        read_only: true
+
+volumes:
+  cgn-seaweedfs-data:

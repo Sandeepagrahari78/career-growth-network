@@ -1,6 +1,6 @@
 # 05 - Current Merged State
 
-Last updated: 2026-10-19 for the CGN-88 candidate; local cache details become merged state only after its PR merges.
+Last updated: 2026-10-19 after CGN-88 merged; the CGN-89 SeaweedFS implementation is pending review.
 
 ## Repository
 - CGN-288/289: on 2026-10-16, the team-approved *product direction* expanded to a continuous post-Class-10 Student Ecosystem V2, retaining social-first Home, the existing social/growth loop, and shared web+Android architecture. PR #29 merged Product Vision PRD, 31-Epic gap audit, bounded-context **impact review only**, screen inventory/Stitch design handoff and updated agent-context sources: https://github.com/Sandeepagrahari78/career-growth-network/pull/29 ; merge SHA `6018f3e5c799841e71df1213dcae507a59bf53c9`. There are **no new implemented preparation APIs, Figma frames, exam catalog, database schemas or signed contracts** in that change. Further technical contract decisions [CGN-290](https://sandeepagrahari1.atlassian.net/browse/CGN-290), reviewed UX/Figma frames [CGN-291](https://sandeepagrahari1.atlassian.net/browse/CGN-291), and real pilot user research [CGN-292](https://sandeepagrahari1.atlassian.net/browse/CGN-292) remain pending.
@@ -35,7 +35,8 @@ Last updated: 2026-10-19 for the CGN-88 candidate; local cache details become me
 - `cgn-system`, `cgn-apps` and `cgn-data` are deny-by-default; DNS egress is explicitly allowed in each namespace.
 - Local Kubernetes runtime: k3d v5.9.0 + K3s v1.35.9-k3s1.
 - Local PostgreSQL runtime: PostgreSQL 16 in Docker/Compose, loopback-only.
-- CGN-88 candidate: local Valkey `9.1.2` Compose service binds `127.0.0.1:16379`, uses optional environment-based authentication and a scoped persistent volume for restart checks. It remains a disposable cache, not canonical domain storage; this line is awaiting CGN-88 review/merge.
+- CGN-88: local Valkey `9.1.2` Compose service binds `127.0.0.1:16379`, uses optional environment-based authentication and a scoped persistent volume for restart checks. It remains a disposable cache, not canonical domain storage; merged by [PR #51](https://github.com/Sandeepagrahari78/career-growth-network/pull/51) at `61bb85267c7f93e76231e279f5d7c171a2860a6c`.
+- CGN-89 candidate: pinned SeaweedFS `4.46` `weed mini` local Compose service publishes only S3 on `127.0.0.1:18333`; generated identities keep the initializer separate from bucket-scoped `cgn-evidence` application access, and one named volume preserves filer metadata and objects. PR review and Linux put/get/head, anonymous-denial, bucket-isolation and restart checks are pending; this is local development storage, not production availability or backup evidence.
 - Database ownership contract: `cgn.postgres-databases.v1`.
 - Current service databases: identity, career, roadmap, evidence, growth, feed, network, community and messaging.
 - Staging GitOps contract: `cgn.staging-gitops.v1`.
