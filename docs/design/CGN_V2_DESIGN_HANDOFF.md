@@ -1,6 +1,6 @@
 # CGN V2 — UX Architecture, Screen Inventory & Figma/Stitch Handoff
 
-**Status:** design brief, not yet drawn/approved Figma frames. **Owner:** Prachi, [CGN-291](https://sandeepagrahari1.atlassian.net/browse/CGN-291). **Product:** [CGN V2 PRD](../product/CGN_V2_PRODUCT_VISION.md). **Final design source:** team-reviewed Figma file/frame URLs, not a generated placeholder. **Delivery:** Web Next.js `apps/web/` and Android Expo React Native `apps/mobile/`, same versioned backend contracts.
+**Status:** initial editable CGN V2 web/Android Figma **concept batch created**, but frames are **NOT yet team-approved**. See [actual editable Figma frame catalog](CGN_V2_FIGMA_CONCEPT_BATCH_01.md); all other remaining screens and states in this document are planned. **Owner:** Prachi, [CGN-291](https://sandeepagrahari1.atlassian.net/browse/CGN-291). **Product:** [CGN V2 PRD](../product/CGN_V2_PRODUCT_VISION.md). **Final design source:** team-reviewed Figma file/frame URLs, not a generated placeholder. **Delivery:** Web Next.js `apps/web/` and Android Expo React Native `apps/mobile/`, same versioned backend contracts.
 
 ## 1. Design system rules
 
@@ -113,3 +113,8 @@ Do NOT paste these literal `PENDING` placeholders into existing coding tickets a
 - [ ] Only then publish `DESIGN.md` + verified Figma refs to GitHub and add narrow Jira implementation tickets with platform ownership, API contract, acceptance tests and screenshot parity test plan.
 
 **No Figma design frames were created or modified as part of CGN-288; this is a traceable design brief.**
+
+
+## Actual Figma concept artifact — CGN-291
+
+[Open CGN V2 editable Figma file](https://www.figma.com/design/9lliKy1wnK8QFfTuBHmsZJ). This is a separate draft file, not a modification of existing historical Figma frames. First batch: six desktop 1440×900 screens, eight Android 390×844 screens, foundations and representative loading/empty/restricted/offline states. Full [screen-by-screen frame links and review limitations](CGN_V2_FIGMA_CONCEPT_BATCH_01.md). **Do not implement until Prachi approves the frames** and associated Jira/API privacy specs are resolved.
