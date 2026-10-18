@@ -50,7 +50,7 @@ credential value is committed.
 - Passed: `node scripts/memory-check.mjs`.
 - Passed: `git diff --check`.
 - Passed: `git check-ignore -v infra/postgres/.env` confirms local secret file is ignored.
-- Passed: final-head [PR CI run 39171230033](https://github.com/Sandeepagrahari78/career-growth-network/actions/runs/39171230033) on `9ed1e234f2eb39ac1aca79838b16185e47d6507f), including formatting, contract tests, build, security and Engineering Memory gates; runtime-only suites were skipped for this docs/config change.
+- Passed: final-head [PR CI run 39171230033](https://github.com/Sandeepagrahari78/career-growth-network/actions/runs/39171230033) on `9ed1e234f2eb39ac1aca79838b16185e47d6507f`, including formatting, contract tests, build, security and Engineering Memory gates; runtime-only suites were skipped for this docs/config change.
 - Passed: [Local Helm Validation run 39171230106](https://github.com/Sandeepagrahari78/career-growth-network/actions/runs/39171230106) on the same final PR head, including local-cluster install smoke.
 - Passed after merge: Main CI run `39171391072` on attempt 3, Docker Images run `39171391080`, Local Helm run `39171391102`, and Staging Validation run `39171820354`, all on merge SHA `1f9b1bb0542d89c81ec457146e2890205e82266f`. Earlier Main CI attempts had PostgreSQL outbox test environment failures; the exact merge SHA passed on retry.
 
@@ -73,11 +73,12 @@ installing packages. Linux PR CI remains authoritative.
 
 ## Exact next step for next agent
 
-The next original ordered ticket is CGN-75. Its live Jira description lists only
-CGN-32 as a hard prerequisite, but the issue is explicitly linked as blocked by
-CGN-76 and CGN-144, both To Do; CGN-76 is in turn linked as blocked by CGN-75.
-Do not guess through this blocker cycle. Ask the ticket owner to reconcile the
-Jira dependency links and dated prerequisite text before implementation.
+The next original ordered ticket is CGN-75. Its dated Jira execution spec lists
+CGN-32 as its only hard prerequisite, but live Jira links also mark CGN-144
+(To Do) as blocking CGN-75. CGN-144's dated spec, in turn, lists CGN-75 as a
+hard prerequisite. CGN-76 is downstream of CGN-75, not a blocker. This leaves a
+CGN-75 ↔ CGN-144 dependency cycle and a conflict between the dated prerequisite
+text and live issue links; reconcile those before implementation.
 
 ## Rollback note
 
