@@ -45,3 +45,4 @@
 
 - Staging-recovery coverage gap: CGN-227's new green rollback rehearsal exercises a GitHub-hosted ephemeral Docker health-demo, not rollback of a live Argo CD/k3d cluster or persistent user data. Mitigation: require a separate explicit, reversible GitOps/Kubernetes rollout-and-rollback acceptance test before production deployment.
 - Change-authority gap: private GitHub Free does not enforce the desired protected branch setting. Mitigation: Sandeep-controlled PR review, fail-closed checks and post-merge Main CI auditing; treat any direct push as a process violation requiring an incident investigation, not a successfully prevented action.
+- Kubernetes Secret encryption-at-rest and production secret injection are not verified for any cluster. CGN-99 documents local/non-production use only; require a separately approved managed-cluster/provider review before claiming production protection.
