@@ -138,8 +138,22 @@ if kubectl -n "$SMOKE_NAMESPACE" get ingress cgn-health-demo-local >/dev/null 2>
   echo "Ingress route still exists after rollback." >&2
   exit 1
 fi
-rollback_status="$(curl --max-time 10 --silent --output /dev/null --write-out '%{http_code}' \
-  --resolve "$HOST:8080:127.0.0.1" "http://$HOST:8080/health")"
-test "$rollback_status" = "404"
+rollback_status=""
+for attempt in $(seq 1 45); do
+  rollback_status="$(curl --max-time 5 --silent --output /dev/null --write-out '%{http_code}' \
+    --resolve "$HOST:8080:127.0.0.1" "http://$HOST:8080/health" || true)"
+  if [ "$rollback_status" = "404" ]; then
+    echo "Ingress rollback reached HTTP 404 on attempt $attempt."
+    break
+  fi
+  if [ "$attempt" -lt 45 ]; then
+    sleep 2
+  fi
+done
+if [ "$rollback_status" != "404" ]; then
+  echo "Ingress rollback did not reach HTTP 404; last status: $rollback_status" >&2
+  kubectl -n "$SMOKE_NAMESPACE" get ingress -o wide >&2 || true
+  exit 1
+fi
 echo "Ingress deletion and default HTTP 404 rollback confirmed."
 echo "CGN local Kubernetes smoke passed."
