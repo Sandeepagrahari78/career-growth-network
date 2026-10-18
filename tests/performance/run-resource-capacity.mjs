@@ -1,12 +1,18 @@
 import assert from "node:assert/strict";
 import { execFileSync, spawn, spawnSync } from "node:child_process";
-import { appendFileSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import {
+  appendFileSync,
+  mkdtempSync,
+  readFileSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const repoRoot = resolve(fileURLToPath(new URL("../..", import.meta.url)));
-const containerName = process.env.CGN_PERFORMANCE_CONTAINER ?? "cgn-performance";
+const containerName =
+  process.env.CGN_PERFORMANCE_CONTAINER ?? "cgn-performance";
 const endpoint = process.env.BASE_URL ?? "http://127.0.0.1:3001";
 const capacity = JSON.parse(
   readFileSync(join(repoRoot, "config/performance/capacity.v1.json"), "utf8"),
@@ -47,10 +53,16 @@ export const resourceBudget = {
   memoryRequestMiB: parseMemoryMiB(requests.memory),
   memoryLimitMiB: parseMemoryMiB(limits.memory),
 };
-assert.ok(resourceBudget.cpuRequestMillicores <= resourceBudget.cpuLimitMillicores);
+assert.ok(
+  resourceBudget.cpuRequestMillicores <= resourceBudget.cpuLimitMillicores,
+);
 assert.ok(resourceBudget.memoryRequestMiB <= resourceBudget.memoryLimitMiB);
 assert.equal(limits.cpu, "500m", "Docker smoke CPU cap must match Helm limits");
-assert.equal(limits.memory, "256Mi", "Docker smoke memory cap must match Helm limits");
+assert.equal(
+  limits.memory,
+  "256Mi",
+  "Docker smoke memory cap must match Helm limits",
+);
 const outputDirectory = mkdtempSync(
   join(process.env.RUNNER_TEMP ?? tmpdir(), "cgn-resource-capacity-"),
 );
@@ -89,7 +101,9 @@ function recordStatsLine(line) {
 }
 
 function summaryFor(name) {
-  return JSON.parse(readFileSync(join(outputDirectory, `${name}.json`), "utf8"));
+  return JSON.parse(
+    readFileSync(join(outputDirectory, `${name}.json`), "utf8"),
+  );
 }
 
 function runK6(name) {
@@ -133,7 +147,9 @@ function phaseMetrics(name, summary) {
     requests: Math.round(summary.metrics.http_reqs.values.count),
     errorRatePercent: summary.metrics.http_req_failed.values.rate * 100,
     p95Ms: summary.metrics.http_req_duration.values["p(95)"],
-    peakCpuMillicores: Math.max(...matching.map((sample) => sample.cpuMillicores)),
+    peakCpuMillicores: Math.max(
+      ...matching.map((sample) => sample.cpuMillicores),
+    ),
     peakMemoryMiB: Math.max(...matching.map((sample) => sample.memoryMiB)),
   };
 }
@@ -152,23 +168,52 @@ function formatPhase(name, metrics) {
     (1 - metrics.peakMemoryMiB / resourceBudget.memoryLimitMiB) * 100,
   );
 
-  return `| ${name} | ${metrics.requests} | ${metrics.errorRatePercent.toFixed(3)}% | ${metrics.p95Ms.toFixed(1)} | ${metrics.peakCpuMillicores.toFixed(1)}m (${cpuRequestPercent.toFixed(0)}% req) | ${metrics.peakMemoryMiB.toFixed(1)} MiB (${memoryRequestPercent.toFixed(0)}% req) | ${cpuLimitHeadroomPercent.toFixed(0)}% | ${memoryLimitHeadroomPercent.toFixed(0)}% |`;
+  const cells = [
+    name,
+    metrics.requests,
+    `${metrics.errorRatePercent.toFixed(3)}%`,
+    metrics.p95Ms.toFixed(1),
+    `${metrics.peakCpuMillicores.toFixed(1)}m (${cpuRequestPercent.toFixed(0)}% req)`,
+    `${metrics.peakMemoryMiB.toFixed(1)} MiB (${memoryRequestPercent.toFixed(0)}% req)`,
+    `${cpuLimitHeadroomPercent.toFixed(0)}%`,
+    `${memoryLimitHeadroomPercent.toFixed(0)}%`,
+  ];
+  return `| ${cells.join(" | ")} |`;
 }
 
 function createDashboard(baseline, pressure) {
   return [
     "## CGN-90 health-demo resource capacity smoke",
     "",
-    `Shortened baseline: ${targetRps} requests/s for ${duration}, with a 100-VU pool configured, against health-demo only. The pressure phase adds a resident 64 MiB allocation and CPU work in the disposable container. This is a staging resource-policy check; it does not simulate 5,000 registered users or prove product capacity.`,
+    [
+      `Shortened baseline: ${targetRps} requests/s for ${duration},`,
+      "with a 100-VU pool configured against health-demo only.",
+      "The pressure phase adds a resident 64 MiB allocation and CPU work",
+      "in the disposable container. This is a staging resource-policy check;",
+      "it does not simulate 5,000 registered users or prove product capacity.",
+    ].join(" "),
     "",
-    `Policy applied: CPU request/limit ${resourceBudget.cpuRequestMillicores}m/${resourceBudget.cpuLimitMillicores}m; memory request/limit ${resourceBudget.memoryRequestMiB}/${resourceBudget.memoryLimitMiB} MiB. HPA thresholds remain ${capacity.resourceBudgets.cpuSustainedPercentScaleTrigger}% CPU and ${capacity.resourceBudgets.memorySustainedPercentScaleTrigger}% memory for ${capacity.resourceBudgets.observationWindowMinutes} minute windows; this short run does not establish sustained scaling behavior.`,
+    [
+      `Policy applied: CPU request/limit ${resourceBudget.cpuRequestMillicores}m/`,
+      `${resourceBudget.cpuLimitMillicores}m; memory request/limit`,
+      `${resourceBudget.memoryRequestMiB}/${resourceBudget.memoryLimitMiB} MiB.`,
+      `HPA thresholds remain ${capacity.resourceBudgets.cpuSustainedPercentScaleTrigger}% CPU and`,
+      `${capacity.resourceBudgets.memorySustainedPercentScaleTrigger}% memory for`,
+      `${capacity.resourceBudgets.observationWindowMinutes} minute windows; this short run`,
+      "does not establish sustained scaling behavior.",
+    ].join(" "),
     "",
     "| Phase | Requests | Error rate | p95 ms | Peak CPU (request use) | Peak memory (request use) | CPU limit headroom | Memory limit headroom |",
     "|---|---:|---:|---:|---:|---:|---:|---:|",
     formatPhase("baseline", baseline),
     formatPhase("cpu+memory pressure", pressure),
     "",
-    "CPU/memory usage and headroom are observed from Docker stats on this ephemeral CI runner. These measurements describe only this image and profile; recalibrate service production resources using representative service workloads and CGN-284 full load/soak evidence.",
+    [
+      "CPU/memory usage and headroom are observed from Docker stats on this",
+      "ephemeral CI runner. These measurements describe only this image and",
+      "profile; recalibrate service production resources using representative",
+      "service workloads and CGN-284 full load/soak evidence.",
+    ].join(" "),
     "",
   ].join("\n");
 }

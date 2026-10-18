@@ -23,11 +23,15 @@ test("health-demo staging resource profile is complete and ordered", () => {
   });
   assert.equal(parseCpuMillicores("50m"), 50);
   assert.equal(parseMemoryMiB("64Mi"), 64);
-  assert.ok(resourceBudget.cpuRequestMillicores < resourceBudget.cpuLimitMillicores);
+  assert.ok(
+    resourceBudget.cpuRequestMillicores < resourceBudget.cpuLimitMillicores,
+  );
   assert.ok(resourceBudget.memoryRequestMiB < resourceBudget.memoryLimitMiB);
 });
 
-test("Helm resource profile requires CPU and memory requests and limits as pairs", () => {
+test(
+  "Helm resource profile requires CPU and memory requests and limits as pairs",
+  () => {
   const pairSchema = schema.definitions.cpuMemoryPair;
   assert.deepEqual(pairSchema.required, ["cpu", "memory"]);
   assert.deepEqual(Object.keys(schema.properties.resources.properties), [
@@ -36,5 +40,9 @@ test("Helm resource profile requires CPU and memory requests and limits as pairs
   ]);
   assert.equal(schema.properties.resources.allOf.length, 2);
   assert.equal(schema.properties.resources.allOf[0].then.required[0], "limits");
-  assert.equal(schema.properties.resources.allOf[1].then.required[0], "requests");
-});
+    assert.equal(
+      schema.properties.resources.allOf[1].then.required[0],
+      "requests",
+    );
+  },
+);
