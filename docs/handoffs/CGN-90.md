@@ -51,13 +51,18 @@ memory 256Mi`; CI applies those limits to the disposable performance container.
 ## Tests run
 
 - Passed: `node --check` for all three new performance scripts.
-- Passed: `node --test tests/performance/resource-capacity.contract.test.mjs` (2/2).
+- Passed: `node --test tests/performance/resource-capacity.contract.test.mjs` (6/6), including Docker stats ANSI parsing and k6 summary compatibility.
 - Passed: JSON parse for `infra/helm/cgn-service/values.schema.json`.
 - Passed: `node scripts/ci/validate-helm-base.mjs`.
 - Passed: `node scripts/memory-check.mjs`.
 - Passed: `git diff --check`.
-- Pending: Linux PR quality/security, k6 resource pressure dashboard and Local
-  Helm validation. Local Docker runtime is not available in this environment.
+- Passed: [Linux PR CI](https://github.com/Sandeepagrahari78/career-growth-network/actions/runs/39168560025) including quality/security, integration, E2E, and k6 capacity smoke; [Local Helm validation](https://github.com/Sandeepagrahari78/career-growth-network/actions/runs/39168560041).
+- Capacity dashboard evidence: baseline 25 RPS for 30s, 751 reported requests,
+  0.000% errors, p95 0.8 ms, peak CPU 3.1m, peak memory 13.4 MiB; pressure
+  phase 751 reported requests, 0.000% errors, p95 25.4 ms, peak CPU 509.8m,
+  peak memory 94.0 MiB. Reported pressure headroom is 0% CPU and 63% memory.
+- Local Docker runtime is not available in this environment; the disposable
+  Docker pressure exercise and Kubernetes install smoke ran in GitHub CI.
 - A local run of `node scripts/ci/validate-autoscaling-disruption.mjs` failed
   its existing LF-only string assertion against the CRLF checkout of unchanged
   `infra/helm/cgn-service/values.yaml`; Linux CI runs against LF checkout.
@@ -72,15 +77,17 @@ memory 256Mi`; CI applies those limits to the disposable performance container.
 
 - Usage/headroom describe only the health-demo endpoint and the shortened CI
   profile on an ephemeral GitHub runner.
+- Docker stats sampled a 509.8m pressure CPU peak against the nominal 500m cap;
+  the dashboard reports zero CPU headroom. Treat the short Docker sample as
+  runner evidence, not Kubernetes quota validation.
 - The pressure exercise is not a sustained five-minute HPA trigger test.
 - Do not reuse these resource values for other services without measured
   workload evidence; full 5K capacity remains CGN-284 scope.
 
 ## Exact next step for next agent
 
-Inspect the actual PR performance dashboard and Local Helm results. Sandeep
-reviews the resource policy and evidence before merging; after merge verify Main
-CI and exact-candidate Staging Validation before moving to the next Jira ticket.
+Sandeep reviews and merges the PR. After merge, verify Main CI and
+exact-candidate Staging Validation before moving to the next Jira ticket.
 
 ## Rollback note
 
@@ -96,7 +103,7 @@ compatible with services that omit resources entirely.
 ## Owner review and PR references
 
 - GitHub PR URL: https://github.com/Sandeepagrahari78/career-growth-network/pull/53
-- Commit / merge SHA: initial implementation `58e154f93b67c0a877adc671908e36763b960d38`; merge pending.
+- Commit / merge SHA: implementation validated at `a75e99e0d3d6feec736f6aaca9fe5b64d4de2949`; merge pending.
 - Jira live dependency/status verification: CGN-90 To Do, assigned Tanvi; hard
   prerequisite CGN-44 Done; ticket permits AI implementation with Sandeep review.
 - Source and tests inspected on latest main: yes, main at
