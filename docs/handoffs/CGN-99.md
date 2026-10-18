@@ -73,12 +73,11 @@ installing packages. Linux PR CI remains authoritative.
 
 ## Exact next step for next agent
 
-The next original ordered ticket is CGN-75. Its dated Jira execution spec lists
-CGN-32 as its only hard prerequisite, but live Jira links also mark CGN-144
-(To Do) as blocking CGN-75. CGN-144's dated spec, in turn, lists CGN-75 as a
-hard prerequisite. CGN-76 is downstream of CGN-75, not a blocker. This leaves a
-CGN-75 ↔ CGN-144 dependency cycle and a conflict between the dated prerequisite
-text and live issue links; reconcile those before implementation.
+The next original ordered ticket is CGN-75. Its dated Jira execution
+spec lists CGN-32 as its only hard prerequisite, and CGN-32 is Done. Live Jira
+links show CGN-75 blocks CGN-76 and CGN-144 (both To Do); they are downstream
+consumers, not blockers. No linked prerequisite blocks CGN-75. Continue with
+its ticket-specific acceptance and review gates.
 
 ## Rollback note
 
