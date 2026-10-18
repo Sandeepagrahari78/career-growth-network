@@ -51,8 +51,10 @@ None. No database, service, business API route or infrastructure was created. Ad
 - `corepack pnpm ci:quick` — workspace, GitOps, Helm, Helm promotion and migration-job validations passed, then stopped at unchanged `scripts/ci/validate-kubernetes-probes.mjs:43` for that same CRLF/LF assertion.
 - `corepack pnpm agent:context --ticket CGN-35 --domain platform` — passed after the lockfile dependencies were installed; generated context was read. Its default bundle is offline, so live Jira was separately checked through Jira MCP.
 - Local running-service HTTP smoke — `/health` 200, `/ready` 200, unknown route 404 with the documented envelope and matching header/body request ID.
-- Docker/k3d staging smoke — not run locally: Docker reports that its engine named pipe is absent, so the existing local cluster/image acceptance path cannot start. The repository's exact-candidate GitHub staging check remains a post-merge review gate; this work is not merged.
-- `corepack pnpm memory:check` and exact-head Linux PR CI — pending.
+- Exact-head Linux PR CI at `f418eaeeea2885a88fc2d77d8a6de6703ca33c74` — passed (run `39101276825`), including platform-template Docker acceptance, security scan, integration and end-to-end deployment smoke.
+- Local Helm Validation — passed (run `39101276918`).
+- Docker/k3d staging smoke — not run locally: Docker reports that its engine named pipe is absent, so the local cluster/image path cannot start. The GitHub Docker acceptance passed; post-merge exact-candidate staging remains a review gate and this PR is not merged.
+- `corepack pnpm memory:check` — passed on the staged change before the implementation commit.
 
 ## Known limitations / risks
 
@@ -81,8 +83,8 @@ Revert the CGN-35 PR to restore the prior Nest default exception response. No pe
 
 ## Owner review and PR references
 
-- GitHub PR URL: pending
-- Commit / merge SHA: pending
+- GitHub PR URL: https://github.com/Sandeepagrahari78/career-growth-network/pull/43
+- Commit / merge SHA: `f418eaeeea2885a88fc2d77d8a6de6703ca33c74` (PR open; not merged)
 - Jira live dependency/status verification: CGN-35 `To Do`, Sandeep, Rank `0|i0007j:`; only hard predecessor CGN-34 is `Done`, and its PR #38 merged to main at `86d25de432fccdfcd835b506f57fc51f0137621d`.
 - Source and tests inspected on latest main: `d1f537a66df04cdcd022f28fcea0f8e9f337da65`; context bundle generated and read before implementation.
 - Required Sandeep review: pending.
