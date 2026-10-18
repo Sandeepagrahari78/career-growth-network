@@ -2,7 +2,7 @@
 
 - Ticket: CGN-75 - Define canonical skill ID taxonomy and versioning rules
 - Branch: `CGN-75-skill-taxonomy`
-- Base branch: `main` at `9b85fdac44328ba67e56cfe1797d63a9cffe29b1`
+- Base branch: `main` at `1fcab5b27da8332c0b6236ed0a6f587aa98a993e`
 - Agent/person: Codex under Sandeep's explicit backlog execution and merge authorization
 - Date: 2026-10-19
 
@@ -26,6 +26,7 @@ CGN-76/77/78; adding example skills as production data would invent taxonomy.
 - `docs/engineering-memory/03-contract-registry.md`
 - `tests/contracts/cgn75-skill-taxonomy.contract.test.mjs`
 - `docs/handoffs/CGN-75.md`
+- `docs/engineering-memory/05-current-state.md` (this follow-up)
 
 ## Contracts changed
 
@@ -45,22 +46,32 @@ None planned. The catalog is versioned JSON; no database migration is authorized
 
 ## Tests run
 
-Passed locally:
+Passed:
 
 - `node --check services/career/catalog/validate-skill-catalog.mjs`
 - `node --test tests/contracts/cgn75-skill-taxonomy.contract.test.mjs` — 5/5
 - `git diff --check`
-- `node scripts/memory-check.mjs` — passed before updating the contract registry;
-  rerun with the final candidate changes below.
-- PR CI, main CI and applicable staging checks are pending.
+- Pinned Prettier 3.6.2 check on the contract test.
+- `node scripts/memory-check.mjs` — passed.
+- Final-head PR CI run `39173846216` passed twice after two fixes: pinned-format
+  correction and CRLF-safe catalog assertion. An earlier rerun hit a transient
+  PostgreSQL integration socket failure; subsequent full runs passed.
+- Final-head Local Helm run `39173845995` passed twice.
+- Post-merge Main CI `39174420420`, Docker Images `39174420408`, Local Helm
+  `39174420423`, exact-SHA Staging Validation `39174551457`, and Jira Delivery
+  Sync `39174600303` all passed for merge SHA `6432d003bdd898422aca02f525e11e42c7ec9900`.
+- Live Jira status verified `Done` after delivery sync.
+
+The broad local Windows contract-suite invocation reported 157/161 passing;
+four pre-existing platform-sensitive checks expect LF-only YAML fixtures.
+Linux PR CI ran the complete contract suite successfully.
 
 ## Known limitations / risks
 
 No skill rows are seeded. CGN-76/77/78 content owners must submit reviewed
 track content and use stable IDs; do not derive identity from mutable display
-text. No runtime career service exists in this workspace yet. This PR changes
-the shared contract, so Sandeep's architecture/data-contract review is required
-before downstream consumption.
+text. No runtime career service exists in this workspace yet. No endpoint,
+instrumentation, event producer, database, or deployment behavior was added.
 
 ## Exact next step for next agent
 
@@ -75,13 +86,14 @@ Revert the CGN-75 PR. No runtime, database, or external state is modified.
 
 - [x] `03-contract-registry.md`
 - [ ] `04-decisions.md` / ADR if needed
-- [ ] `05-current-state.md` (will be updated in a follow-up after merge SHA is known)
+- [x] `05-current-state.md`
 - [ ] `06-known-risks.md` if needed
 
 ## Owner review and PR references
 
-- GitHub PR URL: pending
-- Candidate commit / merge SHA: pending
-- Jira live dependency/status verification (2026-10-19): CGN-75 To Do; assignee Tanvi Ambre; hard prerequisite CGN-32 Done. Live links show CGN-75 blocks CGN-76 and CGN-144, so they are downstream.
+- Implementation PR: https://github.com/Sandeepagrahari78/career-growth-network/pull/57
+- Candidate commit: `89984a2fe465f6f5b5438eec70fc5e46b8c7bef4`
+- Merge SHA: `6432d003bdd898422aca02f525e11e42c7ec9900`
+- Jira live dependency/status verification (2026-10-19): CGN-75 was To Do before implementation; assignee Tanvi Ambre; hard prerequisite CGN-32 Done. Live links show CGN-75 blocks CGN-76 and CGN-144, so they are downstream. Jira is now Done.
 - Source and tests inspected on latest main SHA: `9b85fdac44328ba67e56cfe1797d63a9cffe29b1`; generated context bundle read before implementation.
-- Required Sandeep review: contract and architecture review before merge; user delegated backlog execution and requested merge after two green CI verifications.
+- Review/merge: Sandeep's explicit execution authorization; PR #57 merged after two green exact-head PR CI runs and two green Local Helm runs.
