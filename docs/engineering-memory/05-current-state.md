@@ -83,3 +83,7 @@ After each merged PR, record the ticket, PR/merge reference, modules/contracts c
 PR #37 merged at `5c803011e9ea30c4cacd82b704d4e3b9859c8c1e`: local ticket launcher and GitHub-to-Jira sync are on main. Main CI 38970986386, Docker 38970986433, Helm 38970986415 and staging 38971322220 passed. Sync 38971322332 ran and left Jira unchanged pending the original owner-comment gate. Local Windows doctor/OAuth/live Jira access and repository secret names were verified by the local agent. No end-to-end automatic Done transition has been observed yet.
 
 Owner authorized a follow-up replacing the comment with owner-reviewed merge approval and exact-candidate staging checks. Treat that change as pending until its own merge/run evidence exists. Human technical/business review before merge remains required; no autonomous merge or production hosting claim.
+
+## CGN-99 zero-cost secrets baseline (candidate)
+
+The CGN-99 change records local environment files, GitHub Actions encrypted secrets, and Kubernetes Secrets as the current zero-cost sources. The existing PostgreSQL env example remains placeholder-only; Gitleaks remains fail-closed in PR and main CI. No product runtime, production cluster, or paid secret provider is introduced. See `docs/handoffs/CGN-99.md` for the exact candidate and verification evidence.
