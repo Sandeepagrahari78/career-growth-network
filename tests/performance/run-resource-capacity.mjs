@@ -72,7 +72,6 @@ const targetRps = capacity.loadProfiles.baseline.targetRequestsPerSecond;
 const samples = [];
 let phase = "baseline";
 let pendingStats = "";
-let statsDebugChunks = 0;
 
 function parseMiB(value) {
   const match = value.match(/^([\d.]+)\s*(B|kB|KB|KiB|MB|MiB|GB|GiB)$/i);
@@ -92,13 +91,22 @@ function parseMiB(value) {
   return Number(match[1]) * units[match[2].toLowerCase()];
 }
 
-function recordStatsLine(line) {
+export function parseDockerStatsLine(rawLine) {
+  const line = rawLine.replace(/\u001b\[[0-?]*[ -/]*[@-~]/g, "");
   const [cpu, memoryUsage] = line.trim().split("|");
   const memory = memoryUsage?.split("/")[0]?.trim();
   const cpuPercent = Number.parseFloat(cpu);
   const memoryMiB = memory ? parseMiB(memory) : null;
   if (Number.isFinite(cpuPercent) && Number.isFinite(memoryMiB)) {
-    samples.push({ phase, cpuMillicores: cpuPercent * 10, memoryMiB });
+    return { cpuMillicores: cpuPercent * 10, memoryMiB };
+  }
+  return null;
+}
+
+function recordStatsLine(line) {
+  const parsed = parseDockerStatsLine(line);
+  if (parsed) {
+    samples.push({ phase, ...parsed });
   }
 }
 
@@ -268,10 +276,6 @@ async function main() {
   ]);
   stats.stdout.setEncoding("utf8");
   stats.stdout.on("data", (chunk) => {
-    if (statsDebugChunks < 3) {
-      console.log("Docker stats output:", JSON.stringify(chunk));
-      statsDebugChunks += 1;
-    }
     pendingStats += chunk;
     const lines = pendingStats.split(/[\r\n]+/);
     pendingStats = lines.pop() ?? "";

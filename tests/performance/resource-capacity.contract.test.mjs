@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import {
   parseCpuMillicores,
+  parseDockerStatsLine,
   parseMemoryMiB,
   parseResourcePair,
   resourceBudget,
@@ -27,6 +28,15 @@ test("health-demo staging resource profile is complete and ordered", () => {
     resourceBudget.cpuRequestMillicores < resourceBudget.cpuLimitMillicores,
   );
   assert.ok(resourceBudget.memoryRequestMiB < resourceBudget.memoryLimitMiB);
+});
+
+test("Docker stats parser handles ANSI cursor and erase sequences", () => {
+  const sample = parseDockerStatsLine(
+    "\u001b[H0.17%|13.4MiB / 256MiB\n\u001b[H",
+  );
+  assert.ok(sample);
+  assert.ok(Math.abs(sample.cpuMillicores - 1.7) < 0.001);
+  assert.equal(sample.memoryMiB, 13.4);
 });
 
 test("Helm resource profile requires CPU and memory requests and limits as pairs", () => {
