@@ -72,6 +72,7 @@ const targetRps = capacity.loadProfiles.baseline.targetRequestsPerSecond;
 const samples = [];
 let phase = "baseline";
 let pendingStats = "";
+let statsDebugChunks = 0;
 
 function parseMiB(value) {
   const match = value.match(/^([\d.]+)\s*(B|kB|KB|KiB|MB|MiB|GB|GiB)$/i);
@@ -267,6 +268,10 @@ async function main() {
   ]);
   stats.stdout.setEncoding("utf8");
   stats.stdout.on("data", (chunk) => {
+    if (statsDebugChunks < 3) {
+      console.log("Docker stats output:", JSON.stringify(chunk));
+      statsDebugChunks += 1;
+    }
     pendingStats += chunk;
     const lines = pendingStats.split(/[\r\n]+/);
     pendingStats = lines.pop() ?? "";
