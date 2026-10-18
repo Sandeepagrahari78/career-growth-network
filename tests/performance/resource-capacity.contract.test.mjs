@@ -7,6 +7,7 @@ import {
   parseMemoryMiB,
   parseResourcePair,
   resourceBudget,
+  getRequestCount,
 } from "./run-resource-capacity.mjs";
 
 const schema = JSON.parse(
@@ -37,6 +38,22 @@ test("Docker stats parser handles ANSI cursor and erase sequences", () => {
   assert.ok(sample);
   assert.ok(Math.abs(sample.cpuMillicores - 1.7) < 0.001);
   assert.equal(sample.memoryMiB, 13.4);
+});
+
+test("k6 request count falls back to iterations for compatible summaries", () => {
+  assert.equal(
+    getRequestCount({ metrics: { iterations: { values: { count: 750 } } } }),
+    750,
+  );
+  assert.equal(
+    getRequestCount({
+      metrics: {
+        http_reqs: { values: { count: 751 } },
+        iterations: { values: { count: 750 } },
+      },
+    }),
+    751,
+  );
 });
 
 test("Helm resource profile requires CPU and memory requests and limits as pairs", () => {
