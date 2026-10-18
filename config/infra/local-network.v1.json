@@ -34,6 +34,7 @@
     }
   },
   "networkPolicy": {
+    "defaultDenyNamespaces": ["cgn-system", "cgn-apps", "cgn-data"],
     "defaultDenyIngress": true,
     "defaultDenyEgress": true,
     "allowDnsEgress": true

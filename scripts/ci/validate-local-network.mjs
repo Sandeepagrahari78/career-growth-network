@@ -93,6 +93,11 @@ export function validateBaseline(baseline) {
   assert.equal(baseline.networkPolicy.defaultDenyIngress, true);
   assert.equal(baseline.networkPolicy.defaultDenyEgress, true);
   assert.equal(baseline.networkPolicy.allowDnsEgress, true);
+  assert.deepEqual(
+    [...baseline.networkPolicy.defaultDenyNamespaces].sort(),
+    [...baseline.namespaces].sort(),
+    "every CGN namespace must receive the default-deny baseline",
+  );
 
   return true;
 }
@@ -116,11 +121,65 @@ export function validateManifests(manifestRootPath = manifestRoot) {
   }
 
   assert.match(source, /kind: NetworkPolicy/);
-  assert.match(source, /name: default-deny-all/);
-  assert.match(source, /namespace: cgn-apps/);
-  assert.match(source, /namespace: cgn-data/);
-  assert.match(source, /name: allow-dns-egress/);
-  assert.match(source, /port: 53/);
+
+  const defaultDeny = readFileSync(
+    join(manifestRootPath, "network-policy-default-deny.yaml"),
+    "utf8",
+  );
+  const allowDns = readFileSync(
+    join(manifestRootPath, "network-policy-allow-dns.yaml"),
+    "utf8",
+  );
+  const baseline = loadBaseline();
+
+  for (const namespace of baseline.networkPolicy.defaultDenyNamespaces) {
+    const policyDocuments = defaultDeny.split(/^---\s*$/m);
+    const denyPolicy = policyDocuments.find((document) =>
+      new RegExp(`name: default-deny-all\\s+namespace: ${namespace}\\b`).test(
+        document,
+      ),
+    );
+    assert.ok(denyPolicy, `expected default-deny policy for ${namespace}`);
+    assert.match(denyPolicy, /podSelector:\s*\{\}/);
+    assert.match(denyPolicy, /policyTypes:[\s\S]*?- Ingress[\s\S]*?- Egress/);
+
+    const dnsDocuments = allowDns.split(/^---\s*$/m);
+    const dnsPolicy = dnsDocuments.find((document) =>
+      new RegExp(`name: allow-dns-egress\\s+namespace: ${namespace}\\b`).test(
+        document,
+      ),
+    );
+    assert.ok(dnsPolicy, `expected DNS egress policy for ${namespace}`);
+    assert.match(dnsPolicy, /k8s-app: kube-dns/);
+    assert.match(dnsPolicy, /protocol: UDP\s+port: 53/);
+    assert.match(dnsPolicy, /protocol: TCP\s+port: 53/);
+  }
+
+  const smokeAllow = readFileSync(
+    join(repoRoot, "infra/k8s/smoke/network-policy-probe-allow.yaml"),
+    "utf8",
+  );
+  const smokePolicies = smokeAllow.split(/^---\s*$/m);
+  const egressProbe = smokePolicies.find((document) =>
+    /name: smoke-allow-target-egress/.test(document),
+  );
+  const ingressProbe = smokePolicies.find((document) =>
+    /name: smoke-allow-target-ingress/.test(document),
+  );
+
+  assert.ok(egressProbe, "expected the explicit service egress probe policy");
+  assert.match(egressProbe, /namespace: cgn-apps/);
+  assert.match(egressProbe, /app: netpol-client/);
+  assert.match(egressProbe, /kubernetes\.io\/metadata\.name: cgn-data/);
+  assert.match(egressProbe, /app: netpol-target/);
+  assert.match(egressProbe, /protocol: TCP\s+port: 8080/);
+
+  assert.ok(ingressProbe, "expected the explicit service ingress probe policy");
+  assert.match(ingressProbe, /namespace: cgn-data/);
+  assert.match(ingressProbe, /app: netpol-target/);
+  assert.match(ingressProbe, /kubernetes\.io\/metadata\.name: cgn-apps/);
+  assert.match(ingressProbe, /app: netpol-client/);
+  assert.match(ingressProbe, /protocol: TCP\s+port: 8080/);
 
   assert.doesNotMatch(source, /type:\s*(?:LoadBalancer|NodePort)/);
   assert.doesNotMatch(source, /hostNetwork:\s*true/);
