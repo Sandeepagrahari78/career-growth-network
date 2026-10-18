@@ -101,6 +101,13 @@ function recordStatsLine(line) {
   }
 }
 
+function flushPendingStats() {
+  if (pendingStats.trim()) {
+    recordStatsLine(pendingStats);
+    pendingStats = "";
+  }
+}
+
 function summaryFor(name) {
   return JSON.parse(
     readFileSync(join(outputDirectory, `${name}.json`), "utf8"),
@@ -172,6 +179,7 @@ async function stopStats(stats) {
       new Promise((resolveWait) => setTimeout(() => resolveWait(false), 2000)),
     ])
   ) {
+    flushPendingStats();
     return;
   }
 
@@ -183,6 +191,7 @@ async function stopStats(stats) {
     forceClosed,
     new Promise((resolveWait) => setTimeout(resolveWait, 2000)),
   ]);
+  flushPendingStats();
 }
 
 function formatPhase(name, metrics) {
@@ -259,7 +268,7 @@ async function main() {
   stats.stdout.setEncoding("utf8");
   stats.stdout.on("data", (chunk) => {
     pendingStats += chunk;
-    const lines = pendingStats.split(/\r?\n/);
+    const lines = pendingStats.split(/[\r\n]+/);
     pendingStats = lines.pop() ?? "";
     for (const line of lines) {
       recordStatsLine(line);
