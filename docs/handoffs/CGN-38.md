@@ -1,6 +1,6 @@
 # Handoff - CGN-38
 
-- Ticket: CGN-38 â€” Create service ownership README and runbook template
+- Ticket: CGN-38 — Create service ownership README and runbook template
 - Branch: `CGN-38-service-ownership-runbook-template`
 - Base branch: `main` at `d05d47df8c7e0877727c02d0ae1fe9d2eaa31a91`
 - Agent/person: Codex implementing under Sandeep's delegation; Jira assignee remains Tanvi Ambre
@@ -40,14 +40,15 @@ service has no product database or migration. No runtime/configuration changes.
 
 ## Tests run
 
-- Passed: `node --test tests/contracts/service-ownership-docs.contract.test.mjs` â€” 4/4.
+- Passed: `node --test tests/contracts/service-ownership-docs.contract.test.mjs` — 4/4.
 - Passed: `pnpm memory:check` via the repo-local `.cgn/bin/pnpm.cmd` wrapper; the
   direct `node scripts/memory-check.mjs` check also passed. No merged
   Engineering Memory file needs updating for this docs-only change.
+- Passed: repo-pinned Prettier 3.6.2 on the added contract test.
 - Passed: `git diff --check`.
-- The repo-local wrapper could not find Prettier in this Windows worktree, so a
-  local format check was unavailable. Verify the exact PR-head CI formatting,
-  contract, security and repository gates before review.
+- First exact-head CI run caught a formatting issue in the test; applied
+  Prettier 3.6.2 and updated the branch. Verify the rerun on the final PR head
+  for formatting, contract, security and repository gates before review.
 
 ## Known limitations / risks
 
@@ -55,9 +56,9 @@ service has no product database or migration. No runtime/configuration changes.
   commands, links, contacts and status labels against current main.
 - The example documents the platform reference only; adopting services must
   maintain their own data, backup, authorization and incident procedures.
-- The standalone `pnpm` executable is absent from this Windows worktree; the
-  repo-local wrapper runs scripts that are installed, and GitHub Linux PR CI
-  remains authoritative for the missing formatter and full repository gates.
+- The standalone `pnpm` executable is absent in this Windows worktree; the
+  repo-local wrapper works for available commands. Full Linux PR CI remains
+  authoritative for the complete repository gates.
 
 ## Exact next step for next agent
 
@@ -72,10 +73,10 @@ data, migration or configuration was changed.
 
 ## Engineering Memory updated
 
-- [x] 03-contract-registry.md â€” no contract changed
-- [ ] 04-decisions.md / ADR â€” no decision changed
-- [ ] 05-current-state.md â€” docs are not merged runtime truth
-- [ ] 06-known-risks.md â€” no architecture/runtime risk changed
+- [x] 03-contract-registry.md — no contract changed
+- [ ] 04-decisions.md / ADR — no decision changed
+- [ ] 05-current-state.md — docs are not merged runtime truth
+- [ ] 06-known-risks.md — no architecture/runtime risk changed
 
 ## Owner review and PR references
 
@@ -87,4 +88,3 @@ data, migration or configuration was changed.
   assignee change was made.
 - Source and tests inspected on latest main: `d05d47df8c7e0877727c02d0ae1fe9d2eaa31a91`
 - Required Sandeep review: pending
-
