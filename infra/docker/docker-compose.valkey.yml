@@ -1,0 +1,36 @@
+name: cgn-local-valkey
+
+services:
+  valkey:
+    image: valkey/valkey:9.1.2
+    command:
+      - sh
+      - -ec
+      - |
+        if [ -n "$$CGN_VALKEY_PASSWORD" ]; then
+          exec valkey-server --appendonly yes --appendfsync always --requirepass "$$CGN_VALKEY_PASSWORD"
+        fi
+        exec valkey-server --appendonly yes --appendfsync always
+    environment:
+      CGN_VALKEY_PASSWORD: ${CGN_VALKEY_PASSWORD:-}
+      REDISCLI_AUTH: ${CGN_VALKEY_PASSWORD:-}
+    ports:
+      - "127.0.0.1:16379:6379"
+    volumes:
+      - cgn-valkey-data:/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          if [ -n "$$CGN_VALKEY_PASSWORD" ]; then
+            REDISCLI_AUTH="$$CGN_VALKEY_PASSWORD" valkey-cli --raw ping | grep -qx PONG;
+          else
+            valkey-cli --raw ping | grep -qx PONG;
+          fi
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 5s
+
+volumes:
+  cgn-valkey-data:

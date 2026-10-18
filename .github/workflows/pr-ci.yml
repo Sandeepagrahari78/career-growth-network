@@ -483,6 +483,15 @@ jobs:
         if: always()
         run: node scripts/infra/redpanda-local.mjs reset
 
+      - name: Prove Valkey TTL and restart persistence
+        env:
+          CGN_VALKEY_PASSWORD: cgn-ci-${{ github.run_id }}-${{ github.run_attempt }}
+        run: node scripts/infra/valkey-local.mjs restart-smoke
+
+      - name: Remove only the local Valkey Compose volume
+        if: always()
+        run: node scripts/infra/valkey-local.mjs reset
+
   e2e:
     name: End-to-end deployment smoke
     needs: [changes, quality]
