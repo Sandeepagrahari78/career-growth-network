@@ -47,7 +47,7 @@ configuration was added.
   could not fetch cached workspace packages from registry.npmjs.org (`EACCES`).
   The direct memory script above passed. Verify the same memory and formatting
   gates on GitHub Linux PR CI.
-- Exact PR-head CI is pending; Sandeep security review is also pending.
+- PR #48 exact head `f7027fb3c750bb45c467d11f41da24db9d0a1333`: PR CI run 39115854820 and Local Helm Validation run 39115854854 both passed. Sandeep security review remains pending.
 
 ## Known limitations / risks
 
@@ -79,8 +79,8 @@ data is modified.
 
 ## Owner review and PR references
 
-- GitHub PR URL: pending
-- Commit / merge SHA: pending
-- Jira live dependency/status verification: CGN-66 To Do; assignee Tanvi Ambre; only explicit blocker CGN-32 is Done; Rank 007 is order only.
+- GitHub PR URL: https://github.com/Sandeepagrahari78/career-growth-network/pull/48 (open; review/merge pending)
+- Commit / merge SHA: PR head `f7027fb3c750bb45c467d11f41da24db9d0a1333`; not merged
+- Jira live dependency/status verification (2026-10-18): CGN-66 In Review; assignee Tanvi Ambre; only explicit blocker CGN-32 is Done; Rank 007 is order only.
 - Source and tests inspected on latest main: `d05d47df8c7e0877727c02d0ae1fe9d2eaa31a91`
 - Required Sandeep review: pending
