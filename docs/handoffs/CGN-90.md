@@ -95,10 +95,11 @@ compatible with services that omit resources entirely.
 
 ## Owner review and PR references
 
-- GitHub PR URL: pending
-- Commit / merge SHA: pending
+- GitHub PR URL: https://github.com/Sandeepagrahari78/career-growth-network/pull/53
+- Commit / merge SHA: initial implementation `58e154f93b67c0a877adc671908e36763b960d38`; merge pending.
 - Jira live dependency/status verification: CGN-90 To Do, assigned Tanvi; hard
   prerequisite CGN-44 Done; ticket permits AI implementation with Sandeep review.
 - Source and tests inspected on latest main: yes, main at
   `f5a7679fdcc0c98db9113e01b0dddd4487bc5600`.
-- Required Sandeep review (if sensitive): pending.
+- Required Sandeep review (if sensitive): pending; Jira labels this ticket for
+  Sandeep review and the resource policy affects deployment configuration.
