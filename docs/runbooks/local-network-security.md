@@ -35,9 +35,9 @@ Data services are internal-only and must use `ClusterIP` unless a later Jira tic
 
 ## Network policy intent
 
-The baseline applies deny-by-default ingress and egress intent to `cgn-apps` and `cgn-data`, then adds explicit DNS egress.
+The baseline applies deny-by-default ingress and egress to all three CGN namespaces (`cgn-system`, `cgn-apps`, and `cgn-data`), then permits DNS egress to CoreDNS in each namespace.
 
-Application-to-application and application-to-data allow rules are deliberately not invented here. They must be added by the owning service ticket using the real service contract.
+Permanent application-to-application and application-to-data allow rules remain owned by the real service ticket and must use its actual service contract. The local k3d smoke uses a temporary, port-specific `cgn-apps` to `cgn-data` policy to prove the allow path after proving default deny; the smoke removes that test policy automatically.
 
 The local cluster ticket must use a CNI/network-policy implementation that actually enforces Kubernetes NetworkPolicy before this is treated as an enforcement boundary.
 

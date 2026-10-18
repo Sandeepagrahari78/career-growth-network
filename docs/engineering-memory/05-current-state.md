@@ -32,7 +32,7 @@ Last updated: 2026-10-15 after CGN-61 and staging rollback rehearsal merges.
 - Pod CIDR: `10.244.0.0/16`; service CIDR: `10.96.0.0/16`.
 - Developer Kubernetes API/HTTP/HTTPS bindings are loopback-only.
 - Kubernetes namespaces: `cgn-system`, `cgn-apps`, `cgn-data`.
-- `cgn-apps` and `cgn-data` are deny-by-default; DNS egress is explicitly allowed.
+- `cgn-system`, `cgn-apps` and `cgn-data` are deny-by-default; DNS egress is explicitly allowed in each namespace.
 - Local Kubernetes runtime: k3d v5.9.0 + K3s v1.35.9-k3s1.
 - Local PostgreSQL runtime: PostgreSQL 16 in Docker/Compose, loopback-only.
 - Database ownership contract: `cgn.postgres-databases.v1`.
