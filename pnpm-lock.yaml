@@ -36,6 +36,9 @@ importers:
 
   services/platform-template:
     dependencies:
+      '@cgn/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
       '@nestjs/common':
         specifier: 12.1.2
         version: 12.1.2(reflect-metadata@0.2.2)(rxjs@7.8.2)

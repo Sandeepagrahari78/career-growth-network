@@ -1,0 +1,50 @@
+{
+  "$contract": "http.error-envelope.v1",
+  "responses": [
+    {
+      "case": "validation",
+      "status": 400,
+      "error": {
+        "code": "VALIDATION_ERROR",
+        "message": "Request validation failed.",
+        "requestId": "cgn-contract-test"
+      }
+    },
+    {
+      "case": "unauthenticated",
+      "status": 401,
+      "error": {
+        "code": "UNAUTHENTICATED",
+        "message": "Authentication is required.",
+        "requestId": "cgn-contract-test"
+      }
+    },
+    {
+      "case": "forbidden",
+      "status": 403,
+      "error": {
+        "code": "FORBIDDEN",
+        "message": "You do not have permission to perform this request.",
+        "requestId": "cgn-contract-test"
+      }
+    },
+    {
+      "case": "not-found",
+      "status": 404,
+      "error": {
+        "code": "NOT_FOUND",
+        "message": "The requested resource was not found.",
+        "requestId": "cgn-contract-test"
+      }
+    },
+    {
+      "case": "unexpected",
+      "status": 500,
+      "error": {
+        "code": "UNEXPECTED_ERROR",
+        "message": "An unexpected error occurred.",
+        "requestId": "cgn-contract-test"
+      }
+    }
+  ]
+}

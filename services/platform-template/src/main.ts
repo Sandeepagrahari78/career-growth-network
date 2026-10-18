@@ -2,6 +2,7 @@ import "reflect-metadata";
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module.js";
 import { loadAppConfig } from "./config/app-config.js";
+import { ApiExceptionFilter } from "./http/api-exception.filter.js";
 import { requestCorrelationMiddleware } from "./observability/request-correlation.middleware.js";
 import { StructuredLogger } from "./observability/structured-logger.js";
 
@@ -11,6 +12,7 @@ async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule, { logger });
 
   app.use(requestCorrelationMiddleware(logger));
+  app.useGlobalFilters(new ApiExceptionFilter());
   app.enableShutdownHooks();
   await app.listen(config.port, "0.0.0.0");
   logger.log("service_started", "bootstrap");
