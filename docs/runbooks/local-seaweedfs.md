@@ -24,7 +24,8 @@ anonymous identity is configured. When explicit
 application credentials are not supplied, the lifecycle command generates
 random local credentials and stores them in `.cgn/seaweedfs/credentials.json`;
 the generated SeaweedFS identity config is `.cgn/seaweedfs/s3.json`. Both files
-are ignored by Git. To supply your own local application credentials, set both
+are ignored by Git. The config is readable to the container, while its parent
+directory is owner-only on POSIX systems. To supply your own local application credentials, set both
 `CGN_SEAWEEDFS_ACCESS_KEY` and `CGN_SEAWEEDFS_SECRET_KEY` before starting.
 
 `seaweedfs:verify` checks authenticated bucket listing, anonymous denial,

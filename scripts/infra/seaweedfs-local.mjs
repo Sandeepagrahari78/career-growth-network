@@ -1,7 +1,13 @@
 import assert from "node:assert/strict";
 import { Buffer } from "node:buffer";
 import { createHash, createHmac, randomBytes, randomUUID } from "node:crypto";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import {
+  chmodSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  writeFileSync,
+} from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, URL } from "node:url";
 import { execFileSync } from "node:child_process";
@@ -87,12 +93,14 @@ export function signS3Request({
   };
 }
 
-function writePrivateJson(file, value) {
-  mkdirSync(dirname(file), { recursive: true });
+function writePrivateJson(file, value, mode = 0o600) {
+  mkdirSync(dirname(file), { recursive: true, mode: 0o700 });
+  chmodSync(dirname(file), 0o700);
   writeFileSync(file, `${JSON.stringify(value, null, 2)}\n`, {
     encoding: "utf8",
-    mode: 0o600,
+    mode,
   });
+  chmodSync(file, mode);
 }
 
 export function loadCredentials() {
@@ -126,7 +134,9 @@ export function loadCredentials() {
   }
 
   writePrivateJson(credentialsFile, credentials);
-  writePrivateJson(s3ConfigFile, buildS3Config(credentials));
+  // SeaweedFS runs as non-root and must read the bind-mounted config. Its
+  // owner-only parent keeps these static identity keys private on POSIX hosts.
+  writePrivateJson(s3ConfigFile, buildS3Config(credentials), 0o644);
   return { ...credentials, configFile: s3ConfigFile };
 }
 

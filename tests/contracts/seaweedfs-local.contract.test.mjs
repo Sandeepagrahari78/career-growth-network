@@ -28,6 +28,8 @@ test("SeaweedFS pins the image, loopback API, and persistent volume", () => {
 });
 
 test("S3 access is bucket-scoped and anonymous access is absent", () => {
+  assert.match(script, /writePrivateJson\(s3ConfigFile,[\s\S]+?, 0o644\)/);
+  assert.match(script, /chmodSync\(dirname\(file\), 0o700\)/);
   const config = buildS3Config({
     accessKey: "access-key-example-0001",
     secretKey: "secret-key-example-0001",
