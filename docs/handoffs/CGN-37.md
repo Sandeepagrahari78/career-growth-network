@@ -61,6 +61,7 @@ production configuration was added.
   3 passed; the PostgreSQL outbox integration test was skipped because this
   machine has no Docker daemon.
 - Passed: `node --check` for both new test files.
+- Applied repo-pinned Prettier 3.6.2 to the implementation and both test files.
 - PostgreSQL integration tests use a uniquely named Docker Compose project and
   cover atomic domain/outbox commit and rollback, two concurrent disjoint worker
   claims, and same-ID redelivery by a restarted worker after publish-before-ack
@@ -71,8 +72,10 @@ production configuration was added.
 - `pnpm memory:check` was attempted, but pnpm's dependency sync reached
   registry.npmjs.org and received `EACCES`; the direct Node check above
   completed.
-- Prettier and full `pnpm ci:quick` remain for Linux PR CI because the local
-  package registry is inaccessible.
+- The first exact-head PR CI run failed only Prettier on the three files above;
+  formatting was fixed and the updated head must pass CI before review.
+- `pnpm ci:quick` could not complete locally because pnpm dependency sync
+  received `EACCES` from registry.npmjs.org. Linux PR CI remains authoritative.
 
 ## Known limitations / risks
 

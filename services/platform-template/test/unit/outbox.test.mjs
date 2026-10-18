@@ -31,20 +31,24 @@ function makeRunner(query) {
 test("enqueue stores the unchanged event through the caller's transaction", async () => {
   const calls = [];
   const outbox = new TransactionalOutbox({
-    transaction: async (work) => work({
+    transaction: async (work) =>
+      work({
+        query: async (sql, values) => {
+          calls.push({ sql, values });
+          return { rows: [] };
+        },
+      }),
+  });
+
+  await outbox.enqueue(
+    {
       query: async (sql, values) => {
         calls.push({ sql, values });
         return { rows: [] };
       },
-    }),
-  });
-
-  await outbox.enqueue({
-    query: async (sql, values) => {
-      calls.push({ sql, values });
-      return { rows: [] };
     },
-  }, event);
+    event,
+  );
 
   assert.equal(calls.length, 1);
   assert.match(calls[0].sql, /INSERT INTO cgn_outbox_events/);
@@ -55,20 +59,27 @@ test("enqueue stores the unchanged event through the caller's transaction", asyn
 test("enqueue rejects malformed or unsupported envelopes before writing", async () => {
   let writes = 0;
   const outbox = new TransactionalOutbox({
-    transaction: async (work) => work({
-      query: async () => {
-        writes += 1;
-        return { rows: [] };
-      },
-    }),
+    transaction: async (work) =>
+      work({
+        query: async () => {
+          writes += 1;
+          return { rows: [] };
+        },
+      }),
   });
 
   await assert.rejects(
-    outbox.enqueue({ query: async () => ({ rows: [] }) }, { ...event, eventVersion: 2 }),
+    outbox.enqueue(
+      { query: async () => ({ rows: [] }) },
+      { ...event, eventVersion: 2 },
+    ),
     /valid domain\.event\.envelope\.v1/,
   );
   await assert.rejects(
-    outbox.enqueue({ query: async () => ({ rows: [] }) }, { ...event, occurredAt: "yesterday" }),
+    outbox.enqueue(
+      { query: async () => ({ rows: [] }) },
+      { ...event, occurredAt: "yesterday" },
+    ),
     /valid date-time/,
   );
   assert.equal(writes, 0);
@@ -86,7 +97,10 @@ test("claims are bounded and use row locks, leases, and a stable retry limit", a
   assert.match(calls[0].sql, /FOR UPDATE SKIP LOCKED/);
   assert.match(calls[0].sql, /lease_expires_at/);
   assert.deepEqual(calls[0].values, [1, 2_000, OUTBOX_MAX_ATTEMPTS]);
-  await assert.rejects(outbox.claimBatch(OUTBOX_MAX_BATCH_SIZE + 1), RangeError);
+  await assert.rejects(
+    outbox.claimBatch(OUTBOX_MAX_BATCH_SIZE + 1),
+    RangeError,
+  );
   await assert.rejects(outbox.claimBatch(1, 15 * 60_000 + 1), RangeError);
 });
 
@@ -100,17 +114,28 @@ test("failed publication retries with the same event ID and a bounded safe error
         : [{ event_id: event.eventId }],
     };
   });
-  const outbox = new TransactionalOutbox(runner, () => new Date("2026-10-18T10:00:00.000Z"));
+  const outbox = new TransactionalOutbox(
+    runner,
+    () => new Date("2026-10-18T10:00:00.000Z"),
+  );
 
-  const result = await outbox.dispatchBatch({
-    publish: async () => {
-      const error = new Error("provider details may contain private data");
-      error.code = "TEMPORARY_FAILURE";
-      throw error;
+  const result = await outbox.dispatchBatch(
+    {
+      publish: async () => {
+        const error = new Error("provider details may contain private data");
+        error.code = "TEMPORARY_FAILURE";
+        throw error;
+      },
     },
-  }, 1);
+    1,
+  );
 
-  assert.deepEqual(result, { claimed: 1, published: 0, retried: 1, deadLettered: 0 });
+  assert.deepEqual(result, {
+    claimed: 1,
+    published: 0,
+    retried: 1,
+    deadLettered: 0,
+  });
   const retryCall = calls.find(({ sql }) => sql.includes("available_at = $2"));
   assert.ok(retryCall);
   assert.equal(retryCall.values[0], event.eventId);
@@ -126,10 +151,24 @@ test("repeated failures are durably dead-lettered after the bounded attempt coun
   });
   const outbox = new TransactionalOutbox(runner);
 
-  const result = await outbox.dispatchBatch({ publish: async () => { throw new Error("private"); } }, 1);
+  const result = await outbox.dispatchBatch(
+    {
+      publish: async () => {
+        throw new Error("private");
+      },
+    },
+    1,
+  );
 
-  assert.deepEqual(result, { claimed: 1, published: 0, retried: 0, deadLettered: 1 });
-  const deadLetter = calls.find(({ sql }) => sql.includes("dead_lettered_at = clock_timestamp()"));
+  assert.deepEqual(result, {
+    claimed: 1,
+    published: 0,
+    retried: 0,
+    deadLettered: 1,
+  });
+  const deadLetter = calls.find(({ sql }) =>
+    sql.includes("dead_lettered_at = clock_timestamp()"),
+  );
   assert.ok(deadLetter);
   assert.equal(deadLetter.values[0], event.eventId);
   assert.equal(deadLetter.values[1], "PUBLISH_FAILED");

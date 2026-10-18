@@ -159,11 +159,23 @@ export class TransactionalOutbox {
     limit: number,
     leaseMs = OUTBOX_DEFAULT_LEASE_MS,
   ): Promise<Array<{ event: DomainEventEnvelopeV1; attempt: number }>> {
-    if (!Number.isInteger(limit) || limit < 1 || limit > OUTBOX_MAX_BATCH_SIZE) {
-      throw new RangeError(`Outbox batch size must be between 1 and ${OUTBOX_MAX_BATCH_SIZE}.`);
+    if (
+      !Number.isInteger(limit) ||
+      limit < 1 ||
+      limit > OUTBOX_MAX_BATCH_SIZE
+    ) {
+      throw new RangeError(
+        `Outbox batch size must be between 1 and ${OUTBOX_MAX_BATCH_SIZE}.`,
+      );
     }
-    if (!Number.isInteger(leaseMs) || leaseMs < 1 || leaseMs > OUTBOX_MAX_LEASE_MS) {
-      throw new RangeError("Outbox lease must be between 1 millisecond and 15 minutes.");
+    if (
+      !Number.isInteger(leaseMs) ||
+      leaseMs < 1 ||
+      leaseMs > OUTBOX_MAX_LEASE_MS
+    ) {
+      throw new RangeError(
+        "Outbox lease must be between 1 millisecond and 15 minutes.",
+      );
     }
 
     return this.transactions.transaction(async (client) => {
@@ -207,7 +219,10 @@ export class TransactionalOutbox {
         const code = safeErrorCode(error);
         await this.transactions.transaction(async (client) => {
           if (item.attempt >= OUTBOX_MAX_ATTEMPTS) {
-            await client.query(DEAD_LETTER_EVENT_SQL, [item.event.eventId, code]);
+            await client.query(DEAD_LETTER_EVENT_SQL, [
+              item.event.eventId,
+              code,
+            ]);
             summary.deadLettered += 1;
             return;
           }
