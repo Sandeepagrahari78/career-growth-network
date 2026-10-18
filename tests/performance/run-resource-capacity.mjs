@@ -144,6 +144,11 @@ export function getRequestCount(summary) {
   return Math.round(requestCount);
 }
 
+export function getMetricValues(summary, name) {
+  const metric = summary.metrics[name];
+  return metric?.values ?? metric;
+}
+
 function runK6(name) {
   const result = spawnSync(
     "docker",
@@ -183,10 +188,12 @@ function runK6(name) {
 function phaseMetrics(name, summary) {
   const matching = samples.filter((sample) => sample.phase === name);
   assert.ok(matching.length > 0, `No Docker resource samples for ${name}`);
+  const failedRequests = getMetricValues(summary, "http_req_failed");
+  const requestDuration = getMetricValues(summary, "http_req_duration");
   return {
     requests: getRequestCount(summary),
-    errorRatePercent: summary.metrics.http_req_failed.values.rate * 100,
-    p95Ms: summary.metrics.http_req_duration.values["p(95)"],
+    errorRatePercent: failedRequests.rate * 100,
+    p95Ms: requestDuration["p(95)"],
     peakCpuMillicores: Math.max(
       ...matching.map((sample) => sample.cpuMillicores),
     ),

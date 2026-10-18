@@ -7,6 +7,7 @@ import {
   parseMemoryMiB,
   parseResourcePair,
   resourceBudget,
+  getMetricValues,
   getRequestCount,
 } from "./run-resource-capacity.mjs";
 
@@ -53,6 +54,23 @@ test("k6 request count falls back to iterations for compatible summaries", () =>
       },
     }),
     751,
+  );
+});
+
+test("k6 metric values accept wrapped and direct summary layouts", () => {
+  assert.deepEqual(
+    getMetricValues(
+      { metrics: { http_req_failed: { values: { rate: 0.002 } } } },
+      "http_req_failed",
+    ),
+    { rate: 0.002 },
+  );
+  assert.deepEqual(
+    getMetricValues(
+      { metrics: { http_req_failed: { rate: 0 } } },
+      "http_req_failed",
+    ),
+    { rate: 0 },
   );
 });
 
