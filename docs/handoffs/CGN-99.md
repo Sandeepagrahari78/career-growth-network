@@ -50,7 +50,9 @@ credential value is committed.
 - Passed: `node scripts/memory-check.mjs`.
 - Passed: `git diff --check`.
 - Passed: `git check-ignore -v infra/postgres/.env` confirms local secret file is ignored.
-- Pending: exact-head PR CI and Local Helm Validation; both must pass on the same final head.
+- Initial PR CI run 39170408546: formatting gate failed on the new contract test; that test's formatting has been corrected for the follow-up head. Gitleaks and the completed security subchecks passed; the overall CI result is not green.
+- Initial Local Helm Validation run 39170408510: static Helm checks passed; cluster smoke was still running when this handoff was updated.
+- Pending: rerun PR CI and Local Helm Validation on the corrected final head; both must pass before merge.
 
 The standalone `pnpm` command is unavailable in this Windows environment. `corepack
 pnpm` in the isolated clone attempted package synchronization and failed because
@@ -90,8 +92,8 @@ Existing CI Gitleaks behavior is preserved.
 
 ## Owner review and PR references
 
-- GitHub PR URL: pending
-- Commit / merge SHA: pending
+- GitHub PR URL: https://github.com/Sandeepagrahari78/career-growth-network/pull/54
+- Commit / merge SHA: final merge pending; first published head `f696cbc3a09c26e214e0b96f88461e17fa7ecb33` is superseded by the formatting fix.
 - Jira live dependency/status verification (2026-10-19): CGN-99 To Do, assigned to
   Sandeep Agrahari; explicit hard prerequisite CGN-66 is Done. GitHub PR #48 is
   merged at `ee0a80a1da90de3467d35028ee3bbc165cbe07d1`.

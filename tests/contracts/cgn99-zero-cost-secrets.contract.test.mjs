@@ -37,18 +37,27 @@ test("zero-cost secrets policy keeps credentials outside source control", () => 
     example,
     /^CGN_POSTGRES_PASSWORD=replace-with-a-local-only-password$/m,
   );
-  assert.doesNotMatch(example, /AKIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9]{20,}/);
+  assert.doesNotMatch(
+    example,
+    /AKIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9]{20,}/,
+  );
   assert.match(gitignore, /^\.env\.\*$/m);
   assert.match(gitignore, /^!\*\*\/\.env\.example$/m);
 });
 
-test("operator guide documents injection, rotation and response without paid services", () => {
-  const guide = readFileSync("docs/security/CGN-99-zero-cost-secrets.md", "utf8");
+test(
+  "operator guide documents injection, rotation and response without paid services",
+  () => {
+    const guide = readFileSync(
+      "docs/security/CGN-99-zero-cost-secrets.md",
+      "utf8",
+    );
 
-  assert.match(guide, /GitHub Actions[\s\S]*encrypted/i);
-  assert.match(guide, /Kubernetes `Secret`/);
-  assert.match(guide, /Rotation/);
-  assert.match(guide, /rotate it immediately/i);
-  assert.match(guide, /Gitleaks/);
-  assert.match(guide, /managed provider migration/i);
-});
+    assert.match(guide, /GitHub Actions[\s\S]*encrypted/i);
+    assert.match(guide, /Kubernetes `Secret`/);
+    assert.match(guide, /Rotation/);
+    assert.match(guide, /rotate it immediately/i);
+    assert.match(guide, /Gitleaks/);
+    assert.match(guide, /managed provider migration/i);
+  },
+);
