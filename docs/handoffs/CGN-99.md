@@ -50,9 +50,9 @@ credential value is committed.
 - Passed: `node scripts/memory-check.mjs`.
 - Passed: `git diff --check`.
 - Passed: `git check-ignore -v infra/postgres/.env` confirms local secret file is ignored.
-- Initial PR CI run 39170408546: formatting gate failed on the new contract test; that test's formatting has been corrected for the follow-up head. Gitleaks and the completed security subchecks passed; the overall CI result is not green.
+- Initial PR CI run 39170408546 and follow-up run 39170766356: formatting gate failed on the new contract test. The repo-pinned Prettier 3.6.2 formatter has now been applied locally; neither failed run is treated as green evidence. Gitleaks and completed security subchecks passed.
 - Initial Local Helm Validation run 39170408510: static Helm checks passed; cluster smoke was still running when this handoff was updated.
-- Pending: rerun PR CI and Local Helm Validation on the corrected final head; both must pass before merge.
+- Pending: rerun PR CI and Local Helm Validation on the Prettier-formatted final head; both must pass before merge.
 
 The standalone `pnpm` command is unavailable in this Windows environment. `corepack
 pnpm` in the isolated clone attempted package synchronization and failed because
