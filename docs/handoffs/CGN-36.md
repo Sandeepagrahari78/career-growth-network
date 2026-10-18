@@ -41,6 +41,8 @@ None.
 - `pnpm memory:check` — passed.
 - `pnpm lint`, `pnpm typecheck` and root `pnpm format:check` were attempted. Their `pnpm dlx` step fails locally with `EPERM: operation not permitted, realpath 'C:\\Users\\Sandeep'`.
 - Targeted Prettier 3.6.2 check for the changed test passed when invoked from the local pnpm package cache.
+- Final exact-head GitHub PR CI at `c9a672397ca68df6eb06c9ac95ee111c4908b7dc` — passed (run `39102852076`), including format, lint, typecheck, unit, contract, build, security and integration checks.
+- Local Helm Validation — passed at the same head (run `39102852091`).
 - `git diff --check` — passed.
 
 ## Known limitations / risks
@@ -67,7 +69,7 @@ Revert the CGN-36 PR to restore the prior interface-only envelope. No runtime st
 ## Owner review and PR references
 
 - GitHub PR URL: https://github.com/Sandeepagrahari78/career-growth-network/pull/44
-- Commit / merge SHA: `9d4f109b010a84cb435dd8f3787a31885a91097f` (PR open; not merged)
+- Commit / merge SHA: `c9a672397ca68df6eb06c9ac95ee111c4908b7dc` (PR head; PR open, not merged)
 - Jira live dependency/status verification: CGN-36 To Do, assigned to Sandeep, Highest; hard predecessor CGN-32 Done.
 - Source and tests inspected on latest main: `ab1f041cab534f170c29cfae00dfc5f40f5197f0`; CGN-32 handoff and existing envelope/Career Activity interfaces reviewed.
 - Required Sandeep review: pending.
