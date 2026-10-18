@@ -124,9 +124,19 @@ function summaryFor(name) {
 }
 
 export function getRequestCount(summary) {
+  const httpRequests = summary.metrics.http_reqs;
+  const iterations = summary.metrics.iterations;
   const requestCount =
-    summary.metrics.http_reqs?.values?.count ??
-    summary.metrics.iterations?.values?.count;
+    httpRequests?.values?.count ??
+    httpRequests?.count ??
+    iterations?.values?.count ??
+    iterations?.count;
+  if (!Number.isFinite(requestCount)) {
+    console.log(
+      "Unrecognized k6 summary metrics:",
+      JSON.stringify(summary.metrics),
+    );
+  }
   assert.ok(
     Number.isFinite(requestCount),
     "k6 summary must report request count",
