@@ -36,3 +36,8 @@ A projection is not authoritative source truth. Consumers must tolerate stale pr
 AI remains an internal intelligence/orchestration layer. Product UX remains organized around Career, Growth, Feed, Network, Community and Opportunity concepts.
 
 The local-first architecture must remain portable to a future managed-cloud environment without changing domain ownership.
+
+Security trust boundaries, threats and testable acceptance criteria are
+documented in the [CGN V1 threat model](../security/CGN-66-threat-model.md).
+That checklist is an implementation/review baseline; it does not claim that
+the planned product runtimes or controls already exist.
