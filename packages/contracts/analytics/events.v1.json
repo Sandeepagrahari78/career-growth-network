@@ -1,0 +1,223 @@
+{
+  "schemaVersion": 1,
+  "dictionaryVersion": "1.0.0",
+  "events": [
+    {
+      "eventName": "cgn.analytics.career-goal-selected.v1",
+      "producer": "career",
+      "consentClass": "product_analytics_opt_in",
+      "retentionOwner": "analytics",
+      "properties": [
+        {
+          "name": "sourceSurface",
+          "type": "enum",
+          "required": true,
+          "allowedValues": [
+            "chats",
+            "explore",
+            "home",
+            "journey",
+            "profile",
+            "status-selection"
+          ]
+        }
+      ],
+      "sample": {
+        "eventId": "event-sample-001",
+        "eventType": "cgn.analytics.career-goal-selected.v1",
+        "eventVersion": 1,
+        "occurredAt": "2026-10-19T00:00:00Z",
+        "producer": "career",
+        "payload": {
+          "sourceSurface": "journey"
+        }
+      }
+    },
+    {
+      "eventName": "cgn.analytics.diagnostic-completed.v1",
+      "producer": "career",
+      "consentClass": "product_analytics_opt_in",
+      "retentionOwner": "analytics",
+      "properties": [
+        {
+          "name": "sourceSurface",
+          "type": "enum",
+          "required": true,
+          "allowedValues": [
+            "chats",
+            "explore",
+            "home",
+            "journey",
+            "profile",
+            "status-selection"
+          ]
+        }
+      ],
+      "sample": {
+        "eventId": "event-sample-002",
+        "eventType": "cgn.analytics.diagnostic-completed.v1",
+        "eventVersion": 1,
+        "occurredAt": "2026-10-19T00:00:01Z",
+        "producer": "career",
+        "payload": {
+          "sourceSurface": "journey"
+        }
+      }
+    },
+    {
+      "eventName": "cgn.analytics.growth-identity-updated.v1",
+      "producer": "growth",
+      "consentClass": "product_analytics_opt_in",
+      "retentionOwner": "analytics",
+      "properties": [
+        {
+          "name": "sourceSurface",
+          "type": "enum",
+          "required": true,
+          "allowedValues": [
+            "chats",
+            "explore",
+            "home",
+            "journey",
+            "profile",
+            "status-selection"
+          ]
+        }
+      ],
+      "sample": {
+        "eventId": "event-sample-006",
+        "eventType": "cgn.analytics.growth-identity-updated.v1",
+        "eventVersion": 1,
+        "occurredAt": "2026-10-19T00:00:05Z",
+        "producer": "growth",
+        "payload": {
+          "sourceSurface": "profile"
+        }
+      }
+    },
+    {
+      "eventName": "cgn.analytics.mission-completed.v1",
+      "producer": "roadmap",
+      "consentClass": "product_analytics_opt_in",
+      "retentionOwner": "analytics",
+      "properties": [
+        {
+          "name": "sourceSurface",
+          "type": "enum",
+          "required": true,
+          "allowedValues": [
+            "chats",
+            "explore",
+            "home",
+            "journey",
+            "profile",
+            "status-selection"
+          ]
+        }
+      ],
+      "sample": {
+        "eventId": "event-sample-004",
+        "eventType": "cgn.analytics.mission-completed.v1",
+        "eventVersion": 1,
+        "occurredAt": "2026-10-19T00:00:03Z",
+        "producer": "roadmap",
+        "payload": {
+          "sourceSurface": "journey"
+        }
+      }
+    },
+    {
+      "eventName": "cgn.analytics.plan-created.v1",
+      "producer": "roadmap",
+      "consentClass": "product_analytics_opt_in",
+      "retentionOwner": "analytics",
+      "properties": [
+        {
+          "name": "sourceSurface",
+          "type": "enum",
+          "required": true,
+          "allowedValues": [
+            "chats",
+            "explore",
+            "home",
+            "journey",
+            "profile",
+            "status-selection"
+          ]
+        }
+      ],
+      "sample": {
+        "eventId": "event-sample-003",
+        "eventType": "cgn.analytics.plan-created.v1",
+        "eventVersion": 1,
+        "occurredAt": "2026-10-19T00:00:02Z",
+        "producer": "roadmap",
+        "payload": {
+          "sourceSurface": "journey"
+        }
+      }
+    },
+    {
+      "eventName": "cgn.analytics.proof-submitted.v1",
+      "producer": "evidence",
+      "consentClass": "product_analytics_opt_in",
+      "retentionOwner": "analytics",
+      "properties": [
+        {
+          "name": "sourceSurface",
+          "type": "enum",
+          "required": true,
+          "allowedValues": [
+            "chats",
+            "explore",
+            "home",
+            "journey",
+            "profile",
+            "status-selection"
+          ]
+        }
+      ],
+      "sample": {
+        "eventId": "event-sample-005",
+        "eventType": "cgn.analytics.proof-submitted.v1",
+        "eventVersion": 1,
+        "occurredAt": "2026-10-19T00:00:04Z",
+        "producer": "evidence",
+        "payload": {
+          "sourceSurface": "journey"
+        }
+      }
+    },
+    {
+      "eventName": "cgn.analytics.story-published.v1",
+      "producer": "feed",
+      "consentClass": "product_analytics_opt_in",
+      "retentionOwner": "analytics",
+      "properties": [
+        {
+          "name": "sourceSurface",
+          "type": "enum",
+          "required": true,
+          "allowedValues": [
+            "chats",
+            "explore",
+            "home",
+            "journey",
+            "profile",
+            "status-selection"
+          ]
+        }
+      ],
+      "sample": {
+        "eventId": "event-sample-007",
+        "eventType": "cgn.analytics.story-published.v1",
+        "eventVersion": 1,
+        "occurredAt": "2026-10-19T00:00:06Z",
+        "producer": "feed",
+        "payload": {
+          "sourceSurface": "home"
+        }
+      }
+    }
+  ]
+}

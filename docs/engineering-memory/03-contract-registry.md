@@ -14,6 +14,7 @@ All cross-domain contracts live under `packages/contracts` unless a ticket delib
 - `cgn.database-migration-job.v1` — service-owned database migration sequencing, backup, evidence and fail-closed deployment contract.
 - `career.activity.v1` — canonical eligible career-growth activity.
 - `cgn.skill-catalog.v1` — immutable Career skill IDs, aliases, lifecycle and replacement metadata; track curricula reference this catalog.
+- `cgn.product-analytics.v1` — versioned product-funnel event dictionary with producer, opt-in consent class, Analytics retention owner and payload allow-lists.
 - `domain.event.envelope.v1` — common versioned event envelope.
 - `http.error-envelope.v1` — common synchronous error shape.
 

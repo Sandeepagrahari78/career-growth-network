@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cgn.local/schemas/product-analytics.v1.schema.json",
+  "title": "ProductAnalyticsDictionaryV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "dictionaryVersion", "events"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "dictionaryVersion": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+    },
+    "events": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/event" }
+    }
+  },
+  "$defs": {
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "eventName",
+        "producer",
+        "consentClass",
+        "retentionOwner",
+        "properties",
+        "sample"
+      ],
+      "properties": {
+        "eventName": {
+          "type": "string",
+          "pattern": "^cgn\\.analytics\\.[a-z]+(?:-[a-z]+)*\\.v1$"
+        },
+        "producer": {
+          "enum": ["career", "roadmap", "evidence", "growth", "feed"]
+        },
+        "consentClass": { "const": "product_analytics_opt_in" },
+        "retentionOwner": { "const": "analytics" },
+        "properties": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/property" }
+        },
+        "sample": { "$ref": "#/$defs/sample" }
+      }
+    },
+    "property": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "type", "required"],
+      "properties": {
+        "name": { "type": "string", "pattern": "^[a-z][A-Za-z0-9]*$" },
+        "type": { "enum": ["boolean", "enum", "integer", "number", "string"] },
+        "required": { "type": "boolean" },
+        "allowedValues": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "sample": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "eventId",
+        "eventType",
+        "eventVersion",
+        "occurredAt",
+        "producer",
+        "payload"
+      ],
+      "properties": {
+        "eventId": { "type": "string", "minLength": 1 },
+        "eventType": { "type": "string", "minLength": 1 },
+        "eventVersion": { "const": 1 },
+        "occurredAt": { "type": "string", "format": "date-time" },
+        "producer": { "type": "string", "minLength": 1 },
+        "payload": {
+          "type": "object",
+          "additionalProperties": { "type": ["string", "number", "boolean"] }
+        }
+      }
+    }
+  }
+}
