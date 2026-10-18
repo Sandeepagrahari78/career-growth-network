@@ -1,0 +1,93 @@
+# Handoff - CGN-88
+
+- Ticket: CGN-88 — Provision local Valkey or Redis cache
+- Branch: CGN-88-local-valkey-cache
+- Base branch: main (`9bb6f7d473af903fe2ed1ec5e4ad6427bda6bb7c`)
+- Agent/person: Codex implementation under Sandeep review
+- Date: 2026-10-19
+
+## What changed
+
+Added a pinned, local-only Valkey Compose service, an environment-configurable
+password, a lifecycle CLI, and a TTL/restart smoke. Data lives in a dedicated
+Compose volume and is explicitly documented as disposable cache state.
+
+## Files/modules changed
+
+- `infra/docker/docker-compose.valkey.yml`
+- `scripts/infra/valkey-local.mjs`
+- `scripts/ci/detect-changes.mjs`
+- `.github/workflows/pr-ci.yml`
+- `package.json`
+- `tests/contracts/valkey-local.contract.test.mjs`
+- `docs/runbooks/local-valkey.md`
+- `docs/handoffs/CGN-88.md`
+- `docs/engineering-memory/05-current-state.md`
+- `docs/engineering-memory/06-known-risks.md`
+
+## Contracts changed
+
+No product API, database or event contract changed. The local cache remains an
+infrastructure dependency and does not own canonical domain state.
+
+## Events produced / consumed
+
+None.
+
+## Database / migration / config changes
+
+No database, migration, paid infrastructure or committed secret was added.
+Compose pins Valkey `9.1.2`, binds host port `16379` to loopback, uses a named
+volume, enables append-only persistence for local recovery checks, and accepts
+an optional `CGN_VALKEY_PASSWORD` environment value.
+
+## Tests run
+
+- Passed: `node --test tests/contracts/valkey-local.contract.test.mjs` (4/4).
+- Full contract suite: 147 passed, 3 unrelated existing Windows newline-sensitive
+  validators failed (CGN-45 probes, CGN-60 autoscaling, CGN-61 workload
+  identity); the same baseline failures are recorded in the merged CGN-43
+  handoff.
+- Passed: `docker compose -f infra/docker/docker-compose.valkey.yml config`;
+  Docker emitted a local config-file access warning, but rendered the Compose
+  model successfully.
+- Passed: `node scripts/memory-check.mjs` after staging the 10 ticket files.
+- Blocked locally: `node scripts/infra/valkey-local.mjs restart-smoke`; Docker
+  CLI is installed, but the daemon pipe `npipe:////./pipe/docker_engine` is not
+  available in this environment.
+- `pnpm` is not available on this Windows PATH; equivalent repository Node
+  scripts were used locally. PR CI installs the pinned pnpm version.
+- Linux PR CI must pass the full contract suite and Valkey restart smoke.
+
+## Known limitations / risks
+
+- This is a single-node developer cache, not production availability or
+  capacity evidence.
+- Persistence is for reproducible local recovery checks; cache contents remain
+  disposable and are not a source of truth.
+- Docker daemon availability is environment-dependent.
+
+## Exact next step for next agent
+
+Review the diff, run the listed checks where Docker is available, confirm the
+CGN-43 merged prerequisite and CGN-88 live status, then commit and open the PR.
+The next Sandeep-owned ranked ticket waits until this PR is reviewed and merged.
+
+## Rollback note
+
+Run `pnpm valkey:reset` to stop the scoped Compose project and remove only its
+local data volume, then revert the CGN-88 PR.
+
+## Engineering Memory updated
+
+- [x] 05-current-state.md
+- [x] 06-known-risks.md
+
+## Owner review and PR references
+
+- GitHub PR URL: pending
+- Commit / merge SHA: pending
+- Jira live dependency/status verification: CGN-43 Done; merged handoff and
+  implementation are present on fetched `main` at `9bb6f7d`.
+- Source and tests inspected on latest main: yes
+- Required Sandeep review: required before merge

@@ -1,6 +1,7 @@
 # 06 - Known Risks
 
 - Agent drift: agents may infer features that were never approved. Mitigation: Jira + context bundle + stop-on-conflict rule.
+- Cache source-of-truth confusion: the CGN-88 local Valkey candidate has append-only persistence for restart checks. Mitigation: keep it disposable, use it only for cache/rate-limit/ephemeral workloads, and never persist canonical identity or product state there.
 - Contract drift: producer and consumer may evolve independently. Mitigation: shared contracts + contract tests.
 - Memory drift: docs can become stale. Mitigation: memory check in PR/CI and required handoff update.
 - Privacy drift: social/admin features may expose more than intended. Mitigation: server-side consent/block/RBAC and explicit safe projections.
