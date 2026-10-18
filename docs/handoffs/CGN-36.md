@@ -65,8 +65,8 @@ Revert the CGN-36 PR to restore the prior interface-only envelope. No runtime st
 
 ## Owner review and PR references
 
-- GitHub PR URL: pending
-- Commit / merge SHA: pending
+- GitHub PR URL: https://github.com/Sandeepagrahari78/career-growth-network/pull/44
+- Commit / merge SHA: `9d4f109b010a84cb435dd8f3787a31885a91097f` (PR open; not merged)
 - Jira live dependency/status verification: CGN-36 To Do, assigned to Sandeep, Highest; hard predecessor CGN-32 Done.
 - Source and tests inspected on latest main: `ab1f041cab534f170c29cfae00dfc5f40f5197f0`; CGN-32 handoff and existing envelope/Career Activity interfaces reviewed.
 - Required Sandeep review: pending.
