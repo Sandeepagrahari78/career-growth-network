@@ -14,6 +14,7 @@ const repoRoot = resolve(fileURLToPath(new URL("../..", import.meta.url)));
 const containerName =
   process.env.CGN_PERFORMANCE_CONTAINER ?? "cgn-performance";
 const endpoint = process.env.BASE_URL ?? "http://127.0.0.1:3001";
+const dockerUser = `${process.getuid?.() ?? 0}:${process.getgid?.() ?? 0}`;
 const capacity = JSON.parse(
   readFileSync(join(repoRoot, "config/performance/capacity.v1.json"), "utf8"),
 );
@@ -114,6 +115,8 @@ function runK6(name) {
       "--rm",
       "--network",
       "host",
+      "--user",
+      dockerUser,
       "-e",
       `BASE_URL=${endpoint}`,
       "-e",
@@ -152,6 +155,34 @@ function phaseMetrics(name, summary) {
     ),
     peakMemoryMiB: Math.max(...matching.map((sample) => sample.memoryMiB)),
   };
+}
+
+async function stopStats(stats) {
+  if (stats.exitCode !== null || stats.signalCode !== null) {
+    return;
+  }
+
+  const closed = new Promise((resolveClose) => {
+    stats.once("close", () => resolveClose(true));
+  });
+  stats.kill("SIGTERM");
+  if (
+    await Promise.race([
+      closed,
+      new Promise((resolveWait) => setTimeout(() => resolveWait(false), 2000)),
+    ])
+  ) {
+    return;
+  }
+
+  const forceClosed = new Promise((resolveClose) => {
+    stats.once("close", () => resolveClose(true));
+  });
+  stats.kill("SIGKILL");
+  await Promise.race([
+    forceClosed,
+    new Promise((resolveWait) => setTimeout(resolveWait, 2000)),
+  ]);
 }
 
 function formatPhase(name, metrics) {
@@ -246,8 +277,7 @@ async function main() {
     );
     await new Promise((resolveSleep) => setTimeout(resolveSleep, 1500));
     const pressureSummary = runK6("pressure");
-    stats.kill("SIGTERM");
-    await new Promise((resolveClose) => stats.once("close", resolveClose));
+    await stopStats(stats);
 
     const dashboard = createDashboard(
       phaseMetrics("baseline", baselineSummary),
@@ -261,9 +291,7 @@ async function main() {
     }
     console.log(`Capacity dashboard: ${dashboardPath}`);
   } finally {
-    if (!stats.killed) {
-      stats.kill("SIGTERM");
-    }
+    await stopStats(stats);
   }
 }
 
