@@ -275,12 +275,6 @@ jobs:
           sudo install -m 0755 /tmp/k3d-linux-amd64 /usr/local/bin/k3d
           k3d version
 
-      - name: Create CGN local cluster
-        run: bash scripts/infra/k3d-up.sh
-
-      - name: Prove service discovery and NetworkPolicy enforcement
-        run: bash scripts/infra/k3d-smoke.sh
-
       - name: Install pinned Helm
         shell: bash
         env:
@@ -299,6 +293,12 @@ jobs:
           tar -xzf "/tmp/$archive" -C /tmp
           sudo install -m 0755 /tmp/linux-amd64/helm /usr/local/bin/helm
           helm version
+
+      - name: Create CGN local cluster
+        run: bash scripts/infra/k3d-up.sh
+
+      - name: Prove local ingress, TLS and NetworkPolicy behavior
+        run: bash scripts/infra/k3d-smoke.sh
 
       - name: Build platform-template image
         run: docker build -f services/platform-template/Dockerfile -t cgn-platform-template:cgn34 .

@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cgn-health-demo-local
+  namespace: cgn-apps
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - health.cgn.localhost
+      secretName: cgn-local-development-tls
+  rules:
+    - host: health.cgn.localhost
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: cgn-health-demo
+                port:
+                  number: 3001

@@ -51,10 +51,29 @@ jobs:
           sudo install -m 0755 /tmp/k3d-linux-amd64 /usr/local/bin/k3d
           k3d version
 
+      - name: Install pinned Helm
+        shell: bash
+        env:
+          HELM_VERSION: v3.18.6
+        run: |
+          archive="helm-$HELM_VERSION-linux-amd64.tar.gz"
+          curl --fail --location --silent --show-error \
+            -o "/tmp/$archive" \
+            "https://get.helm.sh/$archive"
+          curl --fail --location --silent --show-error \
+            -o "/tmp/$archive.sha256sum" \
+            "https://get.helm.sh/$archive.sha256sum"
+          expected_sha="$(awk '{print $1}' "/tmp/$archive.sha256sum")"
+          test -n "$expected_sha"
+          echo "$expected_sha  /tmp/$archive" | sha256sum --check -
+          tar -xzf "/tmp/$archive" -C /tmp
+          sudo install -m 0755 /tmp/linux-amd64/helm /usr/local/bin/helm
+          helm version
+
       - name: Create CGN local cluster
         run: bash scripts/infra/k3d-up.sh
 
-      - name: Prove service discovery and NetworkPolicy enforcement
+      - name: Prove local ingress, TLS and NetworkPolicy behavior
         run: bash scripts/infra/k3d-smoke.sh
 
       - name: Destroy CGN local cluster
