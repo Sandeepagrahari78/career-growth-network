@@ -69,9 +69,9 @@ an optional `CGN_VALKEY_PASSWORD` environment value.
 
 ## Exact next step for next agent
 
-Review the diff, run the listed checks where Docker is available, confirm the
-CGN-43 merged prerequisite and CGN-88 live status, then commit and open the PR.
-The next Sandeep-owned ranked ticket waits until this PR is reviewed and merged.
+Sandeep reviews [PR #51](https://github.com/Sandeepagrahari78/career-growth-network/pull/51)
+and required CI. Fix any CGN-88-owned CI failure. After review and merge, select
+CGN-89 as the next Sandeep-owned ticket in the supplied order.
 
 ## Rollback note
 
@@ -85,8 +85,8 @@ local data volume, then revert the CGN-88 PR.
 
 ## Owner review and PR references
 
-- GitHub PR URL: pending
-- Commit / merge SHA: pending
+- GitHub PR URL: https://github.com/Sandeepagrahari78/career-growth-network/pull/51
+- Branch head commit: `013a6ce930550e35922204caec6032f3d537bbd2`; merge pending
 - Jira live dependency/status verification: CGN-43 Done; merged handoff and
   implementation are present on fetched `main` at `9bb6f7d`.
 - Source and tests inspected on latest main: yes
