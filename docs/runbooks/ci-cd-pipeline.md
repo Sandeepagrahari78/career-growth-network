@@ -69,9 +69,10 @@ On every main push the pipeline:
 6. revalidates the shared integration stack;
 7. reruns E2E and k6 performance smoke.
 
-GitHub Free private repositories cannot enforce all protected-branch/ruleset
-features. Therefore this audit is a detection control, not a technical
-prevention control. Team policy remains: **never push directly to main**.
+As of 2026-10-20, the live GitHub repository response reports the repository as
+public and the `main` branch as unprotected. The Main CI audit is a detection
+control, not a technical prevention control. Team policy remains: **never push
+directly to main**.
 
 ## Staging
 

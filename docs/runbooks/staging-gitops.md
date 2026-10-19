@@ -3,8 +3,11 @@
 ## Scope
 
 This runbook covers the zero-budget local-first Argo CD staging GitOps foundation for CGN.
+For the combined local beta operations, resource worksheet, persistence checks,
+and provider-neutral migration map, see the [CGN-225 beta infrastructure
+runbook](beta-infrastructure-and-cloud-migration.md).
 
-CGN-92 installs and validates Argo CD in a local k3d cluster and configures a staging `ApplicationSet` for approved platform baseline manifests. It does **not** create a public staging host, production deployment, cloud Kubernetes cluster, or committed private repository credential.
+CGN-92 installs and validates Argo CD in a local k3d cluster and configures a staging `ApplicationSet` for approved platform baseline manifests. It does **not** create a public staging host, production deployment, cloud Kubernetes cluster, or committed repository credential.
 
 ## Source of truth
 
@@ -42,7 +45,7 @@ After merge to `main`, the path-scoped **Local GitOps Validation** workflow runs
 
 ## Known limitation
 
-The repository is private. A persistent real staging Argo CD installation will require an approved repository credential or GitHub App integration configured as a runtime secret. That secret is intentionally outside CGN-92 and must not be committed to the repository.
+As of 2026-10-20, the live GitHub repository response reports the source repository as public. Read-only cloning therefore does not require a private-repository credential. This does not prove persistent staging sync or create a public staging host. If repository visibility changes to private, configure an approved read-only runtime credential or GitHub App; never commit it. No credential or visibility setting is changed by this runbook.
 
 ## Rollback
 
