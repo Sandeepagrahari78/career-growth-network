@@ -1,6 +1,6 @@
 # 05 - Current Merged State
 
-Last updated: 2026-10-19 after CGN-131 merged; CGN-90, CGN-99, CGN-75 and CGN-131 are merged with verification evidence below.
+Last updated: 2026-10-20 after the CGN-225 zero-cost infrastructure review; CGN-90, CGN-99, CGN-75 and CGN-131 are merged with verification evidence below.
 
 ## Repository
 - CGN-288/289: on 2026-10-16, the team-approved *product direction* expanded to a continuous post-Class-10 Student Ecosystem V2, retaining social-first Home, the existing social/growth loop, and shared web+Android architecture. PR #29 merged Product Vision PRD, 31-Epic gap audit, bounded-context **impact review only**, screen inventory/Stitch design handoff and updated agent-context sources: https://github.com/Sandeepagrahari78/career-growth-network/pull/29 ; merge SHA `6018f3e5c799841e71df1213dcae507a59bf53c9`. There are **no new implemented preparation APIs, Figma frames, exam catalog, database schemas or signed contracts** in that change. Further technical contract decisions [CGN-290](https://sandeepagrahari1.atlassian.net/browse/CGN-290), reviewed UX/Figma frames [CGN-291](https://sandeepagrahari1.atlassian.net/browse/CGN-291), and real pilot user research [CGN-292](https://sandeepagrahari1.atlassian.net/browse/CGN-292) remain pending.
@@ -24,7 +24,7 @@ Last updated: 2026-10-19 after CGN-131 merged; CGN-90, CGN-99, CGN-75 and CGN-13
 - CGN-61: dedicated Kubernetes ServiceAccount and opt-in IRSA *configuration pattern only* merged via PR #22 / `d18093b2e9497709793b764e680109dd0975cbc7`. PR security, unit/contract/quality and local Helm checks passed; no AWS resources created.
 - CGN-227 staging recovery regression: ephemeral Docker fault-injection/rollback rehearsal merged via PR #23 / `aefe416acd71084b3d7a2d1fc7ad992cd5616fa1`. PR quality/security and rollback rehearsal passed. No real Kubernetes/GitOps or production rollback happened.
 - CGN-285: cross-agent navigation, module guides, optional credential-gated read-only Jira context and simulated Sandeep → Prachi → Tanvi handoff merged via PR #25 / `7de3f7a7943fd97b24aee1b3a5c451b4b0a3f2e1`. PR CI run `38748769481` and local Helm validation run `38748769680` succeeded. Demo is synthetic, not three independently running AI models; a live Jira REST request requires local user credentials.
-- CGN-286: ticket-specific platform folder ownership PR gate merged via [PR #27](https://github.com/Sandeepagrahari78/career-growth-network/pull/27), merge SHA `1f969a93862069d9749ede77f14782533a2844b9`. `apps/web/` is Next.js/web; `apps/mobile/` is Expo/Android; the reviewed offline Jira mapping in `config/ci/ticket-platform-scopes.v1.json` enforces the intended app folder against the PR branch. Relevant negative contract tests, PR CI run `38757113673` and local Helm run `38757113415` passed. PR CI does not load live Jira or physically prevent direct main writes on private GitHub Free. No product UI was created by this ticket.
+- CGN-286: ticket-specific platform folder ownership PR gate merged via [PR #27](https://github.com/Sandeepagrahari78/career-growth-network/pull/27), merge SHA `1f969a93862069d9749ede77f14782533a2844b9`. `apps/web/` is Next.js/web; `apps/mobile/` is Expo/Android; the reviewed offline Jira mapping in `config/ci/ticket-platform-scopes.v1.json` enforces the intended app folder against the PR branch. Relevant negative contract tests, PR CI run `38757113673` and local Helm run `38757113415` passed. PR CI does not load live Jira or physically prevent direct main writes. No product UI was created by this ticket.
 - CGN-287: Prachi-owned Android Google Play release-readiness CHECKLIST created under CGN-29. No `.aab` has been published, no Play Console account was registered/charged, and no store approval or live Android runtime claim. See `docs/runbooks/android-play-release-checklist.md`.
 - Real cloud provisioning and production deployment remain intentionally disabled.
 
@@ -73,7 +73,7 @@ Jira is the work source of truth. Figma defines the approved product flow for us
 - The staging recovery drill proves an *ephemeral GitHub-runner Docker* path: healthy /health and /ready → injected HTTP 503 → original known-good image restored → health/readiness/E2E green.
 - Main CI automatically revalidates merge SHAs; consult GitHub Actions for the current run conclusions and never infer a completed green run from a queued or active one.
 - Green Main CI triggers production-like **ephemeral** staging health/E2E/k6 validation, not a persistent remote staging environment.
-- This private GitHub Free repository does not have effective protected-branch enforcement: repository policy and post-push main auditing are detection/manual controls, not prevention of direct pushes.
+- The live GitHub API reports this repository as public and `main` as unprotected (checked 2026-10-20). Repository policy and post-push main auditing are detection/manual controls, not prevention of direct pushes.
 - Real production hosting, live GitOps sync, production release/rollback, image attestation and 5,000-user load/soak validation remain unproven and require their own approved tickets.
 - Next product delivery: start Jira dependency-ordered Identity / Career Activity / Growth Identity / Social Home implementation. Do not mistake the infrastructure health-demo for completed CGN user journeys.
 
@@ -93,3 +93,10 @@ Merged by [PR #54](https://github.com/Sandeepagrahari78/career-growth-network/pu
 Final-head PR CI run `39171230033` and Local Helm run `39171230106` passed on `9ed1e234f2eb39ac1aca79838b16185e47d6507f`. Post-merge Main CI run `39171391072` passed on attempt 3 after two transient PostgreSQL outbox integration failures; Docker run `39171391080`, Local Helm run `39171391102` and Staging Validation run `39171820354` passed. Jira moved CGN-99 to Done after delivery sync.
 
 Kubernetes encryption-at-rest and production secret injection remain unverified; see `docs/handoffs/CGN-99.md`.
+
+## CGN-225 zero-cost infrastructure review (2026-10-20)
+
+- The runbook at `docs/runbooks/beta-infrastructure-and-cloud-migration.md` records the current local-first deployment, known resource settings, persistence checks, cost boundary and provider-neutral migration steps. It does not provision a cloud provider or claim production readiness.
+- The live GitHub repository response reports public visibility and an unprotected `main` branch. No visibility setting was changed. Do not treat repository contents or workflow logs as private.
+- The migration map uses the merged CGN-89 SeaweedFS implementation as the canonical local object store, per owner clarification on 2026-10-20. Older CGN-225 Jira wording names MinIO and should be aligned separately.
+- The local Docker Engine was unavailable during this review. Host minimums, persistent remote Argo CD sync, monitoring/alerts, off-host backups and full 5,000-user capacity remain unverified; see the ticket handoff for exact test evidence.
