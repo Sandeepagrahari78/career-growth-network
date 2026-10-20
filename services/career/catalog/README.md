@@ -4,11 +4,21 @@
 The shared shape is `cgn.skill-catalog.v1` in `packages/contracts`; no endpoint,
 database table, event or runtime service is introduced by this catalog ticket.
 
-The catalog is intentionally empty until content owners approve skills in
-CGN-76/77/78. This ticket defines the shared identity and migration rules; it
-does not invent cross-track or track-specific skill content. Catalog entries
-are sorted by ID, aliases are sorted deterministically, and the validator rejects
-duplicate IDs, ambiguous names/aliases and invalid replacement references.
+`skills.v1.json` contains canonical skill IDs and names. CGN-76/77/78 track
+catalogs reference those IDs and may add reviewed skills. Track-specific
+required/optional status, prerequisites and version-pinned source metadata live
+in `tracks.v1.json`; consumers must not create a second catalog. Catalog entries
+are sorted by ID, aliases are sorted deterministically, and the validators reject
+duplicate IDs, ambiguous names/aliases, invalid references and cyclic
+prerequisites.
+
+`tracks.v1.json` currently contains the proposed AI Engineer track from CGN-76.
+Its content review is pending; it is not an accredited curriculum. Validate the
+track and all skill references with:
+
+```bash
+node services/career/catalog/validate-track-catalog.mjs
+```
 
 ## Identity and versioning rules
 

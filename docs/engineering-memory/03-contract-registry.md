@@ -4,6 +4,8 @@ All cross-domain contracts live under `packages/contracts` unless a ticket delib
 
 ## Canonical contracts
 
+- `cgn.career-track-catalog.v1` - Career-owned versioned track requirements, prerequisite graph and source metadata; adds no API or event.
+
 - `cgn.bounded-contexts.v1` — cross-domain ownership and integration-boundary contract.
 - `cgn.workspace-boundaries.v1` — monorepo package roots and allowed workspace dependency direction.
 - `cgn.staging-gitops.v1` — zero-budget local-first Argo CD staging GitOps source, destination and safety contract.
