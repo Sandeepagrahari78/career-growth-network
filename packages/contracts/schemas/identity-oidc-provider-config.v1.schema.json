@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cgn.local/schemas/identity-oidc-provider-config.v1.schema.json",
+  "title": "CGN Identity OIDC Provider Configuration v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "issuer",
+    "clientId",
+    "clientAuthentication",
+    "redirectUri",
+    "postLogoutRedirectUri",
+    "sessionEncryptionKeyEnv",
+    "googleBrokerAliasEnv",
+    "googleBrokerHintParameterEnv",
+    "sessionLifetimeSeconds",
+    "loginTransactionLifetimeSeconds"
+  ],
+  "properties": {
+    "contract": { "const": "cgn.identity.oidc-provider-config.v1" },
+    "issuer": { "type": "string", "format": "uri", "minLength": 1 },
+    "clientId": { "type": "string", "minLength": 1 },
+    "clientAuthentication": { "enum": ["none", "client_secret_basic"] },
+    "clientSecretEnv": { "const": "CGN_IDENTITY_OIDC_CLIENT_SECRET" },
+    "redirectUri": { "type": "string", "format": "uri" },
+    "postLogoutRedirectUri": { "type": "string", "format": "uri" },
+    "sessionEncryptionKeyEnv": {
+      "const": "CGN_IDENTITY_SESSION_ENCRYPTION_KEY"
+    },
+    "googleBrokerAliasEnv": { "const": "CGN_IDENTITY_GOOGLE_BROKER_ALIAS" },
+    "googleBrokerHintParameterEnv": {
+      "const": "CGN_IDENTITY_GOOGLE_BROKER_HINT_PARAMETER"
+    },
+    "sessionLifetimeSeconds": {
+      "type": "integer",
+      "minimum": 300,
+      "maximum": 604800
+    },
+    "loginTransactionLifetimeSeconds": {
+      "type": "integer",
+      "minimum": 60,
+      "maximum": 900
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "clientAuthentication": { "const": "client_secret_basic" }
+        }
+      },
+      "then": { "required": ["clientSecretEnv"] }
+    }
+  ]
+}

@@ -23,6 +23,8 @@ Use this file for short accepted decisions. Large decisions get an ADR under `do
 - 2026-10-06 / CGN-227: production merge and production deployment remain separate manual decisions; PR/Main/Staging gates fail closed, release/rollback use owner-confirmed immutable SHAs, and real deployment remains disabled until a production target is explicitly approved.
 - 2026-10-17 / CGN-34: `services/platform-template/` is the reusable NestJS + TypeScript platform reference (`@cgn/platform-template`), not a business service. It adds only validated configuration, privacy-safe structured logging, request correlation, graceful shutdown and health/readiness behavior. It reuses the approved Helm chart and local k3d; the temporary namespace smoke is acceptance evidence, not a production deployment. Business APIs, databases, authentication and domain events remain out of scope; CGN-35 and CGN-36 retain their separate contract work.
 
+2026-10-20 / CGN-68: use pinned self-hosted Keycloak 26.8.1 as the open-source OIDC provider, with Google brokered through Keycloak. Identity owns internal account IDs and provider-subject mappings; exact issuer/subject selects accounts and email alone never auto-links. OIDC config stays provider-neutral, code flow uses PKCE and signature validation, and persistent one-use state/session data is hashed/encrypted in Identity's own database. See [ADR-0006](../adr/ADR-0006-keycloak-oidc-identity.md); local development only, no production deployment.
+
 ## Template
 
 Date | Ticket | Decision | Why | Impacted domains | Supersedes

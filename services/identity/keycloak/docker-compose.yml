@@ -1,0 +1,21 @@
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.8.1
+    command:
+      - start-dev
+      - --import-realm
+      - --http-host=0.0.0.0
+      - --http-port=8080
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${CGN_KEYCLOAK_ADMIN_USERNAME:?set CGN_KEYCLOAK_ADMIN_USERNAME in the local environment}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${CGN_KEYCLOAK_ADMIN_PASSWORD:?set CGN_KEYCLOAK_ADMIN_PASSWORD in the local environment}
+      KC_DB: dev-file
+      KC_HEALTH_ENABLED: "true"
+    ports:
+      - "127.0.0.1:18080:8080"
+    volumes:
+      - ./realm-export:/opt/keycloak/data/import:ro
+      - identity_keycloak_data:/opt/keycloak/data
+
+volumes:
+  identity_keycloak_data:

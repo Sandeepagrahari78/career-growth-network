@@ -4,6 +4,8 @@ All cross-domain contracts live under `packages/contracts` unless a ticket delib
 
 ## Canonical contracts
 
+- `cgn.identity.oidc-provider-config.v1` and `cgn.identity.auth-session.v1` define provider-neutral Identity OIDC configuration and a token-free session response; secret values remain in approved environment/secret configuration.
+
 - `cgn.bounded-contexts.v1` — cross-domain ownership and integration-boundary contract.
 - `cgn.workspace-boundaries.v1` — monorepo package roots and allowed workspace dependency direction.
 - `cgn.staging-gitops.v1` — zero-budget local-first Argo CD staging GitOps source, destination and safety contract.
@@ -22,6 +24,8 @@ All cross-domain contracts live under `packages/contracts` unless a ticket delib
 `domain.event.envelope.v1` requires event ID, event type, envelope version, RFC 3339 occurrence timestamp, producer, and payload. Version 1 consumers reject other envelope versions; unknown optional envelope properties remain additive-compatible. The canonical TypeScript interface and JSON Schema live in `packages/contracts/src/events/domain-event-envelope.v1.ts` and `packages/contracts/schemas/domain-event-envelope.v1.schema.json`. Domain-specific payloads remain owned by their producer contracts.
 
 Synchronous HTTP APIs use URL major versions (`/v1/...`); additive changes retain a major path and breaking changes require an explicitly migrated major path. See [synchronous API versioning and error policy](../contracts/synchronous-api-versioning.md). Contract response fixtures live in `packages/contracts/fixtures/http/` and are exercised by shared contract and platform-template HTTP integration tests.
+
+`cgn.identity.oidc-provider-config.v1` and `cgn.identity.auth-session.v1` define provider-neutral Identity OIDC configuration and a token-free session response. The configuration contract stores environment variable names, never secret values. Identity auth routes are versioned under `/v1/identity/auth/`; they emit no cross-domain events.
 
 ## Contract change policy
 
