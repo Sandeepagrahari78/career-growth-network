@@ -108,7 +108,7 @@ function validateEvidenceId(evidenceId: string): void {
 function validateObjectKey(objectKey: string | undefined): void {
   if (objectKey === undefined) return;
   nonEmpty(objectKey, "objectKey");
-  if (/^[a-z][a-z0-9+.-]*:\/\//i.test(objectKey)) {
+  if (/^(?:\/\/|[a-z][a-z0-9+.-]*:)/i.test(objectKey)) {
     throw new TypeError("objectKey must be an opaque private reference, not a URL.");
   }
 }

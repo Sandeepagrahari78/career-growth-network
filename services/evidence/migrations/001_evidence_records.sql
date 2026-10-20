@@ -33,7 +33,7 @@ CREATE TABLE evidence_records (
     object_key IS NULL
     OR (
       length(btrim(object_key)) > 0
-      AND btrim(object_key) !~* '^[a-z][a-z0-9+.-]*://'
+      AND btrim(object_key) !~* '^(//|[a-z][a-z0-9+.-]*:)'
     )
   )
 );

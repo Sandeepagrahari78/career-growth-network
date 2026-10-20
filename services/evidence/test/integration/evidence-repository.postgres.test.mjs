@@ -201,6 +201,16 @@ test(
             "', 'identity-subject-c', 'manual_claim', 'Claim', 'public')",
         ),
       );
+      assert.throws(() =>
+        psql(
+          "INSERT INTO evidence_records " +
+            "(evidence_id, owner_id, provenance_kind, claim_text, object_key) " +
+            "VALUES ('" +
+            "28242969-a2de-47d5-89fc-307c0604cf52" +
+            "', 'identity-subject-c', 'manual_claim', 'Claim', " +
+            "'//bucket.example/object')",
+        ),
+      );
     } finally {
       try {
         runDocker([...compose, "down", "--volumes", "--remove-orphans"]);

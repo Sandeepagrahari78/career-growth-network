@@ -159,5 +159,23 @@ test("rejects empty claims, sources, owners and public object URLs", async () =>
     }),
     /opaque private reference/,
   );
+  await assert.rejects(
+    repository.create({
+      ownerId: "student-a",
+      provenanceKind: "manual_claim",
+      claimText: "A claim",
+      objectKey: "//bucket.example/object",
+    }),
+    /opaque private reference/,
+  );
+  await assert.rejects(
+    repository.create({
+      ownerId: "student-a",
+      provenanceKind: "manual_claim",
+      claimText: "A claim",
+      objectKey: "s3:bucket/object",
+    }),
+    /opaque private reference/,
+  );
   assert.equal(capture.statements.length, 0);
 });
