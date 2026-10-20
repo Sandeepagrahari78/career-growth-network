@@ -3,7 +3,8 @@
 Last updated: 2026-10-20 after the CGN-67 Identity persistence merge; CGN-90, CGN-99, CGN-75, CGN-131 and CGN-67 are merged with verification evidence below.
 
 ## Repository
-- CGN-288/289: on 2026-10-16, the team-approved *product direction* expanded to a continuous post-Class-10 Student Ecosystem V2, retaining social-first Home, the existing social/growth loop, and shared web+Android architecture. PR #29 merged Product Vision PRD, 31-Epic gap audit, bounded-context **impact review only**, screen inventory/Stitch design handoff and updated agent-context sources: https://github.com/Sandeepagrahari78/career-growth-network/pull/29 ; merge SHA `6018f3e5c799841e71df1213dcae507a59bf53c9`. There are **no new implemented preparation APIs, Figma frames, exam catalog, database schemas or signed contracts** in that change. Further technical contract decisions [CGN-290](https://sandeepagrahari1.atlassian.net/browse/CGN-290), reviewed UX/Figma frames [CGN-291](https://sandeepagrahari1.atlassian.net/browse/CGN-291), and real pilot user research [CGN-292](https://sandeepagrahari1.atlassian.net/browse/CGN-292) remain pending.
+
+- CGN-288/289: on 2026-10-16, the team-approved _product direction_ expanded to a continuous post-Class-10 Student Ecosystem V2, retaining social-first Home, the existing social/growth loop, and shared web+Android architecture. PR #29 merged Product Vision PRD, 31-Epic gap audit, bounded-context **impact review only**, screen inventory/Stitch design handoff and updated agent-context sources: https://github.com/Sandeepagrahari78/career-growth-network/pull/29 ; merge SHA `6018f3e5c799841e71df1213dcae507a59bf53c9`. There are **no new implemented preparation APIs, Figma frames, exam catalog, database schemas or signed contracts** in that change. Further technical contract decisions [CGN-290](https://sandeepagrahari1.atlassian.net/browse/CGN-290), reviewed UX/Figma frames [CGN-291](https://sandeepagrahari1.atlassian.net/browse/CGN-291), and real pilot user research [CGN-292](https://sandeepagrahari1.atlassian.net/browse/CGN-292) remain pending.
 - Shared Engineering Memory and agent synchronization: established.
 - CI/CD foundation: established; PR CI, Main CI, Docker Images, Staging Validation, release/rollback dry runs and path-scoped local infrastructure validations are active.
 - CGN-75: added the versioned `cgn.skill-catalog.v1` contract, JSON Schema, Career-owned validator and catalog migration rules via [PR #57](https://github.com/Sandeepagrahari78/career-growth-network/pull/57), merge SHA `6432d003bdd898422aca02f525e11e42c7ec9900`. The catalog has no skill rows until CGN-76/77/78 content owners submit reviewed content. Final-head PR CI `39173846216` and Local Helm `39173845995` each passed twice; Main CI `39174420420`, Docker `39174420408`, Local Helm `39174420423`, Staging Validation `39174551457`, and Jira Delivery Sync `39174600303` passed. Jira status is Done. No runtime API, event producer, database or deployment behavior was added.
@@ -32,7 +33,7 @@ Last updated: 2026-10-20 after the CGN-67 Identity persistence merge; CGN-90, CG
 - CGN-94: fail-closed service-owned database migration deployment job merged via PR #19 / `f61585d9ee9badf6a710f35ffa747f805bf0606c`; PR CI and Database Migration Validation are green, with post-merge validation running at branch creation time.
 - CGN-45: startup/readiness/liveness probe standards merged via PR #20 / `c3a44a3558a5b7b3b628179c509e9bc8033a9377`; PR CI, Main CI, Docker, Local Kubernetes, Local Helm, Helm Promotion and Staging Validation are green.
 - CGN-60: HPA/PodDisruptionBudget standards merged via PR #21 / `323a5b814081fdc934c7c6f6f15930929a366d44`; local Helm and Kubernetes validations previously passed.
-- CGN-61: dedicated Kubernetes ServiceAccount and opt-in IRSA *configuration pattern only* merged via PR #22 / `d18093b2e9497709793b764e680109dd0975cbc7`. PR security, unit/contract/quality and local Helm checks passed; no AWS resources created.
+- CGN-61: dedicated Kubernetes ServiceAccount and opt-in IRSA _configuration pattern only_ merged via PR #22 / `d18093b2e9497709793b764e680109dd0975cbc7`. PR security, unit/contract/quality and local Helm checks passed; no AWS resources created.
 - CGN-227 staging recovery regression: ephemeral Docker fault-injection/rollback rehearsal merged via PR #23 / `aefe416acd71084b3d7a2d1fc7ad992cd5616fa1`. PR quality/security and rollback rehearsal passed. No real Kubernetes/GitOps or production rollback happened.
 - CGN-285: cross-agent navigation, module guides, optional credential-gated read-only Jira context and simulated Sandeep → Prachi → Tanvi handoff merged via PR #25 / `7de3f7a7943fd97b24aee1b3a5c451b4b0a3f2e1`. PR CI run `38748769481` and local Helm validation run `38748769680` succeeded. Demo is synthetic, not three independently running AI models; a live Jira REST request requires local user credentials.
 - CGN-286: ticket-specific platform folder ownership PR gate merged via [PR #27](https://github.com/Sandeepagrahari78/career-growth-network/pull/27), merge SHA `1f969a93862069d9749ede77f14782533a2844b9`. `apps/web/` is Next.js/web; `apps/mobile/` is Expo/Android; the reviewed offline Jira mapping in `config/ci/ticket-platform-scopes.v1.json` enforces the intended app folder against the PR branch. Relevant negative contract tests, PR CI run `38757113673` and local Helm run `38757113415` passed. PR CI does not load live Jira or physically prevent direct main writes. No product UI was created by this ticket.
@@ -40,6 +41,7 @@ Last updated: 2026-10-20 after the CGN-67 Identity persistence merge; CGN-90, CG
 - Real cloud provisioning and production deployment remain intentionally disabled.
 
 ## Infrastructure state
+
 - Terraform uses local state only; no remote backend or cloud provider is enabled.
 - Approved local network contract: `cgn.local-network.v1`.
 - Pod CIDR: `10.244.0.0/16`; service CIDR: `10.96.0.0/16`.
@@ -64,9 +66,11 @@ Last updated: 2026-10-20 after the CGN-67 Identity persistence merge; CGN-90, CG
 - Product tables and runtime DB roles are not created by infrastructure bootstrap tickets.
 
 ## Product state
+
 Jira is the work source of truth. Figma defines the approved product flow for user-facing work. Infrastructure work must not invent product schemas, APIs or flows. Cross-domain ownership is frozen by `cgn.bounded-contexts.v1`; detailed APIs/events still require the owning Jira ticket.
 
 ## Operational evidence expected for CGN-60
+
 - PR CI: green.
 - `pnpm ci:autoscaling`: green.
 - Local Helm Validation on the PR: green.
@@ -81,14 +85,19 @@ Jira is the work source of truth. Figma defines the approved product flow for us
 ## CI/CD completion boundary (2026-10-15)
 
 - PR #22 and PR #23 merged after green required PR checks and explicit founder authorization.
-- The staging recovery drill proves an *ephemeral GitHub-runner Docker* path: healthy /health and /ready → injected HTTP 503 → original known-good image restored → health/readiness/E2E green.
+- The staging recovery drill proves an _ephemeral GitHub-runner Docker_ path: healthy /health and /ready → injected HTTP 503 → original known-good image restored → health/readiness/E2E green.
 - Main CI automatically revalidates merge SHAs; consult GitHub Actions for the current run conclusions and never infer a completed green run from a queued or active one.
 - Green Main CI triggers production-like **ephemeral** staging health/E2E/k6 validation, not a persistent remote staging environment.
 - The live GitHub API reports this repository as public and `main` as unprotected (checked 2026-10-20). Repository policy and post-push main auditing are detection/manual controls, not prevention of direct pushes.
 - Real production hosting, live GitOps sync, production release/rollback, image attestation and 5,000-user load/soak validation remain unproven and require their own approved tickets.
 - Next product delivery: start Jira dependency-ordered Identity / Career Activity / Growth Identity / Social Home implementation. Do not mistake the infrastructure health-demo for completed CGN user journeys.
 
+## CGN-68 Identity OIDC implementation
+
+CGN-68's accepted provider decision is self-hosted Keycloak 26.8.1 for email/password and optional Google identity brokering. The branch adds versioned provider/session contracts, Identity-owned one-use login transaction and auth-session migrations/repositories, OIDC Authorization Code + PKCE, signature/JWKS validation, safe session cookies and versioned Identity HTTP routes. Google credentials are configuration-only; controlled OIDC tests do not claim live Google login. The local Keycloak realm is loopback-only and development-only. No paid service or production deployment is introduced. Follow the ticket handoff for exact validation, PR and merge status; update this section with exact merge and pipeline SHAs when delivered.
+
 ## Update rule
+
 After each merged PR, record the ticket, PR/merge reference, modules/contracts changed, operational status, risks and exact next dependency.
 
 ## CGN-299 delivery automation merged baseline (2026-10-17)

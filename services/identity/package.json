@@ -4,7 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "test:unit": "node --test test/account-repository.test.mjs",
+    "test:unit": "node --test test/*.test.mjs",
+    "test:integration": "node --test test/integration/*.test.mjs",
     "test:postgres": "node test/postgres-acceptance.mjs"
+  },
+  "dependencies": {
+    "openid-client": "6.8.8"
   }
 }
