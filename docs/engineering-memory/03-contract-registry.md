@@ -17,6 +17,7 @@ All cross-domain contracts live under `packages/contracts` unless a ticket delib
 - `cgn.product-analytics.v1` — versioned product-funnel event dictionary with producer, opt-in consent class, Analytics retention owner and payload allow-lists.
 - `domain.event.envelope.v1` — common versioned event envelope.
 - `http.error-envelope.v1` — common synchronous error shape.
+- `cgn.identity.account.v1` and `cgn.identity.provider-subject.v1` — Identity-owned account and OIDC subject persistence shapes; provider credentials remain with the authentication provider.
 
 `domain.event.envelope.v1` requires event ID, event type, envelope version, RFC 3339 occurrence timestamp, producer, and payload. Version 1 consumers reject other envelope versions; unknown optional envelope properties remain additive-compatible. The canonical TypeScript interface and JSON Schema live in `packages/contracts/src/events/domain-event-envelope.v1.ts` and `packages/contracts/schemas/domain-event-envelope.v1.schema.json`. Domain-specific payloads remain owned by their producer contracts.
 

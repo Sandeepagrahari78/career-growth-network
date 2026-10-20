@@ -354,6 +354,9 @@ jobs:
       - name: Run owner-scoped migration smoke
         run: node scripts/infra/postgres-local.mjs migration-smoke
 
+      - name: Verify Identity schema, uniqueness, access boundary and rollback
+        run: node services/identity/test/postgres-acceptance.mjs
+
       - name: Prove backup command
         shell: bash
         run: |

@@ -5,6 +5,7 @@ export default [
       "scripts/infra/**/*.mjs",
       "services/health-demo/**/*.mjs",
       "services/platform-template/test/**/*.mjs",
+      "services/identity/**/*.mjs",
       "eslint.config.js",
     ],
     languageOptions: {

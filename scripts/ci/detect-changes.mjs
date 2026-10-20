@@ -42,7 +42,9 @@ const flags = {
       file.startsWith("infra/postgres/") ||
       file.startsWith("scripts/infra/postgres-") ||
       file === "config/infra/postgres-databases.v1.json" ||
-      file === ".github/workflows/local-postgres.yml",
+      file === ".github/workflows/local-postgres.yml" ||
+      file.startsWith("services/identity/migrations/") ||
+      file === "services/identity/test/postgres-acceptance.mjs",
   ),
   docker: changed.some(
     (file) =>
