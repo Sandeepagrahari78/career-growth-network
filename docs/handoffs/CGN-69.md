@@ -3,8 +3,8 @@
 - Ticket: CGN-69 - Implement profile roles and application authorization context
 - Branch: `CGN-69-application-roles-20261020`
 - Base branch: `main` at `40179f9422ea5b0eceebcb1377849797eb6a43e2`
-- PR / merge: pending
-- Jira status: To Do at implementation start; do not mark Done before merge and delivery validation
+- PR / merge: [#72](https://github.com/Sandeepagrahari78/career-growth-network/pull/72), merged as `024547534c5303b225a3ceb7fe1126350f253f86`
+- Jira status: Done after Jira Delivery Sync run `39390226412` on 2026-10-20
 - Assignee: Sandeep Agrahari
 - Date: 2026-10-20
 
@@ -59,23 +59,25 @@ secrets, paid service or production infrastructure is added.
 
 ## Tests run
 
-- Passed: focused Identity authorization, HTTP and OIDC tests (15 tests).
-- Passed: CGN-69 contract tests (3 tests).
+- Passed: focused Identity authorization, HTTP and OIDC tests (15 tests) and
+  CGN-69 contract tests (3 tests).
 - Passed earlier on this implementation: Identity unit (20), OIDC integration
   (8), root unit, root integration, root lint and root typecheck.
-- Passed earlier: Docker PostgreSQL acceptance for role table ownership,
-  constraints, audit behavior and migration rollback.
-- Engineering Memory gate passed in PR run `39388979722`; exact-head validation
-  is rerunning after aligning this handoff's section headings with the required
-  gate labels.
-- Windows limitation: root contract suite returned 173/176 because of the
-  existing CGN-60 autoscaling, CGN-45 probe and CGN-61 workload identity
-  line-ending-sensitive assertions. The CGN-69 contract tests pass; Linux PR CI
-  is authoritative for these existing platform-sensitive checks.
-- `pnpm format:check` could not be invoked directly in this worktree because
-  `pnpm` is not on PATH; use Corepack. Prior targeted CRLF formatting check
-  passed before this handoff and final assertion adjustment.
-
+- Passed: Docker PostgreSQL acceptance for role table ownership, constraints,
+  audit behavior and migration rollback.
+- Passed: exact-head PR CI run `39389167803` (attempt 2), including format,
+  lint, types, unit, contract, build, security, migration, Docker and integration
+  gates; PR Local Helm run `39389167996`.
+- Passed: post-merge Main CI `39389902415`, Docker Images `39389902434`,
+  Local Helm `39389902408`, exact-merge Staging Validation `39390163488`,
+  and Jira Delivery Sync `39390226412`. Jira CGN-69 is Done.
+- The first PR CI attempt had a transient PostgreSQL socket-startup failure in
+  the existing platform-template outbox test. Only the failed CI job was
+  rerun; it passed on attempt 2. No CGN-69 test failed.
+- Windows limitation: the root contract suite returned 173/176 because of
+  existing line-ending-sensitive assertions in CGN-60 autoscaling, CGN-45
+  probes and CGN-61 workload identity. CGN-69 contract tests passed; Linux PR CI
+  is authoritative for those platform-sensitive checks.
 ## Known limitations / risks
 
 - `recruiter` does not mean approved organization membership (CGN-102).
@@ -86,18 +88,15 @@ secrets, paid service or production infrastructure is added.
   authorization. A client must not forward it as authorization proof.
 - No public or service-to-service role grant mechanism is provided. Grant
   workflows and least-privilege service authentication remain separately owned.
-- `docs/engineering-memory/05-current-state.md` needs a fresh-main,
-  docs-only follow-up after merge, recording exact merge and workflow evidence.
+- `docs/engineering-memory/05-current-state.md` and this handoff were updated
+  from the fresh-main follow-up branch after exact merge and delivery evidence.
 
 ## Exact next step for next agent
 
-Run Corepack Prettier check, `pnpm memory:check`, final scope/security review,
-and build. Commit and push this branch, create the CGN-69 PR, then wait for
-exact-head PR CI and Local Helm checks. Record delegated technical review on
-the exact head. Merge only after all required checks pass, then verify Main CI,
-Docker Images, Local Helm, Staging Validation and Jira Delivery Sync. Update
-Engineering Memory 05 from fresh `main`; after that, re-read live Jira sequence,
-owner and blockers before selecting the next ticket.
+CGN-69 is complete. Re-read the live rank-ordered Jira sequence, verify the next
+ticket's owner and hard blockers against the fresh current state, then start the
+next eligible ticket from a fresh `main` branch/worktree. Do not infer readiness
+from ticket-number order.
 
 ## Rollback note
 
@@ -110,5 +109,5 @@ tables.
 ## Engineering Memory updated
 
 - [x] `03-contract-registry.md`
-- [ ] `05-current-state.md` - update from fresh `main` with merge and workflow evidence
+- [x] `05-current-state.md` - updated from fresh `main` with merge and workflow evidence
 - [x] `06-known-risks.md`
