@@ -143,3 +143,30 @@ Kubernetes encryption-at-rest and production secret injection remain unverified;
 - The local Docker Engine was unavailable during this review. Host minimums, persistent remote Argo CD sync, monitoring/alerts, off-host backups and full 5,000-user capacity remain unverified; see the ticket handoff for exact test evidence.
 - Merged by [PR #61](https://github.com/Sandeepagrahari78/career-growth-network/pull/61), merge SHA `6cca89d822384fc05ff48f3baaf379bebcc42ddb` (candidate `4c67954a204918834e8e439649a1c355bad3ca12`). Exact-head PR CI run `39319090946`, PR Jira Delivery Sync run `39319090674`, post-merge Main CI `39319375711`, Docker Images `39319375703`, Staging Validation `39319656875`, and Jira Delivery Sync `39319656877` / `39319747453` passed.
 - Jira CGN-225 remains In Review because local host-level backup/restore and monitoring acceptance is not demonstrated. Delivery automation briefly moved it to Done after merge; the status was returned to In Review on 2026-10-20. CGN-226, CGN-229 and CGN-261 remain downstream.
+
+## CGN-69 Identity application roles and authorization context
+
+CGN-69 adds Identity-owned global application role assignments for `student`,
+`expert`, `recruiter` and `admin`, plus the versioned
+`cgn.identity.authorization-context.v1` response at
+`GET /v1/identity/auth/authorization-context`. Identity resolves the account
+from the authenticated session and returns only recognized active roles;
+provider/client claims are ignored and there is no implicit new-account role.
+Role changes are transactional and audited.
+
+Merged by [PR #72](https://github.com/Sandeepagrahari78/career-growth-network/pull/72)
+at `024547534c5303b225a3ceb7fe1126350f253f86` (candidate
+`bd715a45221a43c2366dc0f93165759980b317ad`). Exact-head PR CI run
+`39389167803` attempt 2 and PR Local Helm run `39389167996` passed.
+Post-merge Main CI `39389902415`, Docker Images `39389902434`, Local Helm
+`39389902408`, exact-merge Staging Validation `39390163488`, and final Jira
+Delivery Sync `39390226412` passed. Jira is Done. The first PR CI attempt
+encountered the existing transient platform-template PostgreSQL startup race;
+the failed job passed on rerun. No live Google roles, production deployment,
+or paid infrastructure was introduced.
+
+Recruiter role does not imply approved organization membership (CGN-102), expert
+does not imply verified expertise (CGN-186), and admin does not grant delegated
+Admin/Operator permissions or privacy-safe visibility (CGN-279). No role-write
+HTTP route or service-to-service authentication is defined by this ticket. See
+`docs/handoffs/CGN-69.md` for tests, exact workflow evidence and rollback.
