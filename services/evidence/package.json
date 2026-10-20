@@ -2,5 +2,19 @@
   "name": "@cgn/evidence",
   "private": true,
   "version": "0.0.0",
-  "type": "module"
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test:unit": "pnpm build && node --test test/unit/*.test.mjs",
+    "test:integration": "node --test test/integration/*.test.mjs",
+    "test": "pnpm test:unit && pnpm test:integration"
+  },
+  "devDependencies": {
+    "@types/node": "20.13.0",
+    "typescript": "5.9.3"
+  }
 }
