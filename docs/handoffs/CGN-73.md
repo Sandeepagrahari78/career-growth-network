@@ -3,7 +3,7 @@
 - Ticket: CGN-73 - Create API Gateway BFF service with auth context propagation
 - Branch: `CGN-73-api-gateway-bff-20261021`
 - Base branch: `main` at `57d8027a5bb7c051a619187b0e0ba43e5409ca47`
-- PR: pending push and creation; no review or merge authorization is claimed
+- PR: [#74](https://github.com/Sandeepagrahari78/career-growth-network/pull/74) - open; technical review and merge authorization pending
 - Jira: Sandeep-owned, To Do at implementation start; keep Jira ownership and status unchanged until the post-merge delivery gates pass
 - Date: 2026-10-21
 
