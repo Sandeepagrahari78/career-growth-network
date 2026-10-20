@@ -1,0 +1,29 @@
+{
+  "name": "@cgn/ai",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "build": "pnpm --package=typescript@5.9.3 dlx tsc -p tsconfig.json",
+    "typecheck": "pnpm --package=typescript@5.9.3 dlx tsc --noEmit -p tsconfig.json",
+    "test:unit": "pnpm build && node --test test/unit/*.test.mjs",
+    "test:integration": "pnpm build && node --test test/integration/*.test.mjs"
+  },
+  "dependencies": {
+    "@cgn/contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "20.13.0"
+  }
+}
