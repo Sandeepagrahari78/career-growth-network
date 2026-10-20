@@ -4,7 +4,7 @@
 - Branch: `CGN-73-api-gateway-bff-20261021`
 - Base branch: `main` at `57d8027a5bb7c051a619187b0e0ba43e5409ca47`
 - PR: [#74](https://github.com/Sandeepagrahari78/career-growth-network/pull/74) - open; technical review and merge authorization pending
-- Jira: Sandeep-owned, To Do at implementation start; keep Jira ownership and status unchanged until the post-merge delivery gates pass
+- Jira: Sandeep-owned; live status is In Review. Do not transition it to Done until the post-merge delivery gates pass
 - Date: 2026-10-21
 
 ## What changed
@@ -42,9 +42,11 @@ No database, migration, secret, event, or deployment configuration changes. Runt
 - Passed: Gateway unit tests (9), loopback HTTP integration tests (5) and CGN-73 contract tests (3) on Node 22.17.1.
 - Passed: `node scripts/ci/verify-workspace-boundaries.mjs` (16 packages), JavaScript syntax checks for the new test files, and package-manifest JSON parsing.
 - Existing full contracts suite: 176/179 passed. The three failures are the repository's Windows line-ending-sensitive CGN-60 autoscaling, CGN-45 probe, and CGN-61 workload identity validators; all CGN-73 contract tests passed. Linux PR CI remains required.
+- Latest PR CI on `ba712f0006047ea142c76601158904ed931be8da`: context/memory, security, infrastructure, format, lint, typecheck, and unit tests passed. The integration stage failed in two existing Identity OIDC tests; the CI run did not reach `test:contracts` or `build`. Gateway Docker matrix jobs were selected but skipped after the quality gate failed. Local Helm Validation run 190 passed.
+- The failing tests are outside CGN-73's owning boundary and were not changed here. They use a fixed `2026-10-20T10:00:00Z` service clock alongside wall-clock time for expired-token and in-memory-session checks; the GitHub runner had advanced beyond those fixture times. Treat the failed PR CI as a merge blocker until the existing test issue is resolved or its owner provides a reviewed disposition.
 - Blocked locally: Docker daemon is unavailable (`docker_engine` named pipe missing), so the Gateway Docker acceptance test could not run. PR CI's Docker job must pass.
 - Blocked locally: complete pnpm installation was prevented by missing offline tarballs and registry `EACCES`; direct `pnpm` build attempts retried the restricted registry. Compile/tests used the cached toolchain and did not modify the lockfile beyond the Gateway workspace importer.
-- Pending: PR CI, review, merge authorization, Main CI, staging validation, Jira Delivery Sync, `pnpm memory:check` on the staged candidate, and post-merge Engineering Memory update.
+- Pending: green exact-head PR CI including Docker build/security, technical review, Sandeep's merge authorization, exact-merge Main CI, staging validation, Jira Delivery Sync to Done, `pnpm memory:check` on the staged candidate, and post-merge Engineering Memory update.
 
 ## Known limitations / risks
 
@@ -52,11 +54,11 @@ No database, migration, secret, event, or deployment configuration changes. Runt
 - Identity and business-service origins must be supplied by the runtime owner; no deployment alias is assumed or provisioned here.
 - Browser cookie/CSRF policy and service-specific authorization remain outside CGN-73; review them before enabling state-changing browser routes.
 - Successful upstream status/body are relayed with a restricted response-header set. CGN-74 remains responsible for the owning error-handling contract and policy.
-- Local Docker acceptance and Linux PR CI have not yet produced evidence.
+- The PR is open and no reviews have been submitted. Current PR CI is not green because of the existing Identity OIDC integration failures documented above; Docker build/security jobs did not run.
 
 ## Exact next step for next agent
 
-Complete the staged-candidate memory/handoff gates, commit and push this branch, then open the CGN-73 PR. Wait for required technical review and Sandeep's merge authorization. After merge, verify exact-head Main CI, staging validation and Jira delivery sync show CGN-73 Done before starting dependent CGN-74. Recheck live Jira Rank and ownership before selecting any other ready Sandeep-owned ticket. Do not bypass CGN-122, CGN-141 or CGN-95 review gates.
+Keep PR #74 open while the existing Identity clock-sensitive integration test failure is resolved or receives an owner-reviewed disposition; keep this ticket's implementation within `services/gateway/` and `packages/contracts/`. After exact-head PR CI is green and technical review is complete, wait for Sandeep's explicit merge authorization. After merge, verify exact-merge Main CI, staging validation and Jira delivery sync show CGN-73 Done before starting dependent CGN-74. Recheck live Jira Rank and ownership before selecting another ticket: CGN-102 is ranked after CGN-101. Do not bypass CGN-122, CGN-141 or CGN-95 review gates.
 
 ## Rollback note
 
