@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cgn.local/schemas/identity-authorization-context.v1.schema.json",
+  "title": "CGN Identity Authorization Context v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "accountId", "evaluatedAt", "roles"],
+  "properties": {
+    "contract": { "const": "cgn.identity.authorization-context.v1" },
+    "accountId": { "type": "string", "format": "uuid" },
+    "evaluatedAt": { "type": "string", "format": "date-time" },
+    "roles": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "enum": ["student", "expert", "recruiter", "admin"] }
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cgn.local/schemas/identity-account.v1.schema.json",
+  "title": "CGN Identity Account v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "accountId", "createdAt"],
+  "properties": {
+    "contract": { "const": "cgn.identity.account.v1" },
+    "accountId": { "type": "string", "format": "uuid" },
+    "createdAt": { "type": "string", "format": "date-time" }
+  }
+}

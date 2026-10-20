@@ -4,6 +4,9 @@ All cross-domain contracts live under `packages/contracts` unless a ticket delib
 
 ## Canonical contracts
 
+- `cgn.identity.oidc-provider-config.v1` and `cgn.identity.auth-session.v1` define provider-neutral Identity OIDC configuration and a token-free session response; secret values remain in approved environment/secret configuration.
+- `cgn.identity.authorization-context.v1` exposes Identity's current recognized active application roles for an authenticated Identity session. It does not define resource permissions, recruiter membership approval, expert verification, or delegated Admin/Operator visibility.
+
 - `cgn.bounded-contexts.v1` — cross-domain ownership and integration-boundary contract.
 - `cgn.workspace-boundaries.v1` — monorepo package roots and allowed workspace dependency direction.
 - `cgn.staging-gitops.v1` — zero-budget local-first Argo CD staging GitOps source, destination and safety contract.
@@ -17,10 +20,15 @@ All cross-domain contracts live under `packages/contracts` unless a ticket delib
 - `cgn.product-analytics.v1` — versioned product-funnel event dictionary with producer, opt-in consent class, Analytics retention owner and payload allow-lists.
 - `domain.event.envelope.v1` — common versioned event envelope.
 - `http.error-envelope.v1` — common synchronous error shape.
+- `cgn.identity.account.v1` and `cgn.identity.provider-subject.v1` — Identity-owned account and OIDC subject persistence shapes; provider credentials remain with the authentication provider.
 
 `domain.event.envelope.v1` requires event ID, event type, envelope version, RFC 3339 occurrence timestamp, producer, and payload. Version 1 consumers reject other envelope versions; unknown optional envelope properties remain additive-compatible. The canonical TypeScript interface and JSON Schema live in `packages/contracts/src/events/domain-event-envelope.v1.ts` and `packages/contracts/schemas/domain-event-envelope.v1.schema.json`. Domain-specific payloads remain owned by their producer contracts.
 
 Synchronous HTTP APIs use URL major versions (`/v1/...`); additive changes retain a major path and breaking changes require an explicitly migrated major path. See [synchronous API versioning and error policy](../contracts/synchronous-api-versioning.md). Contract response fixtures live in `packages/contracts/fixtures/http/` and are exercised by shared contract and platform-template HTTP integration tests.
+
+`cgn.identity.oidc-provider-config.v1` and `cgn.identity.auth-session.v1` define provider-neutral Identity OIDC configuration and a token-free session response. The configuration contract stores environment variable names, never secret values. Identity auth routes are versioned under `/v1/identity/auth/`; they emit no cross-domain events.
+
+`cgn.identity.authorization-context.v1` returns the Identity account ID, evaluation time and recognized active application roles through `/v1/identity/auth/authorization-context`. Identity reads roles from its own database using the authenticated HttpOnly session; provider and client role claims are not trusted. The contract carries no tokens, organization membership, expert verification state, or delegated Admin/Operator permission matrix. Downstream servers must not treat a client-supplied copy as proof of authorization.
 
 ## Contract change policy
 
