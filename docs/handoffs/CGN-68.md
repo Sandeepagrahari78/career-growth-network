@@ -80,8 +80,9 @@ infrastructure was created.
 - Passed: Identity PostgreSQL acceptance on PostgreSQL 16 in disposable Docker project `cgn68-pg-acceptance`. It verified table ownership, cross-service access denial, FK/expiry/hash constraints, and rollback of both migrations. The unique test container, volume and network were removed afterward; the shared local database was not used.
 - Passed: Keycloak 26.8.1 live local realm import and Admin API inspection using disposable Docker projects. Discovery issuer, exact callback, standard flow, disabled implicit/direct grants, and imported `pkce.code.challenge.method=S256` were verified. The test realm and volume were removed afterward.
 - Passed: `docker compose ... config --quiet` and `node --check services/identity/keycloak/configure-google-broker.mjs` using disposable local configuration values. No real Google login was attempted because no Google credentials were available.
-- PR #70's first exact-head run `39382840535` found a blocking Semgrep issue because AES-GCM decryption did not specify the tag length; fixed by requiring 12-byte IVs and 16-byte authentication tags, with regression coverage. That run also hit a transient PostgreSQL socket-unavailable error in the pre-existing platform-template Docker outbox test; local and Docker-backed integration suites passed. The fixed commit is awaiting a new exact-head CI run.
-- Passed: `pnpm memory:check` after staging the implementation and handoff changes. Pending: push the security fix, new exact-head PR CI, mandatory Sandeep final technical review, merge, and post-merge gates.
+- PR #70's first exact-head run `39382840535` found a blocking Semgrep issue because AES-GCM decryption did not specify the tag length; fixed by requiring 12-byte IVs and 16-byte authentication tags, with regression coverage. That attempt also hit a transient PostgreSQL socket-unavailable error in the pre-existing platform-template Docker outbox test.
+- Passed: exact-candidate PR CI on `cdbbe015` via [PR CI run 39383305176](https://github.com/Sandeepagrahari78/career-growth-network/actions/runs/39383305176) and [Local Helm Validation run 39383305169](https://github.com/Sandeepagrahari78/career-growth-network/actions/runs/39383305169). The failed workflow job was rerun; quality, security, PostgreSQL migration, integration-stack, Docker build/security and PR quality summary jobs passed. The first-attempt Docker outbox startup error did not recur.
+- Passed: `pnpm memory:check` after staging the implementation and security-fix changes. The handoff has since been updated with exact CI evidence; the resulting documentation commit still needs its own exact-head checks. Pending: Sandeep final technical review, merge, and post-merge gates.
 - Context: `pnpm agent:context --ticket CGN-68 --domain identity` attempted dependency installation but registry access was denied; fallback `node scripts/agent-context.mjs --ticket CGN-68 --domain identity` generated the bundle. Jira CGN-68, CGN-67 and CGN-99 were checked live; both hard prerequisites are Done.
 
 ## Known limitations / risks
@@ -93,7 +94,7 @@ infrastructure was created.
 
 ## Exact next step for next agent
 
-Run `pnpm memory:check` after staging, commit and push this feature branch, open the CGN-68 PR, then monitor exact-head GitHub Actions and fix failures from this change. Merge only after the required Sandeep final technical review and exact-candidate gates. After merge, wait for Main CI, Docker, Staging Validation and Jira Delivery Sync before advancing blocked CGN-69/CGN-73; re-read live Jira sequence/readiness before selecting another ticket.
+Run `pnpm memory:check` after staging this handoff update, commit and push the branch, then verify exact-head CI. Merge only after the required Sandeep final technical review and exact-candidate gates. After merge, wait for Main CI, Docker, Staging Validation and Jira Delivery Sync before advancing blocked CGN-69/CGN-73; re-read live Jira sequence/readiness before selecting another ticket.
 
 ## Rollback note
 
