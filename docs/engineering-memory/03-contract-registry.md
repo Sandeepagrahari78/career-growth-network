@@ -5,6 +5,7 @@ All cross-domain contracts live under `packages/contracts` unless a ticket delib
 ## Canonical contracts
 
 - `cgn.identity.oidc-provider-config.v1` and `cgn.identity.auth-session.v1` define provider-neutral Identity OIDC configuration and a token-free session response; secret values remain in approved environment/secret configuration.
+- `cgn.identity.authorization-context.v1` exposes Identity's current recognized active application roles for an authenticated Identity session. It does not define resource permissions, recruiter membership approval, expert verification, or delegated Admin/Operator visibility.
 
 - `cgn.bounded-contexts.v1` — cross-domain ownership and integration-boundary contract.
 - `cgn.workspace-boundaries.v1` — monorepo package roots and allowed workspace dependency direction.
@@ -26,6 +27,8 @@ All cross-domain contracts live under `packages/contracts` unless a ticket delib
 Synchronous HTTP APIs use URL major versions (`/v1/...`); additive changes retain a major path and breaking changes require an explicitly migrated major path. See [synchronous API versioning and error policy](../contracts/synchronous-api-versioning.md). Contract response fixtures live in `packages/contracts/fixtures/http/` and are exercised by shared contract and platform-template HTTP integration tests.
 
 `cgn.identity.oidc-provider-config.v1` and `cgn.identity.auth-session.v1` define provider-neutral Identity OIDC configuration and a token-free session response. The configuration contract stores environment variable names, never secret values. Identity auth routes are versioned under `/v1/identity/auth/`; they emit no cross-domain events.
+
+`cgn.identity.authorization-context.v1` returns the Identity account ID, evaluation time and recognized active application roles through `/v1/identity/auth/authorization-context`. Identity reads roles from its own database using the authenticated HttpOnly session; provider and client role claims are not trusted. The contract carries no tokens, organization membership, expert verification state, or delegated Admin/Operator permission matrix. Downstream servers must not treat a client-supplied copy as proof of authorization.
 
 ## Contract change policy
 

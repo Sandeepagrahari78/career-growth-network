@@ -11,6 +11,12 @@ const SESSION = {
   authenticatedAt: "2026-10-20T10:00:00.000Z",
   expiresAt: "2026-10-20T18:00:00.000Z",
 };
+const AUTHORIZATION_CONTEXT = {
+  contract: "cgn.identity.authorization-context.v1",
+  accountId: SESSION.accountId,
+  evaluatedAt: "2026-10-20T10:00:00.000Z",
+  roles: ["student"],
+};
 
 function cookieValue(headers, name) {
   const lines = headers.getSetCookie?.() ?? [headers.get("set-cookie") ?? ""];
@@ -75,6 +81,10 @@ test("auth HTTP routes set protected cookies and return token-free session views
     async getSession(sessionId) {
       calls.push(["getSession", sessionId]);
       return sessionId ? SESSION : null;
+    },
+    async getAuthorizationContext(sessionId) {
+      calls.push(["getAuthorizationContext", sessionId]);
+      return sessionId ? AUTHORIZATION_CONTEXT : null;
     },
     async refreshSession(sessionId) {
       calls.push(["refreshSession", sessionId]);
@@ -146,6 +156,22 @@ test("auth HTTP routes set protected cookies and return token-free session views
   });
   assert.equal(session.status, 200);
   assert.deepEqual(await session.json(), { session: SESSION });
+  const authorizationContext = await request(
+    "/v1/identity/auth/authorization-context?role=admin",
+    { headers: { cookie: `${sessionName}=${sessionCookie}` } },
+  );
+  assert.equal(authorizationContext.status, 200);
+  assert.deepEqual(await authorizationContext.json(), {
+    authorizationContext: AUTHORIZATION_CONTEXT,
+  });
+  assert.deepEqual(
+    calls.find(([name]) => name === "getAuthorizationContext"),
+    ["getAuthorizationContext", sessionCookie],
+  );
+  const unauthenticatedContext = await request(
+    "/v1/identity/auth/authorization-context",
+  );
+  assert.equal(unauthenticatedContext.status, 401);
   const unauthenticated = await request("/v1/identity/auth/session");
   assert.equal(unauthenticated.status, 401);
   assert.match(
@@ -218,6 +244,9 @@ test("auth HTTP errors are safe and diagnostics never include callback credentia
       });
     },
     async getSession() {
+      return null;
+    },
+    async getAuthorizationContext() {
       return null;
     },
     async refreshSession() {

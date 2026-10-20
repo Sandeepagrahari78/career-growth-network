@@ -286,6 +286,12 @@ function createMemoryAccountRepository() {
 function makeService(provider, options = {}) {
   const repository = options.repository ?? createMemoryRepository();
   const accounts = options.accounts ?? createMemoryAccountRepository();
+  const roleAssignments = options.roleAssignments ?? new Map();
+  const roleRepository = {
+    async listRoleAssignments(accountId) {
+      return roleAssignments.get(accountId) ?? [];
+    },
+  };
   let clock = new Date("2026-10-20T10:00:00.000Z");
   const config = {
     issuer: provider.issuer,
@@ -305,6 +311,7 @@ function makeService(provider, options = {}) {
   return {
     repository,
     accounts,
+    roleAssignments,
     config,
     setNow(value) {
       clock = new Date(value);
@@ -313,6 +320,7 @@ function makeService(provider, options = {}) {
       config,
       transactionAndSessionRepository: repository,
       accountRepository: accounts,
+      roleRepository,
       now: () => new Date(clock),
     }),
   };
@@ -354,6 +362,48 @@ test("email and password use authorization-code PKCE and produce a token-free Id
   assert.equal(
     (await fixture.service.getSession(result.sessionId)).accountId,
     result.session.accountId,
+  );
+});
+
+test("authorization context uses Identity grants and ignores provider role claims", async (t) => {
+  const provider = await createMockProvider();
+  t.after(provider.stop);
+  const fixture = makeService(provider);
+  const start = await fixture.service.beginLogin("email_password");
+  const callbackUrl = provider.createCallback(start.authorizationUrl, {
+    subject: "identity-role-test-subject",
+    claimOverrides: { roles: ["admin"], role: "admin" },
+  });
+  const login = await fixture.service.completeLogin({
+    callbackUrl,
+    browserBinding: start.browserBinding,
+  });
+
+  assert.deepEqual(
+    await fixture.service.getAuthorizationContext(login.sessionId),
+    {
+      contract: "cgn.identity.authorization-context.v1",
+      accountId: login.session.accountId,
+      evaluatedAt: "2026-10-20T10:00:00.000Z",
+      roles: [],
+    },
+  );
+
+  fixture.roleAssignments.set(login.session.accountId, [
+    { role: "student", status: "active" },
+    { role: "admin", status: "inactive" },
+  ]);
+  assert.deepEqual(
+    (await fixture.service.getAuthorizationContext(login.sessionId)).roles,
+    ["student"],
+  );
+
+  fixture.roleAssignments.set(login.session.accountId, [
+    { role: "student", status: "inactive" },
+  ]);
+  assert.deepEqual(
+    (await fixture.service.getAuthorizationContext(login.sessionId)).roles,
+    [],
   );
 });
 
