@@ -53,6 +53,35 @@ test("configuration rejects invalid ports, environments and cookie names", () =>
   );
 });
 
+test("production requires HTTPS to Identity and disables upstream routes until CGN-101", () => {
+  assert.deepEqual(
+    loadAppConfig({
+      NODE_ENV: "production",
+      IDENTITY_BASE_URL: "https://identity.test",
+    }).upstreams,
+    {},
+  );
+  assert.throws(
+    () =>
+      loadAppConfig({
+        NODE_ENV: "production",
+        IDENTITY_BASE_URL: "http://identity.test",
+      }),
+    /IDENTITY_BASE_URL must use HTTPS in production/,
+  );
+  assert.throws(
+    () =>
+      loadAppConfig({
+        NODE_ENV: "production",
+        IDENTITY_BASE_URL: "https://identity.test",
+        CGN_GATEWAY_UPSTREAMS: JSON.stringify({
+          career: "https://career.test",
+        }),
+      }),
+    /disabled in production until CGN-101/,
+  );
+});
+
 test("configuration rejects URL credentials, paths and malformed upstream maps", () => {
   for (const IDENTITY_BASE_URL of [
     "",

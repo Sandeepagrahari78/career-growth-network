@@ -88,6 +88,28 @@ try {
   );
   assert.notEqual(invalidConfig.status, 0, "invalid config must fail closed");
 
+  const productionRoutes = spawnSync(
+    "docker",
+    [
+      "run",
+      "--rm",
+      "-e",
+      "NODE_ENV=production",
+      "-e",
+      "IDENTITY_BASE_URL=https://identity.invalid",
+      "-e",
+      'CGN_GATEWAY_UPSTREAMS={"career":"https://career.invalid"}',
+      image,
+    ],
+    { encoding: "utf8", timeout: 15000 },
+  );
+  assert.notEqual(
+    productionRoutes.status,
+    0,
+    "production proxy routes must remain disabled until CGN-101",
+  );
+  assert.match(productionRoutes.stderr, /until CGN-101/);
+
   docker(["stop", "--time", "10", container]);
   containerStarted = false;
   assert.equal(

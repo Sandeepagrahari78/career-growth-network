@@ -105,14 +105,33 @@ export function loadAppConfig(
     );
   }
 
+  const identityBaseUrl = serviceBaseUrl(
+    environment.IDENTITY_BASE_URL ?? "",
+    "IDENTITY_BASE_URL",
+  );
+  if (
+    nodeEnvironment === "production" &&
+    !identityBaseUrl.startsWith("https://")
+  ) {
+    throw new ConfigurationError(
+      "IDENTITY_BASE_URL must use HTTPS in production.",
+    );
+  }
+
+  const upstreams = configuredUpstreams(
+    environment.CGN_GATEWAY_UPSTREAMS ?? "{}",
+  );
+  if (nodeEnvironment === "production" && Object.keys(upstreams).length > 0) {
+    throw new ConfigurationError(
+      "Gateway upstream routing is disabled in production until CGN-101 establishes trusted service-to-service authentication.",
+    );
+  }
+
   return {
     port,
     environment: nodeEnvironment,
-    identityBaseUrl: serviceBaseUrl(
-      environment.IDENTITY_BASE_URL ?? "",
-      "IDENTITY_BASE_URL",
-    ),
+    identityBaseUrl,
     identitySessionCookieName,
-    upstreams: configuredUpstreams(environment.CGN_GATEWAY_UPSTREAMS ?? "{}"),
+    upstreams,
   };
 }

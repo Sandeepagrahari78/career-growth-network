@@ -2,12 +2,14 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://cgn.local/schemas/gateway-auth-context-forwarding.v1.schema.json",
   "title": "CGN Gateway Auth Context Forwarding v1",
+  "description": "Gateway-to-service transport data. Gateway derives the nested context only from Identity's authorization-context response after Identity validates the caller's session. This envelope does not authenticate Gateway or authorize downstream operations. Receiving services MUST fail closed for protected operations and MUST NOT treat this context as authorization proof until CGN-101 establishes and verifies trusted service-to-service transport.",
   "type": "object",
   "additionalProperties": false,
   "required": ["contract", "identityAuthorizationContext"],
   "properties": {
     "contract": { "const": "cgn.gateway.auth-context-forwarding.v1" },
     "identityAuthorizationContext": {
+      "description": "The unchanged Identity-owned account ID, evaluation time and active application roles. Do not accept a client-supplied copy or add resource permissions here.",
       "$ref": "identity-authorization-context.v1.schema.json"
     }
   }

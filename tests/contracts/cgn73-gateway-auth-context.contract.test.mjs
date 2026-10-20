@@ -56,6 +56,13 @@ test("Gateway forwarding envelope is versioned, closed and reuses Identity's con
 });
 
 test("registry blocks consumer trust until CGN-101 service authentication", () => {
+  assert.match(schema.description, /Identity's authorization-context response/);
+  assert.match(schema.description, /MUST fail closed for protected operations/);
+  assert.match(schema.description, /until CGN-101/);
+  assert.match(
+    schema.properties.identityAuthorizationContext.description,
+    /Identity-owned account ID/,
+  );
   assert.match(registry, /Gateway Auth Context Forwarding v1/);
   assert.match(
     registry,
@@ -67,8 +74,8 @@ test("registry blocks consumer trust until CGN-101 service authentication", () =
 test("forwarded context carries no session credential or consumer authorization extension", () => {
   const properties = Object.keys(schema.properties).sort();
   assert.deepEqual(properties, ["contract", "identityAuthorizationContext"]);
-  assert.doesNotMatch(
-    JSON.stringify(schema),
-    /sessionId|cookie|permission|credential/i,
+  assert.deepEqual(
+    Object.keys(schema.properties.identityAuthorizationContext).sort(),
+    ["$ref", "description"],
   );
 });

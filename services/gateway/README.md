@@ -16,7 +16,7 @@ The forwarding envelope is transport data, not proof that the caller is Gateway.
 | `CGN_IDENTITY_SESSION_COOKIE_NAME` | `cgn_identity_session` | Identity's non-secure local or `__Host-` secure cookie name  |
 | `CGN_GATEWAY_UPSTREAMS`            | `{}`                   | JSON object mapping service aliases to fixed HTTP(S) origins |
 
-The upstream map contains origins only. URL credentials, paths, queries and fragments are rejected. Keep production service-to-service authentication disabled until CGN-101 is merged; the header alone does not authenticate Gateway.
+The upstream map contains origins only. URL credentials, paths, queries and fragments are rejected. In production, `IDENTITY_BASE_URL` must use HTTPS and any non-empty `CGN_GATEWAY_UPSTREAMS` is rejected until CGN-101 establishes trusted service-to-service authentication. Production `/v1/...` proxy routes therefore remain unavailable in this ticket; health and readiness do not authorize downstream operations. The forwarded header alone never authenticates Gateway.
 
 ## Local use
 

@@ -101,13 +101,18 @@ test("health, readiness and unknown configured routes follow service conventions
   assert.equal(identityCalls, 0);
 });
 
-test("missing or invalid session is rejected before forwarding", async (t) => {
+test("missing, invalid, and expired sessions are rejected before forwarding", async (t) => {
   let identityCalls = 0;
   let downstreamCalls = 0;
-  const identity = await startIdentity(t, (_request, response) => {
+  const expiredCookie = "cgn_identity_session=" + "c".repeat(43);
+  const identity = await startIdentity(t, (request, response) => {
     identityCalls += 1;
     response.writeHead(401, { "content-type": "application/json" });
-    response.end("{}");
+    response.end(
+      request.headers.cookie === expiredCookie
+        ? JSON.stringify({ error: { code: "SESSION_EXPIRED" } })
+        : "{}",
+    );
   });
   const downstream = await startServer((_request, response) => {
     downstreamCalls += 1;
@@ -128,6 +133,13 @@ test("missing or invalid session is rejected before forwarding", async (t) => {
   });
   assert.equal(invalid.status, 401);
   assert.equal(identityCalls, 1);
+
+  // Identity owns expiration; this mock models its 401 for an expired session.
+  const expired = await fetch(baseUrl + "/v1/career/goals", {
+    headers: { cookie: expiredCookie },
+  });
+  assert.equal(expired.status, 401);
+  assert.equal(identityCalls, 2);
   assert.equal(downstreamCalls, 0);
 });
 
@@ -172,6 +184,7 @@ test("verified context replaces spoofed headers and only the allowlisted request
       "x-request-id": "cgn-gateway-test-1",
       "x-cgn-auth-context-v1": "spoofed-context",
       "x-user-id": "spoofed-account",
+      "x-user-roles": "admin",
       authorization: "Bearer spoofed-token",
     },
     body: JSON.stringify({ goal: "career" }),
@@ -191,6 +204,7 @@ test("verified context replaces spoofed headers and only the allowlisted request
   assert.equal(downstreamRequest.headers.cookie, undefined);
   assert.equal(downstreamRequest.headers.authorization, undefined);
   assert.equal(downstreamRequest.headers["x-user-id"], undefined);
+  assert.equal(downstreamRequest.headers["x-user-roles"], undefined);
   assert.equal(downstreamRequest.headers["x-request-id"], "cgn-gateway-test-1");
   assert.deepEqual(
     JSON.parse(downstreamRequest.headers[GATEWAY_AUTH_CONTEXT_HEADER_V1]),
