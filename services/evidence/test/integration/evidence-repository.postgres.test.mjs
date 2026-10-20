@@ -151,34 +151,57 @@ test(
       assert.equal(owned.visibility, "private");
       assert.equal(owned.verificationState, "unverified");
       assert.equal(
-        (await repository.findOwnedActive("identity-subject-a", owned.evidenceId))
-          ?.evidenceId,
+        (
+          await repository.findOwnedActive(
+            "identity-subject-a",
+            owned.evidenceId,
+          )
+        )?.evidenceId,
         owned.evidenceId,
       );
       assert.equal(
-        await repository.findOwnedActive("identity-subject-b", owned.evidenceId),
+        await repository.findOwnedActive(
+          "identity-subject-b",
+          owned.evidenceId,
+        ),
         null,
       );
       assert.equal(
-        (await repository.findOwnedActive("identity-subject-b", other.evidenceId))
-          ?.evidenceId,
+        (
+          await repository.findOwnedActive(
+            "identity-subject-b",
+            other.evidenceId,
+          )
+        )?.evidenceId,
         other.evidenceId,
       );
 
       assert.equal(
-        await repository.archiveOwnedActive("identity-subject-a", owned.evidenceId),
+        await repository.archiveOwnedActive(
+          "identity-subject-a",
+          owned.evidenceId,
+        ),
         true,
       );
       assert.equal(
-        await repository.findOwnedActive("identity-subject-a", owned.evidenceId),
+        await repository.findOwnedActive(
+          "identity-subject-a",
+          owned.evidenceId,
+        ),
         null,
       );
       assert.equal(
-        await repository.archiveOwnedActive("identity-subject-b", other.evidenceId),
+        await repository.archiveOwnedActive(
+          "identity-subject-b",
+          other.evidenceId,
+        ),
         true,
       );
       assert.equal(
-        await repository.findOwnedActive("identity-subject-b", other.evidenceId),
+        await repository.findOwnedActive(
+          "identity-subject-b",
+          other.evidenceId,
+        ),
         null,
       );
 

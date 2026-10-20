@@ -36,9 +36,9 @@ function recordingDatabase(responses = []) {
 }
 
 test("creates a manual claim as private and unverified", async () => {
-  const capture = recordingDatabase([[
-    row({ object_key: "objects/opaque-evidence-key" }),
-  ]]);
+  const capture = recordingDatabase([
+    [row({ object_key: "objects/opaque-evidence-key" })],
+  ]);
   const repository = new EvidenceRepository(capture.database);
   const record = await repository.create({
     ownerId: "student-a",
@@ -62,14 +62,16 @@ test("creates a manual claim as private and unverified", async () => {
 });
 
 test("creates an observed source separately from a manual claim", async () => {
-  const capture = recordingDatabase([[
-    row({
-      provenance_kind: "observed_source",
-      claim_text: null,
-      source_reference: "github:repo/project/commit/abc123",
-      object_key: "objects/source-snapshot",
-    }),
-  ]]);
+  const capture = recordingDatabase([
+    [
+      row({
+        provenance_kind: "observed_source",
+        claim_text: null,
+        source_reference: "github:repo/project/commit/abc123",
+        object_key: "objects/source-snapshot",
+      }),
+    ],
+  ]);
   const repository = new EvidenceRepository(capture.database);
   const record = await repository.create({
     ownerId: "student-a",
@@ -100,8 +102,14 @@ test("archive is owner-scoped and reports whether an active row changed", async 
   const capture = recordingDatabase([[{ evidence_id: evidenceId }], []]);
   const repository = new EvidenceRepository(capture.database);
 
-  assert.equal(await repository.archiveOwnedActive("student-a", evidenceId), true);
-  assert.equal(await repository.archiveOwnedActive("student-b", evidenceId), false);
+  assert.equal(
+    await repository.archiveOwnedActive("student-a", evidenceId),
+    true,
+  );
+  assert.equal(
+    await repository.archiveOwnedActive("student-b", evidenceId),
+    false,
+  );
   assert.match(capture.statements[0].statement, /owner_id = \$2/);
   assert.match(capture.statements[0].statement, /archived_at IS NULL/);
   assert.deepEqual(capture.statements[0].values, [evidenceId, "student-a"]);

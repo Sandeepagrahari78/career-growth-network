@@ -4,10 +4,7 @@ export type EvidenceProvenanceKind = "manual_claim" | "observed_source";
 export type EvidenceVerificationState = "unverified" | "verified";
 
 export interface EvidenceSqlExecutor {
-  query(
-    statement: string,
-    values?: unknown[],
-  ): Promise<{ rows: unknown[] }>;
+  query(statement: string, values?: unknown[]): Promise<{ rows: unknown[] }>;
 }
 
 export interface CreateManualClaimInput {
@@ -100,7 +97,11 @@ function nonEmpty(value: string, field: string): void {
 
 function validateEvidenceId(evidenceId: string): void {
   nonEmpty(evidenceId, "evidenceId");
-  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(evidenceId)) {
+  if (
+    !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+      evidenceId,
+    )
+  ) {
     throw new TypeError("evidenceId must be a UUID.");
   }
 }
@@ -109,7 +110,9 @@ function validateObjectKey(objectKey: string | undefined): void {
   if (objectKey === undefined) return;
   nonEmpty(objectKey, "objectKey");
   if (/^(?:\/\/|[a-z][a-z0-9+.-]*:)/i.test(objectKey)) {
-    throw new TypeError("objectKey must be an opaque private reference, not a URL.");
+    throw new TypeError(
+      "objectKey must be an opaque private reference, not a URL.",
+    );
   }
 }
 
@@ -118,7 +121,9 @@ function asEvidenceRow(value: unknown): EvidenceRow {
 }
 
 function iso(value: Date | string): string {
-  return value instanceof Date ? value.toISOString() : new Date(value).toISOString();
+  return value instanceof Date
+    ? value.toISOString()
+    : new Date(value).toISOString();
 }
 
 function nullableIso(value: Date | string | null): string | null {
