@@ -140,6 +140,21 @@ test("encrypts refresh and ID tokens with authenticated AES-GCM ciphertext", () 
   assert.ok(ciphertext.startsWith("v1."));
   assert.doesNotMatch(ciphertext, /refresh-secret-value/);
   assert.equal(decryptSecret(ciphertext, key), "refresh-secret-value");
+  const [version, iv, tag, encryptedValue] = ciphertext.split(".");
+  const shortTag = Buffer.from(tag, "base64url")
+    .subarray(0, 12)
+    .toString("base64url");
+  assert.throws(
+    () => decryptSecret([version, iv, shortTag, encryptedValue].join("."), key),
+    /unsupported format/,
+  );
+  const shortIv = Buffer.from(iv, "base64url")
+    .subarray(0, 8)
+    .toString("base64url");
+  assert.throws(
+    () => decryptSecret([version, shortIv, tag, encryptedValue].join("."), key),
+    /unsupported format/,
+  );
   assert.throws(() => decryptSecret(ciphertext.slice(0, -2) + "aa", key));
   assert.equal(encryptSecret(null, key), null);
   assert.equal(decryptSecret(null, key), null);

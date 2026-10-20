@@ -15,7 +15,7 @@ export function encryptSecret(value, key) {
     return null;
   }
   const iv = randomBytes(12);
-  const cipher = createCipheriv("aes-256-gcm", key, iv);
+  const cipher = createCipheriv("aes-256-gcm", key, iv, { authTagLength: 16 });
   const ciphertext = Buffer.concat([
     cipher.update(value, "utf8"),
     cipher.final(),
@@ -44,12 +44,16 @@ export function decryptSecret(value, key) {
     throw new Error("Encrypted Identity value has an unsupported format.");
   }
 
-  const decipher = createDecipheriv(
-    "aes-256-gcm",
-    key,
-    Buffer.from(ivValue, "base64url"),
-  );
-  decipher.setAuthTag(Buffer.from(tagValue, "base64url"));
+  const iv = Buffer.from(ivValue, "base64url");
+  const authTag = Buffer.from(tagValue, "base64url");
+  if (iv.length !== 12 || authTag.length !== 16) {
+    throw new Error("Encrypted Identity value has an unsupported format.");
+  }
+
+  const decipher = createDecipheriv("aes-256-gcm", key, iv, {
+    authTagLength: 16,
+  });
+  decipher.setAuthTag(authTag);
   return Buffer.concat([
     decipher.update(Buffer.from(ciphertextValue, "base64url")),
     decipher.final(),
