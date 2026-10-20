@@ -102,3 +102,9 @@ Kubernetes encryption-at-rest and production secret injection remain unverified;
 - The local Docker Engine was unavailable during this review. Host minimums, persistent remote Argo CD sync, monitoring/alerts, off-host backups and full 5,000-user capacity remain unverified; see the ticket handoff for exact test evidence.
 - Merged by [PR #61](https://github.com/Sandeepagrahari78/career-growth-network/pull/61), merge SHA `6cca89d822384fc05ff48f3baaf379bebcc42ddb` (candidate `4c67954a204918834e8e439649a1c355bad3ca12`). Exact-head PR CI run `39319090946`, PR Jira Delivery Sync run `39319090674`, post-merge Main CI `39319375711`, Docker Images `39319375703`, Staging Validation `39319656875`, and Jira Delivery Sync `39319656877` / `39319747453` passed.
 - Jira CGN-225 remains In Review because local host-level backup/restore and monitoring acceptance is not demonstrated. Delivery automation briefly moved it to Done after merge; the status was returned to In Review on 2026-10-20. CGN-226, CGN-229 and CGN-261 remain downstream.
+
+## CGN-95 OpenTelemetry SDK (PR pending)
+
+- Candidate implementation adds `@cgn/observability` with W3C Trace Context propagation, asynchronous OTLP/HTTP export, HTTP request spans, and reusable database/Kafka span helpers. `services/platform-template` initializes it from `OTEL_SERVICE_NAME` and `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` and shuts it down with Nest lifecycle hooks.
+- The implementation intentionally does not add database or Kafka driver instrumentation, a collector, or a contract. Export is disabled when no endpoint is configured; spans omit URLs, request/event bodies, credentials, database statements and user identifiers.
+- Jira CGN-95 hard prerequisites CGN-35 and CGN-36 are Done. Jira CGN-95 remains To Do until delivery review and automation complete. See `docs/handoffs/CGN-95.md` for checks and limitations.

@@ -97,6 +97,12 @@ test("HTTP health, readiness, request correlation, and unknown routes", async (t
   assert.match(readiness.headers.get("x-request-id") ?? "", /^[0-9a-f-]{36}$/);
   assert.deepEqual(await readiness.json(), { status: "ready" });
 
+  const malformedTrace = await fetch(`${baseUrl}/health`, {
+    headers: { traceparent: "malformed-trace-context" },
+  });
+  assert.equal(malformedTrace.status, 200);
+  assert.deepEqual(await malformedTrace.json(), { status: "ok" });
+
   const missing = await fetch(`${baseUrl}/not-a-business-route`);
   assert.equal(missing.status, 404);
   const requestId = missing.headers.get("x-request-id");

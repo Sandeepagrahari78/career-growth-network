@@ -7,17 +7,18 @@
     "node": ">=22.12.0"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "pnpm --filter @cgn/observability build && tsc -p tsconfig.json",
     "start": "node dist/main.js",
     "start:dev": "tsc -p tsconfig.json --watch",
-    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "typecheck": "pnpm --filter @cgn/observability build && tsc --noEmit -p tsconfig.json",
     "test:unit": "pnpm build && node --test test/unit/*.test.mjs",
-    "test:integration": "node --test test/integration/*.test.mjs",
+    "test:integration": "pnpm build && node --test test/integration/*.test.mjs",
     "test:docker": "node test/docker-smoke.mjs",
     "test": "pnpm build && pnpm test:unit && pnpm test:integration"
   },
   "dependencies": {
     "@cgn/contracts": "workspace:*",
+    "@cgn/observability": "workspace:*",
     "@nestjs/common": "12.1.2",
     "@nestjs/core": "12.1.2",
     "@nestjs/platform-express": "12.1.2",
