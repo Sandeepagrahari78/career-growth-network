@@ -1,9 +1,9 @@
 # Identity Service
 
-Identity owns the internal account identifier and external provider-subject
-mapping. Provider credentials remain with the authentication provider. Career
-goals, stage, profile, and scoring are owned by their respective domains and
-are not persisted here.
+Identity owns the internal account identifier, external provider-subject
+mapping, authentication sessions, and application roles. Provider credentials
+remain with the authentication provider. Career goals, education stage, career
+profile, and scoring remain with their respective domains.
 
 ## Persistence
 
@@ -11,11 +11,13 @@ The `cgn_identity` database contains the Identity-owned `identity` schema.
 Migration `001_identity_accounts.up.sql` creates UUID accounts and unique
 `(issuer, subject)` provider mappings. Migration `002_identity_auth_sessions.up.sql`
 adds hashed one-time login state and session identifiers, encrypted OIDC
-transaction/session tokens, and Identity-owned expiry indexes. Both repositories
-use the injected Identity database adapter with parameterized queries; no other
-service database is accessed. `createIdentityAuthRuntime()` composes the
-repositories, OIDC service and HTTP server. The process that hosts the service
-supplies the database driver, connection settings and adapter.
+transaction/session tokens, and Identity-owned expiry indexes. Migration
+`003_identity_account_roles.up.sql` creates the allow-listed Identity role
+assignments and role-change audit table. All repositories use the injected
+Identity database adapter with parameterized queries; no other service database
+is accessed. `createIdentityAuthRuntime()` composes the repositories, OIDC
+service and HTTP server. The host process supplies the database driver,
+connection settings and adapter.
 
 Run repository unit tests with `pnpm --filter @cgn/identity test:unit`. The
 PostgreSQL acceptance test runs only against the disposable local/CI database
@@ -36,10 +38,30 @@ authenticated AES-256-GCM ciphertext in the Identity database. Public session
 responses contain only the internal account ID and session timestamps.
 
 HTTP routes are `/v1/identity/auth/authorize`, `/callback`, `/session`,
-`/refresh` and `/logout`. Session and browser-binding cookies are HttpOnly,
+`/authorization-context`, `/refresh` and `/logout`. Session and browser-binding cookies are HttpOnly,
 SameSite=Lax and Secure in production. Production configuration requires HTTPS
 and a confidential OIDC client. Local loopback HTTP is accepted only outside
 production.
+
+## Application roles
+
+Identity persists only the recognized application roles `student`, `expert`,
+`recruiter` and `admin`, with `active` or `inactive` status. A new account gets
+no implicit role. OIDC provider role claims and client-supplied role values are
+ignored. The authenticated `/v1/identity/auth/authorization-context` route
+resolves the account from the HttpOnly Identity session and returns only
+recognized active roles; status is re-read on each request. Unknown and
+inactive roles fail closed. Role changes are Identity-owned and written to the
+role-change audit table.
+
+This context is an Identity response for server-side authorization checks; a
+client must not submit or forward it as authorization proof. The `recruiter`
+application role does not imply an approved organization membership (CGN-102),
+the `expert` role does not imply verified expertise (CGN-186), and the `admin`
+role does not define delegated Admin/Operator visibility or action permissions
+(CGN-279). This ticket adds no role-grant HTTP route or service-to-service
+authentication; those grants remain limited to trusted Identity-side
+workflows. No resource-specific permission matrix is established here.
 
 ## Local Keycloak 26.8.1
 

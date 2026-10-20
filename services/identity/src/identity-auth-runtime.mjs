@@ -1,5 +1,6 @@
 import { IdentityAccountRepository } from "./account-repository.mjs";
 import { IdentityAuthSessionRepository } from "./auth-session-repository.mjs";
+import { IdentityApplicationRoleRepository } from "./application-role-repository.mjs";
 import { createIdentityAuthHttpServer } from "./http-auth-server.mjs";
 import { IdentityOidcAuthService } from "./oidc-auth-service.mjs";
 import { loadIdentityOidcConfig } from "./oidc-config.mjs";
@@ -20,6 +21,7 @@ export function createIdentityAuthRuntime({
       config.encryptionKey,
     ),
     accountRepository: new IdentityAccountRepository(database),
+    roleRepository: new IdentityApplicationRoleRepository(database),
     ...(now ? { now } : {}),
     ...(clientFactory ? { clientFactory } : {}),
   });

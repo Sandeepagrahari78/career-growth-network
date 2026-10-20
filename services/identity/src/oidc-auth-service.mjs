@@ -16,6 +16,7 @@ import {
 import { randomBytes } from "node:crypto";
 import { URL } from "node:url";
 import { IDENTITY_AUTH_SESSION_CONTRACT } from "./identity-auth-contract.mjs";
+import { createAuthorizationContext } from "./application-authorization.mjs";
 
 const LOGIN_METHODS = new Set(["email_password", "google"]);
 
@@ -90,6 +91,7 @@ export class IdentityOidcAuthService {
     config,
     transactionAndSessionRepository,
     accountRepository,
+    roleRepository,
     now = () => new Date(),
     clientFactory,
   }) {
@@ -115,9 +117,15 @@ export class IdentityOidcAuthService {
         "Identity auth requires the Identity account repository.",
       );
     }
+    if (typeof roleRepository?.listRoleAssignments !== "function") {
+      throw new TypeError(
+        "Identity auth requires the Identity application-role repository.",
+      );
+    }
     this.config = config;
     this.repository = transactionAndSessionRepository;
     this.accountRepository = accountRepository;
+    this.roleRepository = roleRepository;
     this.now = now;
     this.clientFactory =
       clientFactory ??
@@ -302,6 +310,21 @@ export class IdentityOidcAuthService {
       return null;
     }
     return sessionView(session);
+  }
+
+  async getAuthorizationContext(sessionId) {
+    const session = await this.getSession(sessionId);
+    if (!session) {
+      return null;
+    }
+    const assignments = await this.roleRepository.listRoleAssignments(
+      session.accountId,
+    );
+    return createAuthorizationContext({
+      accountId: session.accountId,
+      assignments,
+      evaluatedAt: this.now(),
+    });
   }
 
   async refreshSession(sessionId) {

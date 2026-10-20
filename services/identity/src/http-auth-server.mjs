@@ -2,6 +2,7 @@ import { createServer } from "node:http";
 import { randomUUID } from "node:crypto";
 import { URL } from "node:url";
 import { IdentityAuthError } from "./oidc-auth-service.mjs";
+import { IDENTITY_AUTHORIZATION_CONTEXT_API_V1 } from "./identity-auth-contract.mjs";
 
 const SAFE_MESSAGES = {
   identity_provider_unavailable:
@@ -96,6 +97,7 @@ export function createIdentityAuthHttpServer({ authService, config, logger }) {
     typeof authService?.beginLogin !== "function" ||
     typeof authService?.completeLogin !== "function" ||
     typeof authService?.getSession !== "function" ||
+    typeof authService?.getAuthorizationContext !== "function" ||
     typeof authService?.refreshSession !== "function" ||
     typeof authService?.logout !== "function"
   ) {
@@ -169,6 +171,20 @@ export function createIdentityAuthHttpServer({ authService, config, logger }) {
           "x-request-id": requestId,
         });
         response.end(JSON.stringify({ session: result.session }));
+        return;
+      }
+
+      if (
+        request.method === "GET" &&
+        url.pathname === IDENTITY_AUTHORIZATION_CONTEXT_API_V1
+      ) {
+        const authorizationContext = await authService.getAuthorizationContext(
+          cookies.get(names.session),
+        );
+        if (!authorizationContext) {
+          throw new IdentityAuthError("unauthenticated");
+        }
+        sendJson(response, 200, { authorizationContext }, requestId);
         return;
       }
 

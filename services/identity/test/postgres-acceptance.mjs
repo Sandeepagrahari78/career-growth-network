@@ -60,11 +60,14 @@ function runSqlExpectingFailure(sql, expectedError, message) {
 
 let accountsMigrationApplied = false;
 let sessionsMigrationApplied = false;
+let rolesMigrationApplied = false;
 try {
   migrate("up");
   accountsMigrationApplied = true;
   migrate("up", "002_identity_auth_sessions");
   sessionsMigrationApplied = true;
+  migrate("up", "003_identity_account_roles");
+  rolesMigrationApplied = true;
 
   runSql(
     owner +
@@ -90,6 +93,14 @@ try {
   );
   assert.equal(authTablesOwner, "t");
 
+  const roleTablesOwner = runSql(
+    `SELECT bool_and(pg_get_userbyid(relowner) = 'cgn_identity_owner')
+     FROM pg_class
+     WHERE oid IN ('identity.account_roles'::regclass,
+                   'identity.account_role_changes'::regclass);`,
+  );
+  assert.equal(roleTablesOwner, "t");
+
   const unauthorizedTableAccess = runSql(
     "SELECT has_table_privilege('cgn_career_owner', 'identity.accounts', 'SELECT');",
   );
@@ -102,6 +113,13 @@ try {
     ),
     "f",
   );
+  assert.equal(
+    runSql(
+      `SELECT has_table_privilege('cgn_career_owner', 'identity.account_roles', 'SELECT')
+          OR has_table_privilege('cgn_career_owner', 'identity.account_role_changes', 'SELECT');`,
+    ),
+    "f",
+  );
 
   runSql(
     owner +
@@ -110,6 +128,62 @@ try {
        VALUES (repeat('a', 64), '10000000-0000-4000-8000-000000000001',
          'v1.test-ciphertext', '2026-10-20T10:00:00Z', '2026-10-20T18:00:00Z');` +
       reset,
+  );
+
+  runSql(
+    owner +
+      `INSERT INTO identity.account_roles (account_id, role_key, status)
+       VALUES
+         ('10000000-0000-4000-8000-000000000001', 'student', 'active'),
+         ('10000000-0000-4000-8000-000000000001', 'admin', 'inactive');
+       INSERT INTO identity.account_role_changes
+         (change_id, account_id, role_key, previous_status, new_status,
+          actor_account_id, changed_at)
+       VALUES ('20000000-0000-4000-8000-000000000001',
+         '10000000-0000-4000-8000-000000000001', 'student', NULL, 'active',
+         '10000000-0000-4000-8000-000000000002', '2026-10-20T10:00:00Z');` +
+      reset,
+  );
+
+  assert.equal(
+    runSql(
+      `SELECT count(*) FROM identity.account_roles
+       WHERE account_id = '10000000-0000-4000-8000-000000000001'
+         AND status = 'active';`,
+    ),
+    "1",
+  );
+  assert.equal(
+    runSql(
+      `SELECT count(*) FROM identity.account_role_changes
+       WHERE account_id = '10000000-0000-4000-8000-000000000001'
+         AND new_status = 'active';`,
+    ),
+    "1",
+  );
+  runSqlExpectingFailure(
+    owner +
+      `INSERT INTO identity.account_roles (account_id, role_key, status)
+       VALUES ('10000000-0000-4000-8000-000000000001', 'operator', 'active');` +
+      reset,
+    /violates check constraint/i,
+    "An unknown application role unexpectedly succeeded.",
+  );
+  runSqlExpectingFailure(
+    owner +
+      `INSERT INTO identity.account_roles (account_id, role_key, status)
+       VALUES ('10000000-0000-4000-8000-000000000001', 'expert', 'pending');` +
+      reset,
+    /violates check constraint/i,
+    "An unknown role status unexpectedly succeeded.",
+  );
+  runSqlExpectingFailure(
+    owner +
+      `INSERT INTO identity.account_roles (account_id, role_key, status)
+       VALUES ('10000000-0000-4000-8000-000000000099', 'student', 'active');` +
+      reset,
+    /violates foreign key constraint/i,
+    "A role assignment without an Identity account unexpectedly succeeded.",
   );
 
   runSqlExpectingFailure(
@@ -166,6 +240,14 @@ try {
     "A provider mapping without an Identity account unexpectedly succeeded.",
   );
 
+  migrate("down", "003_identity_account_roles");
+  rolesMigrationApplied = false;
+  assert.equal(
+    runSql(
+      "SELECT to_regclass('identity.account_roles') IS NULL AND to_regclass('identity.account_role_changes') IS NULL;",
+    ),
+    "t",
+  );
   migrate("down", "002_identity_auth_sessions");
   sessionsMigrationApplied = false;
   assert.equal(
@@ -178,9 +260,16 @@ try {
   accountsMigrationApplied = false;
   assert.equal(runSql("SELECT to_regnamespace('identity') IS NULL;"), "t");
   console.log(
-    "Identity PostgreSQL acceptance passed: account and auth-session ownership, cross-service access, provider mapping, session FK/expiry constraints and migration rollback.",
+    "Identity PostgreSQL acceptance passed: account, session and role ownership, cross-service access, provider mapping, session constraints, role change audit and migration rollback.",
   );
 } finally {
+  if (rolesMigrationApplied) {
+    try {
+      migrate("down", "003_identity_account_roles");
+    } catch {
+      // Preserve the original acceptance failure; CI tears down the database.
+    }
+  }
   if (sessionsMigrationApplied) {
     try {
       migrate("down", "002_identity_auth_sessions");

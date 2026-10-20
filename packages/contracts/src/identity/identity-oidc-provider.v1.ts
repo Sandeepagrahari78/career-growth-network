@@ -6,6 +6,7 @@ export const IDENTITY_AUTH_API_V1 = {
   authorize: "/v1/identity/auth/authorize",
   callback: "/v1/identity/auth/callback",
   session: "/v1/identity/auth/session",
+  authorizationContext: "/v1/identity/auth/authorization-context",
   refresh: "/v1/identity/auth/refresh",
   logout: "/v1/identity/auth/logout",
 } as const;
