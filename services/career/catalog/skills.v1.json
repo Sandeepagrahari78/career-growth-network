@@ -1,5 +1,36 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "1.0.0",
-  "skills": []
+  "catalogVersion": "1.1.0",
+  "skills": [
+    {
+      "id": "skill.deep_learning_fundamentals",
+      "displayName": "Deep learning fundamentals",
+      "aliases": [],
+      "lifecycle": "active"
+    },
+    {
+      "id": "skill.machine_learning_fundamentals",
+      "displayName": "Machine learning fundamentals",
+      "aliases": [],
+      "lifecycle": "active"
+    },
+    {
+      "id": "skill.model_evaluation",
+      "displayName": "Model evaluation and validation",
+      "aliases": [],
+      "lifecycle": "active"
+    },
+    {
+      "id": "skill.numerical_computing",
+      "displayName": "Numerical computing with arrays",
+      "aliases": [],
+      "lifecycle": "active"
+    },
+    {
+      "id": "skill.python_programming",
+      "displayName": "Python programming",
+      "aliases": [],
+      "lifecycle": "active"
+    }
+  ]
 }

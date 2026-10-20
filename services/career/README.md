@@ -5,7 +5,8 @@ and lifecycle rules are defined by the versioned contract
 `cgn.skill-catalog.v1` in `packages/contracts` and its career-owned data in
 `catalog/skills.v1.json`.
 
-The catalog in this ticket contains cross-track foundational skills only. Track
-curricula and their prerequisite graphs are authored by CGN-76/77/78 and must
-reference these immutable IDs or add approved new ones. Do not derive IDs from
-display names or create a second catalog in a consumer.
+The skill catalog contains canonical skill IDs and names. CGN-76/77/78 track
+catalogs reference these immutable IDs or add reviewed new ones. Track-specific
+required/optional status, prerequisites and version-pinned source metadata live
+in the Career-owned, versioned track catalog; consumers must not create a second
+catalog. Do not derive IDs from display names.

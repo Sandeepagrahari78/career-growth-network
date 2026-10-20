@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "catalogVersion": "1.0.0",
+  "skillCatalogVersion": "1.1.0",
+  "tracks": [
+    {
+      "id": "track.ai_engineer",
+      "displayName": "AI Engineer",
+      "skills": [
+        {
+          "skillId": "skill.deep_learning_fundamentals",
+          "requirement": "optional",
+          "prerequisites": ["skill.machine_learning_fundamentals"],
+          "sourceIds": ["source.pytorch-basics"]
+        },
+        {
+          "skillId": "skill.machine_learning_fundamentals",
+          "requirement": "required",
+          "prerequisites": [
+            "skill.numerical_computing",
+            "skill.python_programming"
+          ],
+          "sourceIds": ["source.scikit-learn-getting-started"]
+        },
+        {
+          "skillId": "skill.model_evaluation",
+          "requirement": "required",
+          "prerequisites": ["skill.machine_learning_fundamentals"],
+          "sourceIds": ["source.scikit-learn-getting-started"]
+        },
+        {
+          "skillId": "skill.numerical_computing",
+          "requirement": "required",
+          "prerequisites": ["skill.python_programming"],
+          "sourceIds": ["source.numpy-beginners"]
+        },
+        {
+          "skillId": "skill.python_programming",
+          "requirement": "required",
+          "prerequisites": [],
+          "sourceIds": ["source.python-tutorial"]
+        }
+      ],
+      "sources": [
+        {
+          "id": "source.numpy-beginners",
+          "kind": "official_documentation",
+          "publisher": "NumPy contributors",
+          "title": "NumPy: the absolute basics for beginners",
+          "url": "https://numpy.org/doc/stable/user/absolute_beginners",
+          "version": "NumPy 2.5",
+          "accessedOn": "2026-10-20"
+        },
+        {
+          "id": "source.python-tutorial",
+          "kind": "official_documentation",
+          "publisher": "Python Software Foundation",
+          "title": "The Python Tutorial",
+          "url": "https://docs.python.org/3.11/tutorial/",
+          "version": "Python 3.11",
+          "accessedOn": "2026-10-20"
+        },
+        {
+          "id": "source.pytorch-basics",
+          "kind": "official_documentation",
+          "publisher": "PyTorch contributors",
+          "title": "Learn the Basics",
+          "url": "https://docs.pytorch.org/tutorials/beginner/basics/intro.html",
+          "version": "PyTorch 2.14.0",
+          "accessedOn": "2026-10-20"
+        },
+        {
+          "id": "source.scikit-learn-getting-started",
+          "kind": "official_documentation",
+          "publisher": "scikit-learn contributors",
+          "title": "Getting Started",
+          "url": "https://scikit-learn.org/1.9/getting_started.html",
+          "version": "scikit-learn 1.9.1",
+          "accessedOn": "2026-10-20"
+        }
+      ]
+    }
+  ]
+}
