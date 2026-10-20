@@ -63,22 +63,29 @@ uniqueness and FK enforcement, then proves rollback.
 - Passed: isolated PostgreSQL 16 acceptance using `node scripts/infra/postgres-local.mjs up`, `node services/identity/test/postgres-acceptance.mjs`, and `node scripts/infra/postgres-local.mjs reset`. The run proved owner, no Career table access, duplicate subject rejection, FK enforcement and rollback; only the isolated CGN-67 Compose project/volume was removed.
 - Windows-only baseline limitation: `pnpm format:check` reports 145 repository files because the checked-in script uses Prettier's default line-ending behavior against this `core.autocrlf=true` checkout. The targeted changed-file check passed with `--end-of-line crlf`.
 - Windows-only baseline limitation: `pnpm test:contracts` — 166/169 passed. The three unrelated failures are existing CRLF-sensitive assertions in CGN-60 autoscaling, CGN-45 probes and CGN-61 workload identity. The new CGN-67 contract tests passed.
-- Required exact-head Linux GitHub PR CI: pending.
+- Passed: exact-head Linux PR CI run `39371584997` and Local Helm run
+  `39371584971` on head `9e61281ba906ecf2e70cc629e665fd22a8d499e7`.
+- Passed: post-merge Main CI `39372850079`, Docker Images `39372850129`, and
+  Local Helm `39372850071` on merge SHA `6d44d746b585f0f92cb48756fdac8438a5f107fa`.
+- Passed: exact-merge Staging Validation run `39373071513`; Jira Delivery Sync
+  run `39373071566` passed and Jira status is Done.
 
 ## Known limitations / risks
 
 - No PostgreSQL driver, pool, HTTP route, authentication flow or runtime
   bootstrap is added. The service bootstrap must inject an adapter implementing
   `query` and `withTransaction` and use credentials scoped to the Identity DB.
-- The independent technical review and exact-head PR CI must pass before merge.
+- The exact-head PR CI and Local Helm checks passed. Sandeep authorized
+  delegated technical review and merge on 2026-10-20; staging validation is
+  still required to complete delivery sync.
 - The migration covers account/provider-subject persistence only; it does not
   establish production readiness or a live identity provider integration.
 
 ## Exact next step for next agent
 
-Push the branch, open/update the PR, and wait for independent technical review
-and exact-head CI. After merge, update `docs/engineering-memory/05-current-state.md` and
-recheck Jira dependencies before selecting the next executable ticket.
+CGN-67 is Done after exact-merge Staging Validation and delivery sync. The next
+live dependency-ordered ticket, CGN-68, has CGN-67 and CGN-99 Done; run its
+standard fresh-main preflight before implementation.
 
 ## Rollback note
 
@@ -90,16 +97,21 @@ the PR. No external database or production user data is modified.
 ## Engineering Memory updated
 
 - [x] `03-contract-registry.md` — added the Identity v1 persistence contracts.
-- [ ] `05-current-state.md` — update only after merge; this branch is not merged
-      truth yet.
+- [x] `05-current-state.md` — records the merged Identity persistence scope and
+      exact PR/merge checks; this follow-up still needs to merge.
 - [ ] ADR / known risks — no ownership or architecture decision changed; record
       follow-up only if review changes the runtime-role boundary.
 
 ## Owner review and PR references
 
-- Jira status/dependencies were checked live on 2026-10-20: In Progress;
+- Jira status/dependencies were checked live on 2026-10-20 before merge: In Progress;
   required dependencies CGN-34, CGN-35, CGN-42, CGN-66 and CGN-290 were Done.
 - The owner resolved the CGN-290 persistence boundary on 2026-10-20; no V2
   stage/goal fields are included.
-- GitHub PR URL / head SHA: pending.
-- Independent technical review: pending.
+- GitHub PR: [#67](https://github.com/Sandeepagrahari78/career-growth-network/pull/67),
+  head `9e61281ba906ecf2e70cc629e665fd22a8d499e7`, merged as
+  `6d44d746b585f0f92cb48756fdac8438a5f107fa`.
+- Sandeep authorized delegated technical review/merge on 2026-10-20; the
+  repository, migration boundaries and rollback path were reviewed before merge.
+- After Main CI, Docker, Local Helm and exact-merge Staging Validation passed,
+  Jira Delivery Sync completed and CGN-67 transitioned to Done.
