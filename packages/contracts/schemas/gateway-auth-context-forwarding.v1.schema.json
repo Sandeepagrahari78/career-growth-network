@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cgn.local/schemas/gateway-auth-context-forwarding.v1.schema.json",
+  "title": "CGN Gateway Auth Context Forwarding v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "identityAuthorizationContext"],
+  "properties": {
+    "contract": { "const": "cgn.gateway.auth-context-forwarding.v1" },
+    "identityAuthorizationContext": {
+      "$ref": "identity-authorization-context.v1.schema.json"
+    }
+  }
+}

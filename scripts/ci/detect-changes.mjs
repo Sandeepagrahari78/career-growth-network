@@ -70,6 +70,7 @@ const flags = {
   platformTemplate: changed.some((file) =>
     file.startsWith("services/platform-template/"),
   ),
+  gateway: changed.some((file) => file.startsWith("services/gateway/")),
   e2e: changed.some(
     (file) =>
       file.startsWith("apps/web/") ||
