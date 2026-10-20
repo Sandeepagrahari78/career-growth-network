@@ -3,6 +3,8 @@
 - Ticket: CGN-68 - Implement open-source OIDC/JWT email and Google authentication
 - Branch: `CGN-68-keycloak-oidc-20261020`
 - Base branch: `main` at `27167973b186393b5d70387e4739c8e4bf67dc2a`
+- PR: [#70](https://github.com/Sandeepagrahari78/career-growth-network/pull/70), merged as `720fec55af251acea528817c239b258f2552df2b`
+- Jira status: Done after final Jira Delivery Sync on 2026-10-20
 - Agent/person: Codex implementation under Sandeep's delegated execution; Jira assignee remains Sandeep Agrahari
 - Date: 2026-10-20
 
@@ -82,8 +84,11 @@ infrastructure was created.
 - Passed: `docker compose ... config --quiet` and `node --check services/identity/keycloak/configure-google-broker.mjs` using disposable local configuration values. No real Google login was attempted because no Google credentials were available.
 - PR #70's first exact-head run `39382840535` found a blocking Semgrep issue because AES-GCM decryption did not specify the tag length; fixed by requiring 12-byte IVs and 16-byte authentication tags, with regression coverage. That attempt also hit a transient PostgreSQL socket-unavailable error in the pre-existing platform-template Docker outbox test.
 - Passed: exact-candidate PR CI on `cdbbe015` via [PR CI run 39383305176](https://github.com/Sandeepagrahari78/career-growth-network/actions/runs/39383305176) and [Local Helm Validation run 39383305169](https://github.com/Sandeepagrahari78/career-growth-network/actions/runs/39383305169). The failed workflow job was rerun; quality, security, PostgreSQL migration, integration-stack, Docker build/security and PR quality summary jobs passed. The first-attempt Docker outbox startup error did not recur.
-- Passed: `pnpm memory:check` after staging the implementation and security-fix changes. The handoff has since been updated with exact CI evidence; the resulting documentation commit still needs its own exact-head checks. Pending: Sandeep final technical review, merge, and post-merge gates.
-- Context: `pnpm agent:context --ticket CGN-68 --domain identity` attempted dependency installation but registry access was denied; fallback `node scripts/agent-context.mjs --ticket CGN-68 --domain identity` generated the bundle. Jira CGN-68, CGN-67 and CGN-99 were checked live; both hard prerequisites are Done.
+- Passed: final exact-head PR CI on `f7ce74d` via [PR CI run 39384124086](https://github.com/Sandeepagrahari78/career-growth-network/actions/runs/39384124086) and [Local Helm Validation run 39384124095](https://github.com/Sandeepagrahari78/career-growth-network/actions/runs/39384124095). Quality, security, migration, integration-stack, Docker build/security, Engineering Memory and quality-summary checks passed; conditional infrastructure, local Kubernetes, end-to-end deployment and k6 jobs were skipped by workflow conditions.
+- Passed: delegated technical review on exact head `f7ce74d` was recorded in [PR review comment 5581790344](https://github.com/Sandeepagrahari78/career-growth-network/pull/70#pullrequestreview-5581790344), with no blocking findings. It was not an independent approval; merge proceeded under Sandeep's direct authorization after all exact-head checks passed.
+- Passed: post-merge Main CI `39384524683`, Docker Images `39384524833`, Local Helm Validation `39384524859`, exact-merge Staging Validation `39384763954`, and final Jira Delivery Sync `39384840920`. Jira CGN-68 reached Done.
+- Passed: `pnpm memory:check` after staging the implementation, security fix and post-merge memory update. The post-merge memory update itself is being delivered from a fresh `main` branch.
+- Context: `pnpm agent:context --ticket CGN-68 --domain identity` attempted dependency installation but registry access was denied; fallback `node scripts/agent-context.mjs --ticket CGN-68 --domain identity` generated the bundle. Jira CGN-68, CGN-67 and CGN-99 were checked live; both hard prerequisites were Done.
 
 ## Known limitations / risks
 
@@ -94,7 +99,7 @@ infrastructure was created.
 
 ## Exact next step for next agent
 
-Run `pnpm memory:check` after staging this handoff update, commit and push the branch, then verify exact-head CI. Merge only after the required Sandeep final technical review and exact-candidate gates. After merge, wait for Main CI, Docker, Staging Validation and Jira Delivery Sync before advancing blocked CGN-69/CGN-73; re-read live Jira sequence/readiness before selecting another ticket.
+CGN-68 is complete. Re-read the live rank-ordered Jira sequence, verify the next ticket's owner and blockers, and start the next eligible item from a fresh `main` worktree. CGN-69 and CGN-73 are now downstream of the merged authentication work; do not start either until its remaining prerequisites are Done.
 
 ## Rollback note
 

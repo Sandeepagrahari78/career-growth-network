@@ -1,6 +1,7 @@
 # 05 - Current Merged State
 
-Last updated: 2026-10-20 after the CGN-67 Identity persistence merge; CGN-90, CGN-99, CGN-75, CGN-131 and CGN-67 are merged with verification evidence below.
+Last updated: 2026-10-20 after the CGN-68 Identity OIDC merge; CGN-90, CGN-99,
+CGN-75, CGN-131, CGN-67 and CGN-68 are merged with verification evidence below.
 
 ## Repository
 
@@ -20,6 +21,17 @@ Last updated: 2026-10-20 after the CGN-67 Identity persistence merge; CGN-90, CG
   `39371584971`, Main CI `39372850079`, Docker `39372850129`, Local Helm
   `39372850071`, exact-merge Staging Validation `39373071513`, and Jira
   Delivery Sync `39373071566` passed. Jira status is Done.
+- CGN-68: added Identity-owned provider-neutral OIDC and token-free session
+  contracts, Keycloak 26.8.1 local realm, Authorization Code + PKCE, encrypted
+  durable login/session state, versioned Identity auth routes and migration
+  002. [PR #70](https://github.com/Sandeepagrahari78/career-growth-network/pull/70)
+  merged at SHA `720fec55af251acea528817c239b258f2552df2b`. Exact-head PR CI
+  `39384124086` and PR Local Helm `39384124095` passed. Post-merge Main CI
+  `39384524683`, Docker Images `39384524833`, Local Helm `39384524859`, exact-
+  merge Staging Validation `39384763954`, and final Jira Delivery Sync
+  `39384840920` passed. Jira is Done. Real Google credentials and production
+  Keycloak deployment remain unverified; no paid service or production
+  infrastructure was enabled.
 - CGN-39: zero-budget Terraform bootstrap merged via PR #6 / `e9fe0cb945eabe9f4bf86eefd144642455641089`.
 - CGN-40: local network/security baseline merged via PR #7 / `42499116c5e2d81552bf206585e3cae04f31ecf9`.
 - CGN-41: local k3d/K3s cluster merged via PR #8 / `797fbaf4144cf86919817dc61177870480ead5d9`; PR and post-merge local Kubernetes validation are green.
@@ -94,7 +106,16 @@ Jira is the work source of truth. Figma defines the approved product flow for us
 
 ## CGN-68 Identity OIDC implementation
 
-CGN-68's accepted provider decision is self-hosted Keycloak 26.8.1 for email/password and optional Google identity brokering. The branch adds versioned provider/session contracts, Identity-owned one-use login transaction and auth-session migrations/repositories, OIDC Authorization Code + PKCE, signature/JWKS validation, safe session cookies and versioned Identity HTTP routes. Google credentials are configuration-only; controlled OIDC tests do not claim live Google login. The local Keycloak realm is loopback-only and development-only. No paid service or production deployment is introduced. Follow the ticket handoff for exact validation, PR and merge status; update this section with exact merge and pipeline SHAs when delivered.
+CGN-68's accepted provider decision is self-hosted Keycloak 26.8.1 for
+email/password and optional Google identity brokering. [PR #70](https://github.com/Sandeepagrahari78/career-growth-network/pull/70)
+is merged at `720fec55af251acea528817c239b258f2552df2b`. The OIDC config/session
+contracts, Identity-owned one-use login transactions, encrypted sessions,
+migration 002 and versioned auth routes are on `main`. Exact PR CI, post-merge
+Main CI, Docker Images, Local Helm, Staging Validation and Jira Delivery Sync
+passed; Jira is Done. Google credentials remain configuration-only, so no live
+Google login is claimed. The local Keycloak realm is loopback-only and
+development-only. No paid service or production deployment was introduced.
+See `docs/handoffs/CGN-68.md` for exact checks and operational limitations.
 
 ## Update rule
 
