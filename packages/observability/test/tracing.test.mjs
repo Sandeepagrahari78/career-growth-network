@@ -61,6 +61,7 @@ test("propagates one trace and keeps exporter failures out of request work", asy
   assert.equal(server.traceId, remoteTraceId);
 
   let propagatedCarrier;
+  let unknownDirectionCallbackRan = false;
   const requestResult = await server.run(async () => {
     propagatedCarrier = injectTraceContext();
     await withTraceContext(propagatedCarrier, async () => {
@@ -71,12 +72,16 @@ test("propagates one trace and keeps exporter failures out of request work", asy
       await runWithKafkaSpan("produce", async () => {
         await Promise.resolve();
       });
+      await runWithKafkaSpan("authorization-header-secret", async () => {
+        unknownDirectionCallbackRan = true;
+      });
     });
     return "request-ok";
   });
   server.end(200);
 
   assert.equal(requestResult, "request-ok");
+  assert.equal(unknownDirectionCallbackRan, true);
   assert.match(
     propagatedCarrier.traceparent,
     /^00-[0-9a-f]{32}-[0-9a-f]{16}-01$/,
@@ -97,9 +102,20 @@ test("propagates one trace and keeps exporter failures out of request work", asy
   const eventSpan = exporter.spans.find(
     (span) => span.name === "kafka.produce",
   );
+  const unknownKafkaSpan = exporter.spans.find(
+    (span) => span.name === "kafka.unknown",
+  );
   assert.ok(serverSpan);
   assert.ok(databaseSpan);
   assert.ok(eventSpan);
+  assert.ok(unknownKafkaSpan);
+  assert.equal(unknownKafkaSpan.kind, 0);
+  assert.equal(
+    exporter.spans.some((span) =>
+      span.name.includes("authorization-header-secret"),
+    ),
+    false,
+  );
   assert.equal(serverSpan.parentSpanContext.spanId, remoteSpanId);
   assert.equal(
     databaseSpan.parentSpanContext.spanId,
@@ -107,6 +123,10 @@ test("propagates one trace and keeps exporter failures out of request work", asy
   );
   assert.equal(
     eventSpan.parentSpanContext.spanId,
+    serverSpan.spanContext().spanId,
+  );
+  assert.equal(
+    unknownKafkaSpan.parentSpanContext.spanId,
     serverSpan.spanContext().spanId,
   );
 

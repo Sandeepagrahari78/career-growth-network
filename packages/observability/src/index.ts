@@ -39,6 +39,7 @@ const DATABASE_OPERATIONS = new Set([
   "query",
   "transaction",
 ]);
+const KAFKA_DIRECTIONS = new Set(["produce", "consume"]);
 
 export type DatabaseOperation = "connect" | "execute" | "query" | "transaction";
 
@@ -185,8 +186,14 @@ export function runWithKafkaSpan<T>(
   direction: "produce" | "consume",
   work: () => T | Promise<T>,
 ): Promise<T> {
-  const kind = direction === "produce" ? SpanKind.PRODUCER : SpanKind.CONSUMER;
-  return runWithSpan(`kafka.${direction}`, kind, work);
+  const safeDirection = KAFKA_DIRECTIONS.has(direction) ? direction : "unknown";
+  const kind =
+    safeDirection === "produce"
+      ? SpanKind.PRODUCER
+      : safeDirection === "consume"
+        ? SpanKind.CONSUMER
+        : SpanKind.INTERNAL;
+  return runWithSpan(`kafka.${safeDirection}`, kind, work);
 }
 
 async function runWithSpan<T>(

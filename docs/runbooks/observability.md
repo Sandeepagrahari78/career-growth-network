@@ -26,8 +26,9 @@ HTTP server spans extract only `traceparent` and `tracestate`. Kafka adapters
 can use `withTraceContext` to extract those headers and `injectTraceContext` to
 create headers for a downstream message. `runWithKafkaSpan` and
 `runWithDatabaseSpan` provide bounded spans for existing adapters. Database
-span operation names use a fixed allowlist, and Kafka span names contain only
-the producer/consumer direction.
+span operation names use a fixed allowlist. Kafka span names contain only the
+producer/consumer direction; unexpected runtime values become `kafka.unknown`
+with an internal span kind so the supplied value is not recorded.
 
 Spans do not include URLs, query strings, request or event bodies, credentials,
 database statements, user identifiers or arbitrary application attributes.

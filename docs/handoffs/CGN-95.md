@@ -11,7 +11,9 @@
 
 - Added the shared `@cgn/observability` package with OpenTelemetry SDK setup,
   OTLP/HTTP environment configuration, W3C trace propagation, HTTP spans and
-  bounded database/Kafka span helpers.
+  bounded database/Kafka span helpers. Runtime-invalid Kafka directions now
+  produce a fixed `kafka.unknown` internal span rather than entering the span
+  name.
 - Wired tracing into platform-template startup, HTTP request middleware, safe
   request logs and Nest shutdown lifecycle.
 - Added privacy/failure tests, the observability runbook and workspace quality
@@ -68,21 +70,33 @@
   Check PR #63 for the latest exact-candidate CI status before merge.
 - `pnpm memory:check` passed after staging the handoff and Engineering Memory
   update.
+- Review follow-up on the corrected working tree: observability package build,
+  typecheck and unit test passed; platform-template typecheck, unit tests and
+  integration tests passed. The PostgreSQL outbox integration case skipped
+  because Docker is unavailable.
+- Root `ci:quick` stopped at the existing CRLF-sensitive Kubernetes-probes
+  validator (`scripts/ci/validate-kubernetes-probes.mjs`); root lint could not
+  start because `pnpm dlx` was denied access to `C:\Users\Sandeep`. The new
+  candidate must receive fresh Linux PR CI before merge; the earlier green run
+  was for the previous head.
 
 ## Known limitations / risks
 
 - Database and Kafka instrumentation is exposed as reusable helpers; service
   adapters and live runtime drivers are not added by this ticket.
+- Unexpected runtime values passed to the Kafka helper are reduced to the
+  fixed `kafka.unknown` name and internal span kind, keeping telemetry bounded.
 - Export is disabled unless `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` is set.
 - The HTTP span omits URLs and request data to avoid recording identifiers or
   secrets. No live collector or staging endpoint was available for this change.
 
 ## Exact next step for next agent
 
-Run the handoff gate and full PR CI on the corrected candidate. Sandeep reviews
-the architecture/security impact before merge. After merge, confirm main CI,
-update this handoff and Engineering Memory with merge evidence, then re-query
-live Jira rank and blockers before starting the next ready ticket.
+Run the handoff gate and full PR CI on the review-corrected candidate. The
+owner has delegated technical review and merge authority to the agent for this
+sequence; merge only after all applicable exact-head checks pass. After merge,
+confirm main CI, update this handoff and Engineering Memory with merge evidence,
+then re-query live Jira rank and blockers before starting the next ready ticket.
 
 ## Rollback note
 
