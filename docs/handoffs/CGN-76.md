@@ -39,12 +39,13 @@ consumer authorization behavior. The catalog pins its dependency on
 
 None.
 
-## Migrations / configuration
+## Database / migration / config changes
 
-None. No service runtime, API route, event, database migration, paid service or
-external registration is introduced.
+No database migration or runtime configuration is introduced. Static JSON
+catalog content is the only product data added. No API route, event, paid
+service or external registration is introduced.
 
-## Tests and checks
+## Tests run
 
 Passed:
 
@@ -63,7 +64,7 @@ required to verify the full suite. Integration, database, API, privacy and E2E
 tests do not apply because this ticket adds static catalog content and a
 deterministic validator only.
 
-## Known limitations and required review
+## Known limitations / risks
 
 - The AI Engineer content is a proposal sourced from official project
   documentation, not a complete or accredited curriculum.
@@ -72,14 +73,22 @@ deterministic validator only.
 - No API, diagnostics, scoring, exam preparation, study plan, runtime or
   deployment behavior is included.
 
-## Exact next step
+## Exact next step for next agent
 
 Have the career content owner review the skill set and prerequisite graph. After
 that review and Sandeep's contract review, merge only with green exact-head CI,
 then update Engineering Memory with the merge SHA and recheck CGN-77/78 against
 the resulting canonical IDs.
 
-## Rollback
+## Rollback note
 
 Revert this PR. The change is static contract/catalog content only; no runtime
 data or external state is modified.
+
+## Engineering Memory updated
+
+The canonical contract registry is updated in this PR. The merged current-state
+page (`docs/engineering-memory/05-current-state.md`) remains unchanged until
+merge because it records merged implementation state. After merge, update it
+with the catalog ownership, version, and merge SHA, then rerun
+`pnpm memory:check`.
