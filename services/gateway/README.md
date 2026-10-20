@@ -8,13 +8,13 @@ The forwarding envelope is transport data, not proof that the caller is Gateway.
 
 ## Configuration
 
-| Variable | Default | Meaning |
-| --- | --- | --- |
-| `PORT` | `3000` | HTTP listener port |
-| `NODE_ENV` | `development` | `development`, `test`, or `production` |
-| `IDENTITY_BASE_URL` | required | Origin of the Identity service |
-| `CGN_IDENTITY_SESSION_COOKIE_NAME` | `cgn_identity_session` | Identity's non-secure local or `__Host-` secure cookie name |
-| `CGN_GATEWAY_UPSTREAMS` | `{}` | JSON object mapping service aliases to fixed HTTP(S) origins |
+| Variable                           | Default                | Meaning                                                      |
+| ---------------------------------- | ---------------------- | ------------------------------------------------------------ |
+| `PORT`                             | `3000`                 | HTTP listener port                                           |
+| `NODE_ENV`                         | `development`          | `development`, `test`, or `production`                       |
+| `IDENTITY_BASE_URL`                | required               | Origin of the Identity service                               |
+| `CGN_IDENTITY_SESSION_COOKIE_NAME` | `cgn_identity_session` | Identity's non-secure local or `__Host-` secure cookie name  |
+| `CGN_GATEWAY_UPSTREAMS`            | `{}`                   | JSON object mapping service aliases to fixed HTTP(S) origins |
 
 The upstream map contains origins only. URL credentials, paths, queries and fragments are rejected. Keep production service-to-service authentication disabled until CGN-101 is merged; the header alone does not authenticate Gateway.
 

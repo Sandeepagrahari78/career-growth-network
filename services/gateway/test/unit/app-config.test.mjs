@@ -6,13 +6,16 @@ import {
 } from "../../dist/config/app-config.js";
 
 test("configuration requires an owning Identity origin and defaults to no consumer routes", () => {
-  assert.deepEqual(loadAppConfig({ IDENTITY_BASE_URL: "http://identity.test" }), {
-    port: 3000,
-    environment: "development",
-    identityBaseUrl: "http://identity.test",
-    identitySessionCookieName: "cgn_identity_session",
-    upstreams: {},
-  });
+  assert.deepEqual(
+    loadAppConfig({ IDENTITY_BASE_URL: "http://identity.test" }),
+    {
+      port: 3000,
+      environment: "development",
+      identityBaseUrl: "http://identity.test",
+      identitySessionCookieName: "cgn_identity_session",
+      upstreams: {},
+    },
+  );
 });
 
 test("configuration parses a bounded upstream allowlist", () => {
@@ -22,7 +25,9 @@ test("configuration parses a bounded upstream allowlist", () => {
       NODE_ENV: "test",
       IDENTITY_BASE_URL: "http://identity.test:3000",
       CGN_IDENTITY_SESSION_COOKIE_NAME: "__Host-cgn_identity_session",
-      CGN_GATEWAY_UPSTREAMS: JSON.stringify({ career: "http://career.test:3001" }),
+      CGN_GATEWAY_UPSTREAMS: JSON.stringify({
+        career: "http://career.test:3001",
+      }),
     }),
     {
       port: 4312,

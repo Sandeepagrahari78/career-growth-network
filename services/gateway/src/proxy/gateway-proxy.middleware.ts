@@ -34,9 +34,9 @@ function sendError(
   });
 }
 
-function requestRoute(originalUrl: string):
-  | { service: string; path: string; search: string }
-  | undefined {
+function requestRoute(
+  originalUrl: string,
+): { service: string; path: string; search: string } | undefined {
   if (!originalUrl.startsWith("/") || originalUrl.startsWith("//")) {
     return undefined;
   }
@@ -46,9 +46,7 @@ function requestRoute(originalUrl: string):
   } catch {
     return undefined;
   }
-  const match = /^\/v1\/([a-z][a-z0-9-]{0,31})(?:\/.*)?$/.exec(
-    parsed.pathname,
-  );
+  const match = /^\/v1\/([a-z][a-z0-9-]{0,31})(?:\/.*)?$/.exec(parsed.pathname);
   if (!match || /%2f|%5c|%2e/i.test(parsed.pathname)) return undefined;
   return { service: match[1], path: parsed.pathname, search: parsed.search };
 }
@@ -166,7 +164,8 @@ export function createGatewayProxyMiddleware(
       if (upstreamContentType) {
         response.setHeader("content-type", upstreamContentType);
       }
-      const upstreamCacheControl = upstreamResponse.headers.get("cache-control");
+      const upstreamCacheControl =
+        upstreamResponse.headers.get("cache-control");
       if (upstreamCacheControl) {
         response.setHeader("cache-control", upstreamCacheControl);
       }

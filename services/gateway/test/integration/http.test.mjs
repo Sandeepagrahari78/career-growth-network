@@ -34,9 +34,10 @@ async function startServer(handler) {
   return {
     server,
     baseUrl: "http://127.0.0.1:" + address.port,
-    close: () => new Promise((resolve, reject) => {
-      server.close((error) => (error ? reject(error) : resolve()));
-    }),
+    close: () =>
+      new Promise((resolve, reject) => {
+        server.close((error) => (error ? reject(error) : resolve()));
+      }),
   };
 }
 
@@ -187,10 +188,7 @@ test("verified context replaces spoofed headers and only the allowlisted request
   assert.equal(downstreamRequest.headers.cookie, undefined);
   assert.equal(downstreamRequest.headers.authorization, undefined);
   assert.equal(downstreamRequest.headers["x-user-id"], undefined);
-  assert.equal(
-    downstreamRequest.headers["x-request-id"],
-    "cgn-gateway-test-1",
-  );
+  assert.equal(downstreamRequest.headers["x-request-id"], "cgn-gateway-test-1");
   assert.deepEqual(
     JSON.parse(downstreamRequest.headers[GATEWAY_AUTH_CONTEXT_HEADER_V1]),
     {
@@ -231,7 +229,10 @@ test("Identity and downstream failures return safe errors without private upstre
     { headers: cookie },
   );
   assert.equal(downstreamFailure.status, 502);
-  assert.doesNotMatch(await downstreamFailure.text(), /ECONNREFUSED|127\.0\.0\.1/);
+  assert.doesNotMatch(
+    await downstreamFailure.text(),
+    /ECONNREFUSED|127\.0\.0\.1/,
+  );
 });
 
 test("malformed Identity response is not forwarded", async (t) => {

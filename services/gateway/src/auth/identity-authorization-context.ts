@@ -64,7 +64,9 @@ export function isIdentityAuthorizationContext(
     roles.every(
       (role) =>
         typeof role === "string" &&
-        IDENTITY_APPLICATION_ROLES_V1.some((allowedRole) => role === allowedRole),
+        IDENTITY_APPLICATION_ROLES_V1.some(
+          (allowedRole) => role === allowedRole,
+        ),
     ) && new Set(roles).size === roles.length
   );
 }

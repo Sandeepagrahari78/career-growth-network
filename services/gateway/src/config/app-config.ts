@@ -2,7 +2,9 @@ export interface AppConfig {
   port: number;
   environment: "development" | "test" | "production";
   identityBaseUrl: string;
-  identitySessionCookieName: "cgn_identity_session" | "__Host-cgn_identity_session";
+  identitySessionCookieName:
+    | "cgn_identity_session"
+    | "__Host-cgn_identity_session";
   upstreams: Record<string, string>;
 }
 
@@ -30,7 +32,8 @@ function serviceBaseUrl(value: string, name: string): string {
     parsed.hash !== ""
   ) {
     throw new ConfigurationError(
-      name + " must be an origin URL without credentials, path, query, or fragment.",
+      name +
+        " must be an origin URL without credentials, path, query, or fragment.",
     );
   }
   return parsed.origin;
@@ -41,16 +44,25 @@ function configuredUpstreams(value: string): Record<string, string> {
   try {
     parsed = JSON.parse(value);
   } catch {
-    throw new ConfigurationError("CGN_GATEWAY_UPSTREAMS must be a JSON object.");
+    throw new ConfigurationError(
+      "CGN_GATEWAY_UPSTREAMS must be a JSON object.",
+    );
   }
   if (parsed === null || Array.isArray(parsed) || typeof parsed !== "object") {
-    throw new ConfigurationError("CGN_GATEWAY_UPSTREAMS must be a JSON object.");
+    throw new ConfigurationError(
+      "CGN_GATEWAY_UPSTREAMS must be a JSON object.",
+    );
   }
 
   const upstreams: Record<string, string> = {};
   for (const [service, baseUrl] of Object.entries(parsed)) {
-    if (!/^[a-z][a-z0-9-]{0,31}$/.test(service) || typeof baseUrl !== "string") {
-      throw new ConfigurationError("CGN_GATEWAY_UPSTREAMS has an invalid service entry.");
+    if (
+      !/^[a-z][a-z0-9-]{0,31}$/.test(service) ||
+      typeof baseUrl !== "string"
+    ) {
+      throw new ConfigurationError(
+        "CGN_GATEWAY_UPSTREAMS has an invalid service entry.",
+      );
     }
     upstreams[service] = serviceBaseUrl(baseUrl, "CGN_GATEWAY_UPSTREAMS entry");
   }

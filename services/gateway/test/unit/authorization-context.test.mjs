@@ -29,11 +29,17 @@ test("Identity context validation rejects malformed or extended payloads", () =>
     false,
   );
   assert.equal(
-    isIdentityAuthorizationContext({ ...validContext, roles: ["student", "student"] }),
+    isIdentityAuthorizationContext({
+      ...validContext,
+      roles: ["student", "student"],
+    }),
     false,
   );
   assert.equal(
-    isIdentityAuthorizationContext({ ...validContext, accountId: "not-a-uuid" }),
+    isIdentityAuthorizationContext({
+      ...validContext,
+      accountId: "not-a-uuid",
+    }),
     false,
   );
   assert.equal(
@@ -89,9 +95,16 @@ test("missing, duplicate and invalid session cookies fail closed without calling
   for (const cookie of [
     undefined,
     "cgn_identity_session=short",
-    "cgn_identity_session=" + "a".repeat(43) + "; cgn_identity_session=" + "b".repeat(43),
+    "cgn_identity_session=" +
+      "a".repeat(43) +
+      "; cgn_identity_session=" +
+      "b".repeat(43),
   ]) {
-    const result = await resolveIdentityAuthorizationContext(cookie, config, fetcher);
+    const result = await resolveIdentityAuthorizationContext(
+      cookie,
+      config,
+      fetcher,
+    );
     assert.equal(result.kind, "unauthenticated");
   }
   assert.equal(calls, 0);
@@ -117,7 +130,8 @@ test("Identity errors and malformed response are not treated as authenticated", 
   const malformed = await resolveIdentityAuthorizationContext(
     cookie,
     config,
-    async () => new Response(JSON.stringify({ ...validContext, trusted: true })),
+    async () =>
+      new Response(JSON.stringify({ ...validContext, trusted: true })),
   );
   assert.deepEqual(malformed, { kind: "unavailable" });
 });

@@ -36,10 +36,9 @@ async function waitForReady(baseUrl) {
 let containerStarted = false;
 try {
   if (process.env.CGN_GATEWAY_IMAGE === undefined) {
-    docker(
-      ["build", "-f", "services/gateway/Dockerfile", "-t", image, "."],
-      { stdio: "inherit" },
-    );
+    docker(["build", "-f", "services/gateway/Dockerfile", "-t", image, "."], {
+      stdio: "inherit",
+    });
   }
 
   docker([
@@ -56,7 +55,10 @@ try {
   containerStarted = true;
   const mapping = docker(["port", container, "3000/tcp"]);
   const portMatch = mapping.match(/127\.0\.0\.1:(\d+)/);
-  assert.ok(portMatch, "Docker did not report a loopback port mapping: " + mapping);
+  assert.ok(
+    portMatch,
+    "Docker did not report a loopback port mapping: " + mapping,
+  );
   const baseUrl = "http://127.0.0.1:" + portMatch[1];
   await waitForReady(baseUrl);
 
