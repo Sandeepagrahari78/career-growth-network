@@ -4,8 +4,8 @@
 - **Branch:** `CGN-95-opentelemetry-sdk`
 - **Base:** `4e97805c89121f5ba3e7c39a4e8937666309a50d`
 - **PR:** [#63](https://github.com/Sandeepagrahari78/career-growth-network/pull/63)
-- **Status:** implementation is ready for owner review; required handoff headings
-  are being aligned after the initial CI gate failure.
+- **Status:** PR is open; the required handoff headings have been corrected
+  after the initial CI gate failure. The follow-up run is the delivery gate.
 
 ## What changed
 
@@ -64,7 +64,8 @@
   passed; Linux PR CI is authoritative for these repository-wide checks.
 - Initial PR CI run `39356907144` stopped at the handoff gate because this file
   lacked the required exact section headings. Other quality jobs were skipped.
-  Rerun status will be added after this correction is pushed.
+  The exact headings are now present and the local handoff verifier passes.
+  Check PR #63 for the latest exact-candidate CI status before merge.
 - `pnpm memory:check` passed after staging the handoff and Engineering Memory
   update.
 
