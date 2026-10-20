@@ -4,6 +4,7 @@ import { dirname, resolve } from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
 import { fileURLToPath } from "node:url";
 
+const { AbortSignal } = globalThis;
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 const image = process.env.CGN_GATEWAY_IMAGE ?? "cgn-gateway:docker-test";
 const container = "cgn-gateway-smoke-" + process.pid;
@@ -23,7 +24,9 @@ async function waitForReady(baseUrl) {
       const response = await fetch(baseUrl + "/ready", {
         signal: AbortSignal.timeout(1000),
       });
-      if (response.status === 200) return;
+      if (response.status === 200) {
+        return;
+      }
       lastError = new Error("readiness returned " + response.status);
     } catch (error) {
       lastError = error;

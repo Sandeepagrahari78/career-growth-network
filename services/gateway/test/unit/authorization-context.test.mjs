@@ -11,6 +11,7 @@ import {
   IDENTITY_AUTHORIZATION_CONTEXT_CONTRACT_V1,
 } from "../../dist/gateway-auth-context-contract.js";
 
+const { Response } = globalThis;
 const validContext = {
   contract: IDENTITY_AUTHORIZATION_CONTEXT_CONTRACT_V1,
   accountId: "c2c7c1f0-f2ec-43bb-9ea1-04d32409f362",

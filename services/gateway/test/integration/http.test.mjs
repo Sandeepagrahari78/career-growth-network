@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { Buffer } from "node:buffer";
 import { createServer } from "node:http";
 import test from "node:test";
 import "reflect-metadata";
@@ -144,7 +145,9 @@ test("verified context replaces spoofed headers and only the allowlisted request
   let downstreamRequest;
   const downstream = await startServer(async (request, response) => {
     const chunks = [];
-    for await (const chunk of request) chunks.push(chunk);
+    for await (const chunk of request) {
+      chunks.push(chunk);
+    }
     downstreamRequest = {
       method: request.method,
       url: request.url,
