@@ -8,6 +8,7 @@ This is a *navigation guide*. Authoritative ownership rules: `packages/contracts
 | Career Intelligence | `services/career/` | career goal, tracks, diagnostic | Package skeleton; product APIs pending Jira |
 | Roadmap | `services/roadmap/` | plan and daily missions | Package skeleton; product APIs pending Jira |
 | Evidence | `services/evidence/` | proof, provenance, validation | Package skeleton; product APIs pending Jira |
+| AI orchestration | `services/ai/` | internal provider orchestration | CGN-122 establishes the runtime boundary and fake-provider flow; no vendor credentials, route, persistence or product-domain truth |
 | Growth | `services/growth/` | readiness and Growth Identity | Package skeleton; product APIs pending Jira |
 | Feed | `services/feed/` | social feed/stories projections | Package skeleton; product APIs pending Jira |
 | Network | `services/network/` | social connections and block truth | Package skeleton; product APIs pending Jira |
