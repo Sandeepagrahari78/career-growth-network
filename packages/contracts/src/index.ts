@@ -4,4 +4,6 @@ export * from "./http/error-envelope.v1.js";
 export * from "./career/skill-catalog.v1.js";
 export * from "./analytics/product-analytics.v1.js";
 export * from "./identity/identity-account.v1.js";
+export * from "./identity/identity-oidc-provider.v1.js";
+export * from "./identity/identity-authorization-context.v1.js";
 export * from "./ai/ai-provider.v1.js";

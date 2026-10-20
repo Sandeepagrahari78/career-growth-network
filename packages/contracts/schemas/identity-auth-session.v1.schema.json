@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cgn.local/schemas/identity-auth-session.v1.schema.json",
+  "title": "CGN Identity Authentication Session v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "accountId", "authenticatedAt", "expiresAt"],
+  "properties": {
+    "contract": { "const": "cgn.identity.auth-session.v1" },
+    "accountId": { "type": "string", "format": "uuid" },
+    "authenticatedAt": { "type": "string", "format": "date-time" },
+    "expiresAt": { "type": "string", "format": "date-time" }
+  }
+}
