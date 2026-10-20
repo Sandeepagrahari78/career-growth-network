@@ -473,7 +473,7 @@ test("rejects issuer, audience, expiry, signature and nonce failures", async (t)
     { name: "audience", claimOverrides: { aud: "different-client" } },
     {
       name: "expired",
-      exp: Math.floor(Date.now() / 1000) - 3_600,
+      exp: Math.floor(Date.now() / 1000) + 300,
       expectedCode: "invalid_identity_token",
     },
     { name: "signature", signingKeyOverride: wrongKey },
@@ -481,6 +481,10 @@ test("rejects issuer, audience, expiry, signature and nonce failures", async (t)
   ];
   for (const invalidCase of invalidCases) {
     const fixture = makeService(provider);
+    if (invalidCase.name === "expired") {
+      // Provider accepts the token, but CGN's injected service clock rejects it.
+      fixture.setNow(new Date(Date.now() + 600_000).toISOString());
+    }
     const start = await fixture.service.beginLogin("email_password");
     await assert.rejects(
       fixture.service.completeLogin({
