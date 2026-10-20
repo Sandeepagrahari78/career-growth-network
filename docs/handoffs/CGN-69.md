@@ -19,7 +19,7 @@ unknown and inactive roles. Trusted repository updates are transactional,
 audited and idempotent. No role-grant route or resource-specific permission
 matrix is introduced.
 
-## Files / modules changed
+## Files/modules changed
 
 - `packages/contracts/src/identity/identity-authorization-context.v1.ts`
 - `packages/contracts/schemas/identity-authorization-context.v1.schema.json`
@@ -39,21 +39,25 @@ matrix is introduced.
   `docs/engineering-memory/06-known-risks.md`
 - `docs/handoffs/CGN-69.md`
 
-## Contracts and events
+## Contracts changed
 
 Adds `cgn.identity.authorization-context.v1` and
 `GET /v1/identity/auth/authorization-context`. Response contains the current
 Identity account ID, evaluation time and recognized active global roles. No
-events are produced or consumed. No other service database is accessed.
+other service database is accessed.
 
-## Migration and configuration
+## Events produced / consumed
+
+None.
+
+## Database / migration / config changes
 
 Migration 003 creates Identity-owned `account_roles` and
 `account_role_changes` tables with constrained role/status values, account
 foreign keys, audit rows and public access revoked. No external configuration,
 secrets, paid service or production infrastructure is added.
 
-## Tests and checks
+## Tests run
 
 - Passed: focused Identity authorization, HTTP and OIDC tests (15 tests).
 - Passed: CGN-69 contract tests (3 tests).
@@ -61,7 +65,9 @@ secrets, paid service or production infrastructure is added.
   (8), root unit, root integration, root lint and root typecheck.
 - Passed earlier: Docker PostgreSQL acceptance for role table ownership,
   constraints, audit behavior and migration rollback.
-- Passed earlier: `pnpm memory:check` is pending re-run with this handoff staged.
+- Engineering Memory gate passed in PR run `39388979722`; exact-head validation
+  is rerunning after aligning this handoff's section headings with the required
+  gate labels.
 - Windows limitation: root contract suite returned 173/176 because of the
   existing CGN-60 autoscaling, CGN-45 probe and CGN-61 workload identity
   line-ending-sensitive assertions. The CGN-69 contract tests pass; Linux PR CI
@@ -70,7 +76,7 @@ secrets, paid service or production infrastructure is added.
   `pnpm` is not on PATH; use Corepack. Prior targeted CRLF formatting check
   passed before this handoff and final assertion adjustment.
 
-## Boundaries and known limitations
+## Known limitations / risks
 
 - `recruiter` does not mean approved organization membership (CGN-102).
 - `expert` does not mean verified expertise (CGN-186).
@@ -83,7 +89,7 @@ secrets, paid service or production infrastructure is added.
 - `docs/engineering-memory/05-current-state.md` needs a fresh-main,
   docs-only follow-up after merge, recording exact merge and workflow evidence.
 
-## Next agent instructions
+## Exact next step for next agent
 
 Run Corepack Prettier check, `pnpm memory:check`, final scope/security review,
 and build. Commit and push this branch, create the CGN-69 PR, then wait for
@@ -93,10 +99,16 @@ Docker Images, Local Helm, Staging Validation and Jira Delivery Sync. Update
 Engineering Memory 05 from fresh `main`; after that, re-read live Jira sequence,
 owner and blockers before selecting the next ticket.
 
-## Rollback
+## Rollback note
 
 Use `services/identity/migrations/003_identity_account_roles.down.sql` against
 the disposable/local Identity database before reverting the application
 reference to role tables. Do not drop shared PostgreSQL volumes. Revert the
 merged change only after no runtime instance uses the new context endpoint or
 tables.
+
+## Engineering Memory updated
+
+- [x] `03-contract-registry.md`
+- [ ] `05-current-state.md` - update from fresh `main` with merge and workflow evidence
+- [x] `06-known-risks.md`
