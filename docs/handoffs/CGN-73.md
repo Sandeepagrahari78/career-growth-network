@@ -54,7 +54,7 @@ No database, migration, secret, event, or deployment-manifest changes. Runtime c
 - Blocked locally: the Docker smoke was retried with access to the user's Docker config; Docker Desktop's Linux engine pipe `//./pipe/dockerDesktopLinuxEngine` is missing, so the image build/container acceptance test cannot run locally. PR CI's Docker job must pass.
 - pnpm registry investigation: the configured registry is the default `https://registry.npmjs.org/`, with no project/global registry override or registry/proxy environment override found. A read-only package metadata request failed with OS `EACCES` under the default sandbox, then succeeded with network access enabled; this identifies sandbox egress as the cause, not registry credentials or a changed registry setting. No security settings were weakened and no registry settings were changed. In this PowerShell shell the `pnpm` executable is absent from child-process `PATH`, so Corepack's `pnpm run` dependency check also fails to spawn `pnpm install`; the required context bundle was generated with `node scripts/agent-context.mjs --ticket CGN-73 --domain gateway`, and checks used cached local tools/direct Node commands. Live Jira owner, status, acceptance and links were independently verified through the connected Jira tool.
 - Jira acceptance clarification requested in comment [10302](https://sandeepagrahari1.atlassian.net/browse/CGN-73?focusedCommentId=10302): whether health/readiness and mock propagation with protected downstream operations closed can satisfy CGN-73, or whether CGN-73 must wait for CGN-101's trusted staging integration. This ticket remains In Review; no Done claim is made.
-- Pending: push this review-hardening commit and obtain green exact-head PR CI including Docker build/security, technical/security review, Sandeep's merge authorization, exact-merge Main CI, staging validation, Jira acceptance clarification and Delivery Sync, and post-merge Engineering Memory update.
+- Current pushed PR head: `6957003996ce91c29af400ca7e788dc65357dcfc`. Pending: fresh exact-head PR CI including Docker build/security, technical/security review, Sandeep's merge authorization, exact-merge Main CI, staging validation, Jira acceptance clarification and Delivery Sync, and post-merge Engineering Memory update.
 
 ## Known limitations / risks
 
@@ -66,7 +66,7 @@ No database, migration, secret, event, or deployment-manifest changes. Runtime c
 
 ## Exact next step for next agent
 
-Keep PR #74 open. Push the authorized test-only clock stabilization, obtain a clean exact-head PR CI run, technical/security review, Sandeep's explicit merge authorization, and a Jira answer to comment 10302. After merge, verify exact-merge Main CI, staging validation and Jira delivery sync show CGN-73 Done before starting dependent CGN-74. Recheck live Jira Rank and ownership before selecting another ticket: CGN-102 is ranked after CGN-101. Do not bypass CGN-122, CGN-141 or CGN-95 review gates.
+Keep PR #74 open while fresh exact-head CI runs. Obtain a clean PR CI result, technical/security review, Sandeep's explicit merge authorization, and a Jira answer to comment 10302. After merge, verify exact-merge Main CI, staging validation and Jira delivery sync show CGN-73 Done before starting dependent CGN-74. Recheck live Jira Rank and ownership before selecting another ticket: CGN-102 is ranked after CGN-101. Do not bypass CGN-122, CGN-141 or CGN-95 review gates.
 
 ## Rollback note
 
