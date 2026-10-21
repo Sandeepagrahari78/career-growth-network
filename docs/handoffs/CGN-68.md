@@ -118,3 +118,11 @@ when its local test data is no longer needed.
 - [x] `04-decisions.md`
 - [x] `05-current-state.md`
 - [x] `06-known-risks.md`
+
+## Identity OIDC integration fixture regression follow-up — 2026-10-21
+
+- **Scope:** Test-only correction for existing Identity integration assertions. No runtime auth, token handling, provider setup, contracts, migrations, or permissions are modified.
+- **Reason:** Independent PR #64 and #63 review CI both reported an invalid expired-token expectation (expiry only ten seconds in the past, within common OIDC clock skew leeway). The test fixture also fixed its service clock at 2026-10-20 10:00 UTC while its in-memory repository session-rotation method consulted the real process clock, causing a date-dependent `session_expired` failure.
+- **Change:** Make in-memory rotation consistently use the injected fixture clock. Keep the token unexpired for the OIDC library, then advance CGN's injected clock beyond token expiry to verify the Identity-owned `invalid_identity_token` path without relying on the provider's clock skew policy. Existing positive refresh/rotation and negative expiry tests stay enforced.
+- **Checks:** Fresh exact-head GitHub PR CI required; tests are not claimed to have run locally during connector-only editing. Human security/test review required. This regression PR is separate from Evidence CGN-141 and Observability CGN-95.
+- **Merge and Jira:** No automatic merge; existing CGN-68 Done remains unchanged. After owner approval and merge, revalidate PR #64 then PR #63 against latest main and require green checks.
