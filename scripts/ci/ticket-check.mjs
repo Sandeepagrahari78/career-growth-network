@@ -203,8 +203,8 @@ function windowsPnpmEntry() {
         ]
       : []),
   ];
-  const entry = candidates.find((candidate) =>
-    candidate && isAbsolute(candidate) && existsSync(candidate),
+  const entry = candidates.find(
+    (candidate) => candidate && isAbsolute(candidate) && existsSync(candidate),
   );
   if (!entry) {
     throw new Error(
