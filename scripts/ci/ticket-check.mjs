@@ -49,7 +49,10 @@ export function validateBranch(branch, ticket) {
   const match = branchPattern.exec(branch);
   if (!match || match[1] !== ticket) {
     throw new Error(
-      "Use the matching isolated " + ticket + "-description branch, not " + branch,
+      "Use the matching isolated " +
+        ticket +
+        "-description branch, not " +
+        branch,
     );
   }
 }
@@ -68,7 +71,8 @@ export function buildPlan(files, packageScripts = {}) {
       file.startsWith("/")
     ) {
       throw new Error(
-        "Unsafe or unsupported changed path; use full CI and inspect manually: " + file,
+        "Unsafe or unsupported changed path; use full CI and inspect manually: " +
+          file,
       );
     }
   }
@@ -86,7 +90,11 @@ export function buildPlan(files, packageScripts = {}) {
     ),
   ].sort();
   const commands = [
-    { label: "branch", command: "node", args: ["scripts/ci/verify-branch.mjs"] },
+    {
+      label: "branch",
+      command: "node",
+      args: ["scripts/ci/verify-branch.mjs"],
+    },
     { label: "memory", command: "pnpm", args: ["memory:check"] },
     {
       label: "handoff",
@@ -243,7 +251,9 @@ export async function main(args = process.argv.slice(2), cwd = process.cwd()) {
   }
   const remote = git(["remote", "get-url", "origin"], root);
   if (
-    !/^(https:\/\/github\.com\/Sandeepagrahari78\/career-growth-network(?:\.git)?|git@github\.com:Sandeepagrahari78\/career-growth-network\.git|ssh:\/\/git@github\.com\/Sandeepagrahari78\/career-growth-network\.git)$/.test(remote)
+    !/^(https:\/\/github\.com\/Sandeepagrahari78\/career-growth-network(?:\.git)?|git@github\.com:Sandeepagrahari78\/career-growth-network\.git|ssh:\/\/git@github\.com\/Sandeepagrahari78\/career-growth-network\.git)$/.test(
+      remote,
+    )
   ) {
     throw new Error(
       "Unexpected origin repository. Refusing to validate unrelated code.",
@@ -288,7 +298,14 @@ export async function main(args = process.argv.slice(2), cwd = process.cwd()) {
       const begin = Date.now();
       execute(
         "node",
-        ["scripts/agent-context.mjs", "--ticket", options.ticket, "--domain", "cicd", "--jira-live"],
+        [
+          "scripts/agent-context.mjs",
+          "--ticket",
+          options.ticket,
+          "--domain",
+          "cicd",
+          "--jira-live",
+        ],
         root,
         env,
       );
@@ -353,7 +370,9 @@ export async function main(args = process.argv.slice(2), cwd = process.cwd()) {
             outcome: "failed",
           });
           console.error(
-            "Docker smoke failed for " + name + ". Inspect container logs, port mapping, readiness and exit code; do not skip its PR CI gate.",
+            "Docker smoke failed for " +
+              name +
+              ". Inspect container logs, port mapping, readiness and exit code; do not skip its PR CI gate.",
           );
           throw error;
         }

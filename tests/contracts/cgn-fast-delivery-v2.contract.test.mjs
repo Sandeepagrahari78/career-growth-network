@@ -25,11 +25,14 @@ test("accepts only exact ticket and supported flags", () => {
     jiraLive: false,
     docker: false,
   });
-  assert.deepEqual(parseArgs(["--ticket", "CGN-301", "--jira-live", "--docker"]), {
-    ticket: "CGN-301",
-    jiraLive: true,
-    docker: true,
-  });
+  assert.deepEqual(
+    parseArgs(["--ticket", "CGN-301", "--jira-live", "--docker"]),
+    {
+      ticket: "CGN-301",
+      jiraLive: true,
+      docker: true,
+    },
+  );
   assert.throws(() => parseArgs(["--ticket", "../secret"]), /Usage:/);
   assert.throws(
     () => parseArgs(["--ticket", "CGN-301", "--no-security"]),
@@ -88,9 +91,12 @@ test("workspace and CI policy changes require full quality locally", () => {
 
 test("missing or untested package fails into full-quality fallback", () => {
   assert.equal(buildPlan(["services/new-service/index.ts"], {}).mode, "full");
-  assert.equal(buildPlan(["services/new-service/index.ts"], {
-    "services/new-service": { build: "tsc" },
-  }).mode, "full");
+  assert.equal(
+    buildPlan(["services/new-service/index.ts"], {
+      "services/new-service": { build: "tsc" },
+    }).mode,
+    "full",
+  );
 });
 
 test("unknown changed path with unsafe characters refuses shell execution", () => {
@@ -119,7 +125,8 @@ test("plan deduplicates package checks but preserves changed files", () => {
   );
   assert.equal(plan.files.length, 2);
   assert.equal(
-    plan.commands.filter((x) => x.label === "services/gateway:test:unit").length,
+    plan.commands.filter((x) => x.label === "services/gateway:test:unit")
+      .length,
     1,
   );
 });
