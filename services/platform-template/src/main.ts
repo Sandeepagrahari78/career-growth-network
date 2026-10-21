@@ -1,5 +1,9 @@
 import "reflect-metadata";
 import { NestFactory } from "@nestjs/core";
+import {
+  initializeTracingFromEnvironment,
+  shutdownTracing,
+} from "@cgn/observability";
 import { AppModule } from "./app.module.js";
 import { loadAppConfig } from "./config/app-config.js";
 import { ApiExceptionFilter } from "./http/api-exception.filter.js";
@@ -7,6 +11,7 @@ import { requestCorrelationMiddleware } from "./observability/request-correlatio
 import { StructuredLogger } from "./observability/structured-logger.js";
 
 async function bootstrap(): Promise<void> {
+  initializeTracingFromEnvironment();
   const config = loadAppConfig();
   const logger = new StructuredLogger();
   const app = await NestFactory.create(AppModule, { logger });
@@ -18,7 +23,8 @@ async function bootstrap(): Promise<void> {
   logger.log("service_started", "bootstrap");
 }
 
-bootstrap().catch((error: unknown) => {
+bootstrap().catch(async (error: unknown) => {
+  await shutdownTracing();
   const logger = new StructuredLogger();
   if (error instanceof Error && error.name === "ConfigurationError") {
     logger.error("configuration_invalid", undefined, "bootstrap");

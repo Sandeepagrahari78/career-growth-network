@@ -23,6 +23,14 @@ const dockerAvailable =
   spawnSync("docker", ["info"], { stdio: "ignore" }).status === 0;
 const execFileAsync = promisify(execFile);
 
+function isPostgresStartupSocketFailure(error) {
+  const stderr = String(error?.stderr ?? error?.message ?? "");
+  // Retry a missing startup socket only, never PostgreSQL SQL/migration errors.
+  return /psql: error: connection to server on socket.*failed: (No such file or directory|Connection refused)/i.test(
+    stderr,
+  );
+}
+
 function runDocker(args, input) {
   return execFileSync("docker", args, {
     cwd: repoRoot,
@@ -178,6 +186,22 @@ const event = (eventId) => ({
   payload: { activityId: `activity-${eventId}` },
 });
 
+test("PostgreSQL connection retries never mask SQL or migration failures", () => {
+  assert.equal(
+    isPostgresStartupSocketFailure({
+      stderr:
+        'psql: error: connection to server on socket "/var/run/postgresql/.s.PGSQL.5432" failed: No such file or directory',
+    }),
+    true,
+  );
+  assert.equal(
+    isPostgresStartupSocketFailure({
+      stderr: 'psql: ERROR: relation "cgn_outbox_events" already exists',
+    }),
+    false,
+  );
+});
+
 test(
   "PostgreSQL outbox is atomic, supports two workers, and redelivers the same ID after worker restart",
   { skip: !dockerAvailable && "Docker daemon is unavailable" },
@@ -205,25 +229,34 @@ test(
         }
       }
       assert.ok(ready, "PostgreSQL became ready");
-      runDocker(
-        [
-          ...compose,
-          "exec",
-          "-T",
-          "postgres",
-          "psql",
-          "-X",
-          "-v",
-          "ON_ERROR_STOP=1",
-          "-U",
-          "cgn",
-          "-d",
-          "cgn_test",
-          "-f",
-          "-",
-        ],
-        readFileSync(migrationFile, "utf8"),
-      );
+      const migrationCommand = [
+        ...compose,
+        "exec",
+        "-T",
+        "postgres",
+        "psql",
+        "-X",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-U",
+        "cgn",
+        "-d",
+        "cgn_test",
+        "-f",
+        "-",
+      ];
+      const migrationSql = readFileSync(migrationFile, "utf8");
+      for (let attempt = 0; attempt < 20; attempt += 1) {
+        try {
+          runDocker(migrationCommand, migrationSql);
+          break;
+        } catch (error) {
+          if (!isPostgresStartupSocketFailure(error) || attempt === 19) {
+            throw error;
+          }
+          await delay(1_000);
+        }
+      }
       psql("CREATE TABLE domain_rows (id text PRIMARY KEY)");
 
       const outbox = new TransactionalOutbox(makePostgresRunner());

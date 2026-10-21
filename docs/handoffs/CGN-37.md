@@ -123,3 +123,12 @@ before rolling back its migration.
   additional blocker. No manual Jira status or assignee change was made.
 - Source and tests inspected on latest main: `d05d47df8c7e0877727c02d0ae1fe9d2eaa31a91`
 - Required Sandeep review: pending
+
+## PostgreSQL integration startup race review — 2026-10-21
+
+- **Context:** The existing Evidence PR #64 fresh CI occasionally failed in the platform-template outbox integration test while applying its migration, even after `pg_isready` had returned success. Exact error: `psql: error: connection to server on socket "/var/run/postgresql/.s.PGSQL.5432" failed: No such file or directory`.
+- **Scope:** Test harness only. Retain the real PostgreSQL integration coverage, migration SQL, atomic transaction tests, concurrent worker claims and at-least-once redelivery assertions. No production outbox code, persistent database or CI enforcement policy was changed.
+- **Hardening:** Retry a failed migration up to 20 times with a one-second bounded delay only when initial `psql` fails connecting to a missing/refused Unix-domain socket during startup. Never retry SQL syntax errors, schema constraint failures, or partially applied migrations.
+- **Regression:** A Docker-independent test checks that socket-not-ready is recognized while an ordinary SQL relation-exists error is not.
+- **Validation:** The edit was prepared through the connected GitHub service without running local tests. Require exact-head Linux PR CI including format/lint/type/contracts/build and PostgreSQL integration. The underlying Docker runner's possible resource exhaustion cannot be ruled out without additional evidence.
+- **Release:** This is a separate review-required regression PR, not a scope expansion of CGN-141 or CGN-95. Do not merge, change CGN-37 Done, or close downstream Jira until owner's review and accepted CI evidence. After approved merge, refresh PR #64 then PR #63 against the latest main and re-run their CI checks.

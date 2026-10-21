@@ -170,3 +170,9 @@ does not imply verified expertise (CGN-186), and admin does not grant delegated
 Admin/Operator permissions or privacy-safe visibility (CGN-279). No role-write
 HTTP route or service-to-service authentication is defined by this ticket. See
 `docs/handoffs/CGN-69.md` for tests, exact workflow evidence and rollback.
+
+## CGN-95 OpenTelemetry SDK (PR pending)
+
+- Candidate implementation adds `@cgn/observability` with W3C Trace Context propagation, asynchronous OTLP/HTTP export, HTTP request spans, and reusable database/Kafka span helpers. `services/platform-template` initializes it from `OTEL_SERVICE_NAME` and `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` and shuts it down with Nest lifecycle hooks.
+- The implementation intentionally does not add database or Kafka driver instrumentation, a collector, or a contract. Export is disabled when no endpoint is configured; spans omit URLs, request/event bodies, credentials, database statements and user identifiers.
+- Jira CGN-95 hard prerequisites CGN-35 and CGN-36 are Done. Jira CGN-95 remains In Review until delivery review and automation complete. See `docs/handoffs/CGN-95.md` for checks and limitations.

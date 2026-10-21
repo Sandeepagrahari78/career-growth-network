@@ -8,11 +8,6 @@ import { URL, URLSearchParams } from "node:url";
 import { IdentityOidcAuthService } from "../../src/oidc-auth-service.mjs";
 
 const CLIENT_ID = "cgn-identity-test";
-const TEST_NOW = new Date();
-const TEST_NOW_UNIX_SECONDS = Math.floor(TEST_NOW.getTime() / 1000);
-const TEST_SESSION_EXPIRES_AT = new Date(
-  TEST_NOW.getTime() + 8 * 60 * 60 * 1000,
-);
 
 function json(response, status, value) {
   response.writeHead(status, {
@@ -114,7 +109,7 @@ async function createMockProvider() {
           return;
         }
         state.codes.delete(form.get("code"));
-        const now = TEST_NOW_UNIX_SECONDS;
+        const now = Math.floor(Date.now() / 1000);
         const claims = {
           iss: state.issuer,
           aud: CLIENT_ID,
@@ -205,7 +200,7 @@ async function createMockProvider() {
   return state;
 }
 
-function createMemoryRepository({ now = () => new Date() } = {}) {
+function createMemoryRepository(now = () => new Date()) {
   const transactions = new Map();
   const sessions = new Map();
   return {
@@ -289,10 +284,9 @@ function createMemoryAccountRepository() {
 }
 
 function makeService(provider, options = {}) {
-  let clock = new Date(TEST_NOW);
+  let clock = new Date("2026-10-20T10:00:00.000Z");
   const repository =
-    options.repository ??
-    createMemoryRepository({ now: () => new Date(clock) });
+    options.repository ?? createMemoryRepository(() => new Date(clock));
   const accounts = options.accounts ?? createMemoryAccountRepository();
   const roleAssignments = options.roleAssignments ?? new Map();
   const roleRepository = {
@@ -361,8 +355,8 @@ test("email and password use authorization-code PKCE and produce a token-free Id
     result.session.accountId,
     /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
   );
-  assert.equal(result.session.authenticatedAt, TEST_NOW.toISOString());
-  assert.equal(result.session.expiresAt, TEST_SESSION_EXPIRES_AT.toISOString());
+  assert.equal(result.session.authenticatedAt, "2026-10-20T10:00:00.000Z");
+  assert.equal(result.session.expiresAt, "2026-10-20T18:00:00.000Z");
   assert.equal(result.session.email, undefined);
   assert.equal(fixture.repository.sessions.size, 1);
   assert.doesNotMatch(JSON.stringify(result), /access-|refresh-|id_token/i);
@@ -391,7 +385,7 @@ test("authorization context uses Identity grants and ignores provider role claim
     {
       contract: "cgn.identity.authorization-context.v1",
       accountId: login.session.accountId,
-      evaluatedAt: TEST_NOW.toISOString(),
+      evaluatedAt: "2026-10-20T10:00:00.000Z",
       roles: [],
     },
   );
@@ -479,7 +473,7 @@ test("rejects issuer, audience, expiry, signature and nonce failures", async (t)
     { name: "audience", claimOverrides: { aud: "different-client" } },
     {
       name: "expired",
-      exp: TEST_NOW_UNIX_SECONDS - 10,
+      exp: Math.floor(Date.now() / 1000) + 300,
       expectedCode: "invalid_identity_token",
     },
     { name: "signature", signingKeyOverride: wrongKey },
@@ -487,6 +481,10 @@ test("rejects issuer, audience, expiry, signature and nonce failures", async (t)
   ];
   for (const invalidCase of invalidCases) {
     const fixture = makeService(provider);
+    if (invalidCase.name === "expired") {
+      // Provider accepts the token, but CGN's injected service clock rejects it.
+      fixture.setNow(new Date(Date.now() + 600_000).toISOString());
+    }
     const start = await fixture.service.beginLogin("email_password");
     await assert.rejects(
       fixture.service.completeLogin({
@@ -568,9 +566,7 @@ test("refresh rotates session identifiers, expiry invalidates sessions, and logo
     }),
     browserBinding: expiryStart.browserBinding,
   });
-  expiryFixture.setNow(
-    new Date(TEST_SESSION_EXPIRES_AT.getTime() + 1000).toISOString(),
-  );
+  expiryFixture.setNow("2026-10-20T18:00:01.000Z");
   assert.equal(
     await expiryFixture.service.getSession(expiryLogin.sessionId),
     null,

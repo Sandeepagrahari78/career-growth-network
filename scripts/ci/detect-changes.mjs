@@ -40,6 +40,7 @@ const flags = {
     (file) =>
       file === "infra/docker/docker-compose.postgres.yml" ||
       file.startsWith("infra/postgres/") ||
+      (file.startsWith("services/") && file.includes("/migrations/")) ||
       file.startsWith("scripts/infra/postgres-") ||
       file === "config/infra/postgres-databases.v1.json" ||
       file === ".github/workflows/local-postgres.yml" ||

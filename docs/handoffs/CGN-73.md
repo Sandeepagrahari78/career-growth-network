@@ -77,3 +77,10 @@ Revert the CGN-73 merge commit through a reviewed GitHub PR. This change adds no
 ## Engineering Memory updated
 
 Updated `docs/engineering-memory/03-contract-registry.md` with the new envelope and the CGN-101 consumer trust gate. `05-current-state.md` remains merged-state-only and must be updated after CGN-73 actually merges; no unmerged work is represented as current main state.
+
+## Docker regression correction — 2026-10-22
+
+- Gateway Docker image defaults to NODE_ENV=production and correctly requires an HTTPS Identity origin. Old test passed http://identity.invalid, so the Gateway process exited before binding its HTTP port; the readiness check then failed with ECONNREFUSED.
+- Updated the smoke test's mock Identity URL to https://identity.invalid and added bounded state and startup-log diagnostics for readiness failures. Production validation and CGN-101 safety restrictions are unchanged.
+- Reconciled this feature against latest main without importing obsolete changes to Identity integration tests. Preserve the already merged OpenTelemetry, Evidence, and Fast Delivery V2 implementation.
+- Require passing exact-head PR Docker, full CI, human review, Main CI, staging and Jira sync. No local Docker execution was possible in this connected GitHub session.

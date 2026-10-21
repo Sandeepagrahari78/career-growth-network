@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { startHttpServerSpan } from "@cgn/observability";
 import type { NextFunction, Request, Response } from "express";
 import { StructuredLogger } from "./structured-logger.js";
 
@@ -11,6 +12,7 @@ export function requestCorrelationMiddleware(logger: StructuredLogger) {
       ? suppliedId
       : randomUUID();
     const startedAt = performance.now();
+    const serverSpan = startHttpServerSpan(request.headers, request.method);
 
     response.setHeader("x-request-id", requestId);
     response.once("finish", () => {
@@ -22,8 +24,10 @@ export function requestCorrelationMiddleware(logger: StructuredLogger) {
         method,
         statusCode: response.statusCode,
         durationMs: Math.max(0, Math.round(performance.now() - startedAt)),
+        ...(serverSpan.traceId ? { traceId: serverSpan.traceId } : {}),
       });
+      serverSpan.end(response.statusCode);
     });
-    next();
+    serverSpan.run(next);
   };
 }
