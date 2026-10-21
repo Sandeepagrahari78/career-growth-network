@@ -32,12 +32,15 @@ export class StructuredLogger implements LoggerService {
     method: string;
     statusCode: number;
     durationMs: number;
+    traceId?: string;
   }): void {
+    const { traceId, ...safeDetails } = details;
     this.emit({
       timestamp: new Date().toISOString(),
       level: "info",
       event: "http_request_completed",
-      ...details,
+      ...safeDetails,
+      ...(traceId && /^[0-9a-f]{32}$/i.test(traceId) ? { traceId } : {}),
     });
   }
 
