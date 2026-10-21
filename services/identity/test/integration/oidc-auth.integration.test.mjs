@@ -291,7 +291,8 @@ function createMemoryAccountRepository() {
 function makeService(provider, options = {}) {
   let clock = new Date(TEST_NOW);
   const repository =
-    options.repository ?? createMemoryRepository({ now: () => new Date(clock) });
+    options.repository ??
+    createMemoryRepository({ now: () => new Date(clock) });
   const accounts = options.accounts ?? createMemoryAccountRepository();
   const roleAssignments = options.roleAssignments ?? new Map();
   const roleRepository = {
