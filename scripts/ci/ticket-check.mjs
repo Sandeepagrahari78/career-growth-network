@@ -1,6 +1,6 @@
 import { execFileSync, spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { dirname, isAbsolute, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ticketPattern = /^CGN-[1-9][0-9]*$/;
@@ -189,17 +189,40 @@ function git(args, cwd) {
   }).trim();
 }
 
-function pnpmExecutable() {
-  return process.platform === "win32" ? "pnpm.cmd" : "pnpm";
+function windowsPnpmEntry() {
+  const runtime = dirname(process.execPath);
+  const appData = process.env.APPDATA;
+  const candidates = [
+    process.env.CGN_PNPM_CLI,
+    join(runtime, "node_modules", "corepack", "dist", "pnpm.js"),
+    join(runtime, "node_modules", "pnpm", "bin", "pnpm.cjs"),
+    ...(appData
+      ? [
+          join(appData, "npm", "node_modules", "corepack", "dist", "pnpm.js"),
+          join(appData, "npm", "node_modules", "pnpm", "bin", "pnpm.cjs"),
+        ]
+      : []),
+  ];
+  const entry = candidates.find((candidate) =>
+    candidate && isAbsolute(candidate) && existsSync(candidate),
+  );
+  if (!entry) {
+    throw new Error(
+      "Cannot locate shell-free pnpm JS CLI. Install Corepack or set CGN_PNPM_CLI to its absolute pnpm.js/pnpm.cjs path.",
+    );
+  }
+  return entry;
 }
 
 function execute(command, args, cwd, env) {
-  const executable = command === "pnpm" ? pnpmExecutable() : command;
-  const result = spawnSync(executable, args, {
+  const windowsPnpm = command === "pnpm" && process.platform === "win32";
+  const executable = windowsPnpm ? process.execPath : command;
+  const launchArgs = windowsPnpm ? [windowsPnpmEntry(), ...args] : args;
+  const result = spawnSync(executable, launchArgs, {
     cwd,
     env,
     stdio: "inherit",
-    shell: process.platform === "win32" && command === "pnpm",
+    shell: false,
     timeout: 10 * 60 * 1000,
   });
   if (result.error) {
