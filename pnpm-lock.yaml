@@ -27,7 +27,14 @@ importers:
 
   services/community: {}
 
-  services/evidence: {}
+  services/evidence:
+    devDependencies:
+      "@types/node":
+        specifier: 20.13.0
+        version: 20.13.0
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
 
   services/feed: {}
 
