@@ -275,10 +275,14 @@ export async function main(args = process.argv.slice(2), cwd = process.cwd()) {
   const packages = {};
   for (const file of changed) {
     const match = /^(apps|services|packages)\/([^/]+)\//.exec(file);
-    if (!match) continue;
+    if (!match) {
+      continue;
+    }
     const folder = match[1] + "/" + match[2];
     const manifest = join(root, folder, "package.json");
-    if (!existsSync(manifest)) continue;
+    if (!existsSync(manifest)) {
+      continue;
+    }
     packages[folder] = JSON.parse(readFileSync(manifest, "utf8")).scripts ?? {};
   }
   const plan = buildPlan(changed, packages);
