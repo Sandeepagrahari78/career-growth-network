@@ -18,3 +18,4 @@ coverage/
 crash.log
 crash.*.log
 .local/
+.cgn/ticket-metrics/
