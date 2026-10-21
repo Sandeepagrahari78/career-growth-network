@@ -58,7 +58,14 @@ importers:
 
   services/community: {}
 
-  services/evidence: {}
+  services/evidence:
+    devDependencies:
+      "@types/node":
+        specifier: 20.13.0
+        version: 20.13.0
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
 
   services/feed: {}
 
@@ -83,7 +90,7 @@ importers:
       "@cgn/contracts":
         specifier: workspace:*
         version: link:../../packages/contracts
-      "@cgn/observability":
+      '@cgn/observability':
         specifier: workspace:*
         version: link:../../packages/observability
       "@nestjs/common":
@@ -888,6 +895,7 @@ packages:
       {
         integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==,
       }
+
 
   '@opentelemetry/api-logs@0.222.0':
     resolution: {integrity: sha512-9mb1If+IF6u0ZVXkHQ6ogEae5HwA6ajIVUgpSDQyRASxft6BSXHvBvPooRle3yFN/fKnCdSOnuu0OC3PLcF6+g==}
