@@ -74,7 +74,9 @@ try {
       container,
     ]);
     console.error("Gateway container state: " + state);
-    console.error("Gateway startup logs:\n" + docker(["logs", "--tail", "40", container]));
+    console.error(
+      "Gateway startup logs:\n" + docker(["logs", "--tail", "40", container]),
+    );
     throw error;
   }
 
