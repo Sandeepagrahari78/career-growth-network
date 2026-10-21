@@ -50,7 +50,7 @@ try {
     "--name",
     container,
     "-e",
-    "IDENTITY_BASE_URL=http://identity.invalid",
+    "IDENTITY_BASE_URL=https://identity.invalid",
     "-p",
     "127.0.0.1::3000",
     image,
@@ -63,7 +63,20 @@ try {
     "Docker did not report a loopback port mapping: " + mapping,
   );
   const baseUrl = "http://127.0.0.1:" + portMatch[1];
-  await waitForReady(baseUrl);
+  try {
+    await waitForReady(baseUrl);
+  } catch (error) {
+    // Keep startup diagnostics actionable without changing production config.
+    const state = docker([
+      "inspect",
+      "--format",
+      "{{.State.Status}} (exit={{.State.ExitCode}})",
+      container,
+    ]);
+    console.error("Gateway container state: " + state);
+    console.error("Gateway startup logs:\n" + docker(["logs", "--tail", "40", container]));
+    throw error;
+  }
 
   const health = await fetch(baseUrl + "/health");
   assert.equal(health.status, 200);
@@ -81,7 +94,7 @@ try {
       "-e",
       "PORT=invalid",
       "-e",
-      "IDENTITY_BASE_URL=http://identity.invalid",
+      "IDENTITY_BASE_URL=https://identity.invalid",
       image,
     ],
     { encoding: "utf8", timeout: 15000 },
