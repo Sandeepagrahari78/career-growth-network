@@ -200,7 +200,7 @@ async function createMockProvider() {
   return state;
 }
 
-function createMemoryRepository() {
+function createMemoryRepository(now = () => new Date()) {
   const transactions = new Map();
   const sessions = new Map();
   return {
@@ -239,7 +239,7 @@ function createMemoryRepository() {
       expiresAt,
     }) {
       const session = sessions.get(oldSessionId);
-      if (!session || new Date(session.expiresAt) <= new Date()) {
+      if (!session || new Date(session.expiresAt) <= now()) {
         return null;
       }
       sessions.delete(oldSessionId);
@@ -284,7 +284,9 @@ function createMemoryAccountRepository() {
 }
 
 function makeService(provider, options = {}) {
-  const repository = options.repository ?? createMemoryRepository();
+  let clock = new Date("2026-10-20T10:00:00.000Z");
+  const repository =
+    options.repository ?? createMemoryRepository(() => new Date(clock));
   const accounts = options.accounts ?? createMemoryAccountRepository();
   const roleAssignments = options.roleAssignments ?? new Map();
   const roleRepository = {
@@ -292,7 +294,6 @@ function makeService(provider, options = {}) {
       return roleAssignments.get(accountId) ?? [];
     },
   };
-  let clock = new Date("2026-10-20T10:00:00.000Z");
   const config = {
     issuer: provider.issuer,
     clientId: CLIENT_ID,
@@ -472,7 +473,7 @@ test("rejects issuer, audience, expiry, signature and nonce failures", async (t)
     { name: "audience", claimOverrides: { aud: "different-client" } },
     {
       name: "expired",
-      exp: Math.floor(Date.now() / 1000) - 10,
+      exp: Math.floor(Date.now() / 1000) + 300,
       expectedCode: "invalid_identity_token",
     },
     { name: "signature", signingKeyOverride: wrongKey },
@@ -480,6 +481,10 @@ test("rejects issuer, audience, expiry, signature and nonce failures", async (t)
   ];
   for (const invalidCase of invalidCases) {
     const fixture = makeService(provider);
+    if (invalidCase.name === "expired") {
+      // Provider accepts the token, but CGN's injected service clock rejects it.
+      fixture.setNow(new Date(Date.now() + 600_000).toISOString());
+    }
     const start = await fixture.service.beginLogin("email_password");
     await assert.rejects(
       fixture.service.completeLogin({
