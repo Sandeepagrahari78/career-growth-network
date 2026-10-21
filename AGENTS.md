@@ -102,3 +102,11 @@ pnpm memory:check
 - Read the exact six original PNG files and their visual spec on up-to-date merged `main` before UI design work. For these six primary screens, product-owner-approved screenshot layout takes visual precedence over conflicting early Figma 92-screen prototype drafts. Prachi still reviews final editable Figma version; no automatic pixel-accuracy claims.
 - Keep **CGN-290 / PR #34** API/domain/safety RFC and **CGN-128 / PR #35** Expo navigation/client foundation in view. Check their **live** merge status before coding. Do not duplicate unmerged work or implement hypothetical endpoints.
 - The Codex agent must first present a ticket-to-screen-to-contract impact table, exact touched files, blockers, testing plan and dependency status; honor existing ticket authorization and proceed through implementation, tests, commit, push and PR once scope is clear; request clarification only for unresolved scope or required approvals. Respect existing three-agent branch/handoff/CI rules and minors privacy constraints.
+
+
+## Fast Delivery V2 — CGN-301 pre-push quality loop
+
+- Every scoped CGN coding ticket uses the existing live Jira/contract/dependency preflight; read only the current source-of-truth handoffs and architecture context. Do not change ticket ownership, bypass blockers or perform repeated full repo reads without a changed main/contract reason.
+- After implementing acceptance/tests and writing the handoff, commit scoped files locally, then run `pnpm ticket:check --ticket CGN-NNN` before pushing. It verifies branch, handoff, Engineering Memory, platform scope, boundaries and affected tests; critical/unknown work falls back to full `ci:quick`. For applicable service Docker smoke and an available daemon, run with `--docker` before push; use `--jira-live` only with existing approved local Jira credentials.
+- This CLI is local preflight, NOT a replacement for GitHub PR CI, source security, required service Docker/integration gates, human architectural/privacy review, merged Main CI, exact-candidate staging or automatic Jira Done. A green CLI never authorizes merge.
+- Keep one existing PR per ticket, fix real failed test causes, capture timing evidence in ignored `.cgn/ticket-metrics/`, and do not disclose secrets. See `docs/runbooks/fast-delivery-v2.md` for the full SOP, limitations and rollback.

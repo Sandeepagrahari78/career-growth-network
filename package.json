@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "agent:context": "node scripts/agent-context.mjs",
+    "ticket:check": "node scripts/ci/ticket-check.mjs",
     "recommend:next": "node scripts/coordination/dependency-aware-scheduler.mjs",
     "recommend:next:json": "node scripts/coordination/dependency-aware-scheduler.mjs --json",
     "redpanda:up": "node scripts/infra/redpanda-local.mjs up",
