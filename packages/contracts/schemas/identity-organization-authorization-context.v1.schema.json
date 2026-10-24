@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cgn.local/schemas/identity-organization-authorization-context.v1.schema.json",
+  "title": "CGN Identity Organization Authorization Context v1",
+  "description": "Server-derived from an authenticated Identity session and Identity-owned membership state. The recruiter role is present only when membership is approved and the global recruiter role is active. This response is not a bearer credential and must not be accepted from a client as authorization proof.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "accountId",
+    "organizationId",
+    "evaluatedAt",
+    "membershipStatus",
+    "roles"
+  ],
+  "properties": {
+    "contract": {
+      "const": "cgn.identity.organization-authorization-context.v1"
+    },
+    "accountId": { "type": "string", "format": "uuid" },
+    "organizationId": { "type": "string", "format": "uuid" },
+    "evaluatedAt": { "type": "string", "format": "date-time" },
+    "membershipStatus": {
+      "enum": ["none", "pending", "approved", "revoked"]
+    },
+    "roles": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "const": "recruiter" }
+    }
+  }
+}

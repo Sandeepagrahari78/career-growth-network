@@ -2,7 +2,10 @@ import { createServer } from "node:http";
 import { randomUUID } from "node:crypto";
 import { URL } from "node:url";
 import { IdentityAuthError } from "./oidc-auth-service.mjs";
-import { IDENTITY_AUTHORIZATION_CONTEXT_API_V1 } from "./identity-auth-contract.mjs";
+import {
+  IDENTITY_AUTHORIZATION_CONTEXT_API_V1,
+  IDENTITY_ORGANIZATION_AUTHORIZATION_CONTEXT_API_V1,
+} from "./identity-auth-contract.mjs";
 
 const SAFE_MESSAGES = {
   identity_provider_unavailable:
@@ -16,6 +19,8 @@ const SAFE_MESSAGES = {
   session_expired: "Your sign-in session expired. Please sign in again.",
   unsupported_login_method: "This sign-in method is not available.",
   unauthenticated: "Sign-in is required.",
+  invalid_organization_context:
+    "A single valid organization identifier is required.",
   request_error: "The request could not be completed.",
 };
 
@@ -98,6 +103,7 @@ export function createIdentityAuthHttpServer({ authService, config, logger }) {
     typeof authService?.completeLogin !== "function" ||
     typeof authService?.getSession !== "function" ||
     typeof authService?.getAuthorizationContext !== "function" ||
+    typeof authService?.getOrganizationAuthorizationContext !== "function" ||
     typeof authService?.refreshSession !== "function" ||
     typeof authService?.logout !== "function"
   ) {
@@ -185,6 +191,40 @@ export function createIdentityAuthHttpServer({ authService, config, logger }) {
           throw new IdentityAuthError("unauthenticated");
         }
         sendJson(response, 200, { authorizationContext }, requestId);
+        return;
+      }
+
+      if (
+        request.method === "GET" &&
+        url.pathname === IDENTITY_ORGANIZATION_AUTHORIZATION_CONTEXT_API_V1
+      ) {
+        const organizationIds = url.searchParams.getAll("organizationId");
+        const unknownParameters = [...url.searchParams.keys()].some(
+          (parameter) => parameter !== "organizationId",
+        );
+        if (
+          organizationIds.length !== 1 ||
+          unknownParameters ||
+          !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+            organizationIds[0],
+          )
+        ) {
+          throw new IdentityAuthError("invalid_organization_context", 400);
+        }
+        const organizationAuthorizationContext =
+          await authService.getOrganizationAuthorizationContext(
+            cookies.get(names.session),
+            organizationIds[0],
+          );
+        if (!organizationAuthorizationContext) {
+          throw new IdentityAuthError("unauthenticated");
+        }
+        sendJson(
+          response,
+          200,
+          { organizationAuthorizationContext },
+          requestId,
+        );
         return;
       }
 

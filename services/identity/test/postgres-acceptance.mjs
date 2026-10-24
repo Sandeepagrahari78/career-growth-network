@@ -61,6 +61,7 @@ function runSqlExpectingFailure(sql, expectedError, message) {
 let accountsMigrationApplied = false;
 let sessionsMigrationApplied = false;
 let rolesMigrationApplied = false;
+let membershipsMigrationApplied = false;
 try {
   migrate("up");
   accountsMigrationApplied = true;
@@ -68,6 +69,8 @@ try {
   sessionsMigrationApplied = true;
   migrate("up", "003_identity_account_roles");
   rolesMigrationApplied = true;
+  migrate("up", "004_identity_organization_memberships");
+  membershipsMigrationApplied = true;
 
   runSql(
     owner +
@@ -101,6 +104,14 @@ try {
   );
   assert.equal(roleTablesOwner, "t");
 
+  const membershipTablesOwner = runSql(
+    `SELECT bool_and(pg_get_userbyid(relowner) = 'cgn_identity_owner')
+     FROM pg_class
+     WHERE oid IN ('identity.organization_memberships'::regclass,
+                   'identity.organization_membership_changes'::regclass);`,
+  );
+  assert.equal(membershipTablesOwner, "t");
+
   const unauthorizedTableAccess = runSql(
     "SELECT has_table_privilege('cgn_career_owner', 'identity.accounts', 'SELECT');",
   );
@@ -117,6 +128,13 @@ try {
     runSql(
       `SELECT has_table_privilege('cgn_career_owner', 'identity.account_roles', 'SELECT')
           OR has_table_privilege('cgn_career_owner', 'identity.account_role_changes', 'SELECT');`,
+    ),
+    "f",
+  );
+  assert.equal(
+    runSql(
+      `SELECT has_table_privilege('cgn_career_owner', 'identity.organization_memberships', 'SELECT')
+          OR has_table_privilege('cgn_career_owner', 'identity.organization_membership_changes', 'SELECT');`,
     ),
     "f",
   );
@@ -143,6 +161,73 @@ try {
          '10000000-0000-4000-8000-000000000001', 'student', NULL, 'active',
          '10000000-0000-4000-8000-000000000002', '2026-10-20T10:00:00Z');` +
       reset,
+  );
+
+  runSql(
+    owner +
+      `INSERT INTO identity.organization_memberships
+        (account_id, organization_id, status, changed_at)
+       VALUES
+         ('10000000-0000-4000-8000-000000000001',
+          '30000000-0000-4000-8000-000000000001', 'pending', '2026-10-20T10:00:00Z'),
+         ('10000000-0000-4000-8000-000000000001',
+          '30000000-0000-4000-8000-000000000002', 'approved', '2026-10-20T11:00:00Z'),
+         ('10000000-0000-4000-8000-000000000002',
+          '30000000-0000-4000-8000-000000000001', 'approved', '2026-10-20T12:00:00Z');
+       INSERT INTO identity.organization_membership_changes
+         (change_id, account_id, organization_id, previous_status, new_status,
+          actor_account_id, changed_at)
+       VALUES ('40000000-0000-4000-8000-000000000001',
+         '10000000-0000-4000-8000-000000000001',
+         '30000000-0000-4000-8000-000000000001', NULL, 'pending',
+         '10000000-0000-4000-8000-000000000002', '2026-10-20T10:00:00Z');` +
+      reset,
+  );
+
+  assert.equal(
+    runSql(
+      `SELECT count(*) FROM identity.organization_memberships
+       WHERE account_id = '10000000-0000-4000-8000-000000000001'
+         AND organization_id = '30000000-0000-4000-8000-000000000001';`,
+    ),
+    "1",
+  );
+  assert.equal(
+    runSql(
+      `SELECT count(*) FROM identity.organization_memberships
+       WHERE account_id = '10000000-0000-4000-8000-000000000001'
+         AND organization_id = '30000000-0000-4000-8000-000000000002'
+         AND status = 'approved';`,
+    ),
+    "1",
+  );
+  assert.equal(
+    runSql(
+      `SELECT count(*) FROM identity.organization_membership_changes
+       WHERE account_id = '10000000-0000-4000-8000-000000000001'
+         AND new_status = 'pending';`,
+    ),
+    "1",
+  );
+  runSqlExpectingFailure(
+    owner +
+      `INSERT INTO identity.organization_memberships
+        (account_id, organization_id, status)
+       VALUES ('10000000-0000-4000-8000-000000000001',
+         '30000000-0000-4000-8000-000000000003', 'active');` +
+      reset,
+    /violates check constraint/i,
+    "An unknown membership state unexpectedly succeeded.",
+  );
+  runSqlExpectingFailure(
+    owner +
+      `INSERT INTO identity.organization_memberships
+        (account_id, organization_id, status)
+       VALUES ('10000000-0000-4000-8000-000000000099',
+         '30000000-0000-4000-8000-000000000004', 'pending');` +
+      reset,
+    /violates foreign key constraint/i,
+    "A membership without an Identity account unexpectedly succeeded.",
   );
 
   assert.equal(
@@ -240,6 +325,14 @@ try {
     "A provider mapping without an Identity account unexpectedly succeeded.",
   );
 
+  migrate("down", "004_identity_organization_memberships");
+  membershipsMigrationApplied = false;
+  assert.equal(
+    runSql(
+      "SELECT to_regclass('identity.organization_memberships') IS NULL AND to_regclass('identity.organization_membership_changes') IS NULL;",
+    ),
+    "t",
+  );
   migrate("down", "003_identity_account_roles");
   rolesMigrationApplied = false;
   assert.equal(
@@ -260,9 +353,16 @@ try {
   accountsMigrationApplied = false;
   assert.equal(runSql("SELECT to_regnamespace('identity') IS NULL;"), "t");
   console.log(
-    "Identity PostgreSQL acceptance passed: account, session and role ownership, cross-service access, provider mapping, session constraints, role change audit and migration rollback.",
+    "Identity PostgreSQL acceptance passed: account, session, role and organization-membership ownership; cross-service isolation; provider mapping; session constraints; membership audit; and migration rollback.",
   );
 } finally {
+  if (membershipsMigrationApplied) {
+    try {
+      migrate("down", "004_identity_organization_memberships");
+    } catch {
+      // Preserve the original acceptance failure; CI tears down the database.
+    }
+  }
   if (rolesMigrationApplied) {
     try {
       migrate("down", "003_identity_account_roles");

@@ -289,9 +289,19 @@ function makeService(provider, options = {}) {
     options.repository ?? createMemoryRepository(() => new Date(clock));
   const accounts = options.accounts ?? createMemoryAccountRepository();
   const roleAssignments = options.roleAssignments ?? new Map();
+  const organizationMembershipStatuses =
+    options.organizationMembershipStatuses ?? new Map();
   const roleRepository = {
     async listRoleAssignments(accountId) {
       return roleAssignments.get(accountId) ?? [];
+    },
+  };
+  const organizationMembershipRepository = {
+    async findMembershipStatus(accountId, organizationId) {
+      return (
+        organizationMembershipStatuses.get(`${accountId}:${organizationId}`) ??
+        "none"
+      );
     },
   };
   const config = {
@@ -322,6 +332,7 @@ function makeService(provider, options = {}) {
       transactionAndSessionRepository: repository,
       accountRepository: accounts,
       roleRepository,
+      organizationMembershipRepository,
       now: () => new Date(clock),
     }),
   };
@@ -406,6 +417,75 @@ test("authorization context uses Identity grants and ignores provider role claim
     (await fixture.service.getAuthorizationContext(login.sessionId)).roles,
     [],
   );
+});
+
+test("organization context grants recruiter only for an approved membership in the requested organization", async (t) => {
+  const provider = await createMockProvider();
+  t.after(provider.stop);
+  const membershipStatuses = new Map();
+  const fixture = makeService(provider, {
+    organizationMembershipStatuses: membershipStatuses,
+  });
+  const start = await fixture.service.beginLogin("email_password");
+  const login = await fixture.service.completeLogin({
+    callbackUrl: provider.createCallback(start.authorizationUrl, {
+      subject: "organization-role-subject",
+      claimOverrides: {
+        roles: ["recruiter"],
+        organizationId: "10000000-0000-4000-8000-000000000001",
+      },
+    }),
+    browserBinding: start.browserBinding,
+  });
+  const accountId = login.session.accountId;
+  const organizationA = "10000000-0000-4000-8000-000000000001";
+  const organizationB = "10000000-0000-4000-8000-000000000002";
+
+  fixture.roleAssignments.set(accountId, [
+    { role: "recruiter", status: "active" },
+  ]);
+  membershipStatuses.set(`${accountId}:${organizationA}`, "pending");
+  membershipStatuses.set(`${accountId}:${organizationB}`, "approved");
+
+  const pending = await fixture.service.getOrganizationAuthorizationContext(
+    login.sessionId,
+    organizationA,
+  );
+  assert.equal(pending.membershipStatus, "pending");
+  assert.deepEqual(pending.roles, []);
+
+  const approved = await fixture.service.getOrganizationAuthorizationContext(
+    login.sessionId,
+    organizationB,
+  );
+  assert.equal(approved.membershipStatus, "approved");
+  assert.deepEqual(approved.roles, ["recruiter"]);
+  assert.equal(approved.organizationId, organizationB);
+
+  const absent = await fixture.service.getOrganizationAuthorizationContext(
+    login.sessionId,
+    "10000000-0000-4000-8000-000000000003",
+  );
+  assert.equal(absent.membershipStatus, "none");
+  assert.deepEqual(absent.roles, []);
+
+  membershipStatuses.set(`${accountId}:${organizationB}`, "revoked");
+  const revoked = await fixture.service.getOrganizationAuthorizationContext(
+    login.sessionId,
+    organizationB,
+  );
+  assert.equal(revoked.membershipStatus, "revoked");
+  assert.deepEqual(revoked.roles, []);
+
+  fixture.roleAssignments.set(accountId, [
+    { role: "recruiter", status: "inactive" },
+  ]);
+  membershipStatuses.set(`${accountId}:${organizationB}`, "approved");
+  const inactive = await fixture.service.getOrganizationAuthorizationContext(
+    login.sessionId,
+    organizationB,
+  );
+  assert.deepEqual(inactive.roles, []);
 });
 
 test("Google is routed through the configured broker and matching email never merges subjects", async (t) => {
