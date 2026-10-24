@@ -1,0 +1,25 @@
+{
+  "contract": "cgn.evidence-upload-policy.v1",
+  "maxFileSizeBytes": 10485760,
+  "signedUploadUrlTtlSeconds": 300,
+  "signedDownloadUrlTtlSeconds": 60,
+  "allowedFiles": [
+    {
+      "extensions": [".pdf"],
+      "contentType": "application/pdf"
+    },
+    {
+      "extensions": [".jpg", ".jpeg"],
+      "contentType": "image/jpeg"
+    },
+    {
+      "extensions": [".png"],
+      "contentType": "image/png"
+    }
+  ],
+  "privateObjectsOnly": true,
+  "quarantineUntilClean": true,
+  "ownerAuthorizationRequired": true,
+  "postUploadValidationRequired": true,
+  "scannerFailureMode": "fail_closed"
+}

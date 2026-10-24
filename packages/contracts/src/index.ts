@@ -7,3 +7,4 @@ export * from "./identity/identity-account.v1.js";
 export * from "./identity/identity-oidc-provider.v1.js";
 export * from "./identity/identity-authorization-context.v1.js";
 export * from "./ai/ai-provider.v1.js";
+export * from "./evidence/evidence-upload-validation.v1.js";

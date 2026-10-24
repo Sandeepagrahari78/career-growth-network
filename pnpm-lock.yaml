@@ -63,6 +63,10 @@ importers:
   services/community: {}
 
   services/evidence:
+    dependencies:
+      "@cgn/contracts":
+        specifier: workspace:*
+        version: link:../../packages/contracts
     devDependencies:
       "@types/node":
         specifier: 20.13.0
