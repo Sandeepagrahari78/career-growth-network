@@ -1,18 +1,12 @@
-import {
-  EVIDENCE_RECORD_ARCHIVE_CONTRACT_V1,
-  EVIDENCE_RECORD_ARCHIVED_CONTRACT_V1,
-  EVIDENCE_RECORD_CREATE_CONTRACT_V1,
-  EVIDENCE_RECORD_CONTRACT_V1,
-  EVIDENCE_RECORD_UPDATE_CONTRACT_V1,
-  IDENTITY_AUTHORIZATION_CONTEXT_CONTRACT,
-  type ArchiveEvidenceRequestV1,
-  type CreateManualEvidenceRequestV1,
-  type EvidenceRecordApiErrorCodeV1,
-  type EvidenceRecordArchivedV1,
-  type EvidenceRecordV1,
-  type IdentityAuthorizationContextV1,
-  type UpdateManualEvidenceRequestV1,
-  type EvidenceUploadValidationV1,
+import type {
+  ArchiveEvidenceRequestV1,
+  CreateManualEvidenceRequestV1,
+  EvidenceRecordApiErrorCodeV1,
+  EvidenceRecordArchivedV1,
+  EvidenceRecordV1,
+  IdentityAuthorizationContextV1,
+  UpdateManualEvidenceRequestV1,
+  EvidenceUploadValidationV1,
 } from "@cgn/contracts";
 import {
   EvidenceIdempotencyConflictError,
@@ -22,6 +16,18 @@ import {
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const EVIDENCE_RECORD_ARCHIVE_CONTRACT_V1: ArchiveEvidenceRequestV1["contract"] =
+  "cgn.evidence-record-archive.v1";
+const EVIDENCE_RECORD_ARCHIVED_CONTRACT_V1: EvidenceRecordArchivedV1["contract"] =
+  "cgn.evidence-record-archived.v1";
+const EVIDENCE_RECORD_CREATE_CONTRACT_V1: CreateManualEvidenceRequestV1["contract"] =
+  "cgn.evidence-record-create.v1";
+const EVIDENCE_RECORD_CONTRACT_V1: EvidenceRecordV1["contract"] =
+  "cgn.evidence-record.v1";
+const EVIDENCE_RECORD_UPDATE_CONTRACT_V1: UpdateManualEvidenceRequestV1["contract"] =
+  "cgn.evidence-record-update.v1";
+const IDENTITY_AUTHORIZATION_CONTEXT_CONTRACT: IdentityAuthorizationContextV1["contract"] =
+  "cgn.identity.authorization-context.v1";
 
 export class EvidenceApiError extends Error {
   constructor(
