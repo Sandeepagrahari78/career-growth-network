@@ -12,10 +12,13 @@ bucket or signed URLs are rejected. Owner-scoped reads and updates always
 include the owner ID in the query, and archived records are absent from active
 reads.
 
-This ticket adds no HTTP API, event producer or confidence transition workflow.
-Expert validation workflow remains in Experts. The evidence record stores only
-the current verification state; later owning tickets define authorized
-transitions and cross-domain contracts.
+CGN-143 adds the Evidence-owned application API for manual project evidence.
+It consumes a trusted Identity authorization context, derives the owner from
+that context and never accepts a caller-selected owner ID. The API is an
+application boundary for its owning transport; this package does not expose a
+public HTTP listener or create an unauthenticated route. Expert validation
+remains in Experts. This API does not change evidence confidence or publish
+domain events.
 
 ## Upload validation policy (CGN-134)
 
@@ -79,6 +82,42 @@ introduced by this adapter.
 Run pnpm --filter @cgn/evidence test for the package tests. The SeaweedFS
 integration test starts an isolated Compose project and removes only that
 project's temporary volume and generated credentials.
+
+## Manual project evidence API (CGN-143)
+
+`EvidenceProjectApiV1` exposes `createManualProjectEvidence`,
+`updateManualProjectEvidence` and `archiveProjectEvidence`. Its public shapes
+are `cgn.evidence-record.v1` and the versioned create/update/archive request
+contracts in `packages/contracts/src/evidence/evidence-record.v1.ts`.
+
+- Create requests require an idempotency key. Repeating the same owner/key and
+  payload returns the existing record; reusing a key with different content
+  returns a conflict.
+- The service derives ownership from `cgn.identity.authorization-context.v1`.
+  A caller must pass the context resolved by Identity; request bodies do not
+  carry `ownerId`.
+- Updates change manual claim text only. Provenance and attached object
+  identity are immutable. Updates and archives require the expected record
+  revision and reject stale writes.
+- Records remain private and unverified. Active reads omit archived records.
+  Archive returns only an Evidence ID, revision and archive timestamp; an
+  idempotent retry after archival does not return the claim. Responses never
+  expose object keys, signed URLs, claim text in errors, or provider/database
+  exception details.
+- An attached object is accepted only through an injected server-side
+  validator that returns a clean CGN-134 validation for the same owner and key.
+  The repository stores the inspected object revision, checksum, type, size
+  and validation time. Missing or rejected validation fails closed. A real
+  scanner and runtime composition remain separate work.
+- Migration 002 adds optimistic revision and idempotency columns, pinned
+  validation metadata and an Evidence-owned audit table. A database trigger
+  records create/update/archive action, owner, evidence ID, revision and time;
+  it does not store claim text or object keys. No cross-domain event is
+  produced.
+
+The API accepts `IdentityAuthorizationContextV1` from a trusted service
+boundary. It does not parse browser cookies, authenticate arbitrary HTTP
+headers, or read Identity's database.
 
 ## Migration
 

@@ -7,7 +7,7 @@ This is a *navigation guide*. Authoritative ownership rules: `packages/contracts
 | Identity & consent | `services/identity/` | accounts, auth, roles, consent | Package skeleton; product APIs pending Jira |
 | Career Intelligence | `services/career/` | career goal, tracks, diagnostic | Package skeleton; product APIs pending Jira |
 | Roadmap | `services/roadmap/` | plan and daily missions | Package skeleton; product APIs pending Jira |
-| Evidence | `services/evidence/` | proof, provenance, validation | Package skeleton; product APIs pending Jira |
+| Evidence | `services/evidence/` | proof, provenance, validation | CGN-141 owns evidence records; CGN-142 adds the S3-compatible storage adapter; CGN-143 adds the owner-scoped manual evidence application API with idempotency, revisions and audited archive. No public HTTP listener or scanner runtime is established. |
 | AI orchestration | `services/ai/` | internal provider orchestration | CGN-122 establishes the runtime boundary and fake-provider flow; no vendor credentials, route, persistence or product-domain truth |
 | Growth | `services/growth/` | readiness and Growth Identity | Package skeleton; product APIs pending Jira |
 | Feed | `services/feed/` | social feed/stories projections | Package skeleton; product APIs pending Jira |

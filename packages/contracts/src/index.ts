@@ -10,3 +10,4 @@ export * from "./identity/identity-organization-authorization-context.v1.js";
 export * from "./ai/ai-provider.v1.js";
 export * from "./ai/ai-prompt-registry.v1.js";
 export * from "./evidence/evidence-upload-validation.v1.js";
+export * from "./evidence/evidence-record.v1.js";
