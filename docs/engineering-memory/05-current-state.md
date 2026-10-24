@@ -1,7 +1,7 @@
 # 05 - Current Merged State
 
-Last updated: 2026-10-24 after the CGN-142 Evidence storage merge; CGN-90,
-CGN-99, CGN-75, CGN-131, CGN-67, CGN-68, CGN-141, CGN-134 and CGN-142 are
+Last updated: 2026-10-25 after the CGN-102 Identity membership merge; CGN-90,
+CGN-99, CGN-75, CGN-131, CGN-67, CGN-68, CGN-102, CGN-141, CGN-134 and CGN-142 are
 merged with verification evidence below.
 
 ## Repository
@@ -187,6 +187,29 @@ does not imply verified expertise (CGN-186), and admin does not grant delegated
 Admin/Operator permissions or privacy-safe visibility (CGN-279). No role-write
 HTTP route or service-to-service authentication is defined by this ticket. See
 `docs/handoffs/CGN-69.md` for tests, exact workflow evidence and rollback.
+
+## CGN-102 Identity organization memberships and recruiter authorization
+
+CGN-102 adds Identity-owned organization membership states (`pending`,
+`approved`, `revoked`) with transactional, idempotent writes and an audit
+history. The authenticated, organization-scoped context returns the recruiter
+role only when membership is approved and the global Identity recruiter role
+is active. It is informational context, not a bearer credential or downstream
+authorization proof. No public membership-write route or cross-service access
+was added; Recruiter owns organization onboarding/approval, and protected
+downstream operations remain closed pending CGN-101 service-to-service
+verification.
+
+Merged by [PR #80](https://github.com/Sandeepagrahari78/career-growth-network/pull/80)
+at SHA `4d0adbd5b3f9114f81fb00598e286167ddac7ea9` (final candidate
+`f723f9b57d181357e13bf9a5c428cb9d3576aa1b`). Exact-head PR CI
+`40123875498` and PR Local Helm `40123875501` passed. The CI PostgreSQL job
+proved Identity membership schema ownership, access isolation, constraints and
+rollback against ephemeral PostgreSQL. Post-merge Main CI `40124094633`,
+Docker Images `40124094584`, Local Helm `40124094721`, exact-merge Staging
+Validation `40124325621`, and final Jira Delivery Sync `40124373016` passed.
+Jira is Done. No persistent staging deployment or production release is
+claimed; see `docs/handoffs/CGN-102.md` for the exact evidence and limitations.
 
 ## CGN-95 OpenTelemetry SDK (PR pending)
 
