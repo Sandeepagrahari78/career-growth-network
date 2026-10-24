@@ -2,8 +2,29 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   AiOrchestrationError,
+  AiPromptResolutionError,
   AiOrchestrator,
+  resolveAiPrompt,
 } from "../../dist/ai-orchestrator.js";
+
+const versionOne = {
+  promptId: "career.plan",
+  promptVersion: 1,
+  template: "Plan for {{goal}} using {{context}}",
+  variables: ["goal", "context"],
+  modelConfig: {
+    model: "approved-model-alias",
+    temperature: 0.2,
+    maxOutputTokens: 1200,
+  },
+  responseSchema: {
+    type: "object",
+    properties: { plan: { type: "string" } },
+    required: ["plan"],
+    additionalProperties: false,
+  },
+  provenance: { source: "repository", revision: "CGN-123-fixture-1" },
+};
 
 test("injects the provider and returns its generated result", async () => {
   const records = [];
@@ -112,6 +133,123 @@ test("does not call the provider when the caller is already cancelled", async ()
     (error) => error.code === "AI_REQUEST_CANCELLED",
   );
   assert.equal(called, false);
+});
+
+test("resolves the exact prompt version with reproducible metadata", () => {
+  const newerVersion = {
+    ...versionOne,
+    promptVersion: 2,
+    template: "Updated plan for {{goal}} using {{context}}",
+    provenance: { source: "repository", revision: "CGN-123-fixture-2" },
+  };
+  const request = resolveAiPrompt(
+    [newerVersion, versionOne],
+    "career.plan",
+    1,
+    { goal: "career growth", context: "private context" },
+  );
+
+  assert.deepEqual(request, {
+    prompt: "Plan for career growth using private context",
+    promptMetadata: {
+      promptId: "career.plan",
+      promptVersion: 1,
+      modelConfig: {
+        model: "approved-model-alias",
+        temperature: 0.2,
+        maxOutputTokens: 1200,
+      },
+      responseSchema: versionOne.responseSchema,
+      provenance: { source: "repository", revision: "CGN-123-fixture-1" },
+    },
+  });
+});
+
+test("does not fall back when an exact prompt version is unavailable", () => {
+  assert.throws(
+    () =>
+      resolveAiPrompt([versionOne], "career.plan", 2, {
+        goal: "career growth",
+        context: "private context",
+      }),
+    (error) => {
+      assert.ok(error instanceof AiPromptResolutionError);
+      assert.equal(error.code, "AI_PROMPT_VERSION_NOT_FOUND");
+      return true;
+    },
+  );
+});
+
+test("rejects ambiguous prompt versions and invalid model/schema metadata", () => {
+  const cyclicSchema = {};
+  cyclicSchema.self = cyclicSchema;
+  const invalidDefinitions = [
+    [versionOne, { ...versionOne }],
+    [{ ...versionOne, modelConfig: { model: " " } }],
+    [{ ...versionOne, modelConfig: { model: "model", apiKey: "private" } }],
+    [{ ...versionOne, modelConfig: { model: "model", temperature: 2.1 } }],
+    [{ ...versionOne, modelConfig: { model: "model", maxOutputTokens: 0 } }],
+    [{ ...versionOne, responseSchema: [] }],
+    [{ ...versionOne, responseSchema: cyclicSchema }],
+    [{ ...versionOne, provenance: { source: "repository", revision: " " } }],
+    [{ ...versionOne, template: "Plan for {{unknown}}" }],
+  ];
+
+  for (const definitions of invalidDefinitions) {
+    assert.throws(
+      () =>
+        resolveAiPrompt(definitions, "career.plan", 1, {
+          goal: "career growth",
+          context: "private context",
+        }),
+      (error) => error.code === "AI_PROMPT_CONFIGURATION_INVALID",
+    );
+  }
+});
+
+test("rejects missing and undeclared prompt variables without echoing values", () => {
+  const privateInput = "fixture-private-value-123";
+  for (const variables of [
+    { goal: privateInput },
+    { goal: "career", context: privateInput, extra: privateInput },
+    { goal: 42, context: privateInput },
+  ]) {
+    assert.throws(
+      () => resolveAiPrompt([versionOne], "career.plan", 1, variables),
+      (error) => {
+        assert.ok(error instanceof AiPromptResolutionError);
+        assert.equal(error.code, "AI_PROMPT_VARIABLES_INVALID");
+        assert.equal(error.message.includes(privateInput), false);
+        return true;
+      },
+    );
+  }
+});
+
+test("keeps resolved prompt variables out of orchestration telemetry", async () => {
+  const privateInput = "fixture-private-value-456";
+  const records = [];
+  const request = resolveAiPrompt([versionOne], "career.plan", 1, {
+    goal: "career growth",
+    context: privateInput,
+  });
+  const orchestrator = new AiOrchestrator(
+    {
+      async generate(generationRequest) {
+        assert.equal(generationRequest.prompt.includes(privateInput), true);
+        assert.deepEqual(
+          generationRequest.promptMetadata,
+          request.promptMetadata,
+        );
+        return { text: "fixture result" };
+      },
+    },
+    { record: (entry) => records.push(entry) },
+  );
+
+  await orchestrator.generate(request);
+  assert.equal(JSON.stringify(records).includes(privateInput), false);
+  assert.equal(JSON.stringify(records).includes("Plan for"), false);
 });
 
 test("rejects an invalid timeout configuration", () => {
