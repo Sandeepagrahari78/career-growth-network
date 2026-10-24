@@ -142,6 +142,27 @@ test("same idempotency key and payload returns the existing record", async () =>
   assert.deepEqual(capture.statements[1].values, ["student-a", "request-3"]);
 });
 
+test("observed-source idempotency compares its source reference", async () => {
+  const sourceReference = "github:repo/project/commit/abc123";
+  const existing = row({
+    provenance_kind: "observed_source",
+    claim_text: null,
+    source_reference: sourceReference,
+  });
+  const capture = recordingDatabase([[], [existing]]);
+  const repository = new EvidenceRepository(capture.database);
+  const record = await repository.create({
+    ownerId: "student-a",
+    idempotencyKey: "observed-replay",
+    provenanceKind: "observed_source",
+    sourceReference,
+  });
+
+  assert.equal(record.evidenceId, evidenceId);
+  assert.equal(record.sourceReference, sourceReference);
+  assert.equal(capture.statements.length, 2);
+});
+
 test("same idempotency key with a different payload conflicts", async () => {
   const capture = recordingDatabase([
     [],

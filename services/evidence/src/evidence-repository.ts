@@ -267,10 +267,14 @@ function createRequestMatches(
   record: EvidenceRecord,
   input: CreateEvidenceInput,
 ): boolean {
+  const sourceReferenceMatches =
+    input.provenanceKind === "observed_source"
+      ? record.sourceReference === input.sourceReference
+      : record.sourceReference === null;
   return (
     record.provenanceKind === input.provenanceKind &&
     record.claimText === (input.claimText ?? null) &&
-    record.sourceReference === (input.sourceReference ?? null) &&
+    sourceReferenceMatches &&
     record.objectKey === (input.objectKey ?? null)
   );
 }
