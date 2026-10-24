@@ -5,4 +5,15 @@ packages:
 
 blockExoticSubdeps: true
 minimumReleaseAge: 10080
+# CGN-303: Exact-version emergency security updates; do not disable the 7-day policy.
+# Remove these exceptions once the releases are at least seven days old.
+minimumReleaseAgeExclude:
+  - 'body-parser@2.4.0'
+  - 'multer@2.5.0'
 trustPolicy: no-downgrade
+
+# CGN-303: Pin transitive request-parsing DoS fixes until upstreams are patched.
+# CVE-2026-111181 and CVE-2026-113872.
+overrides:
+  body-parser: 2.4.0
+  multer: 2.5.0
