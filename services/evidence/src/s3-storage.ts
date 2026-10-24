@@ -1,4 +1,3 @@
-import { Buffer } from "node:buffer";
 import { createHash, createHmac, randomUUID } from "node:crypto";
 import type {
   EvidenceDownloadAuthorizationV1,
@@ -88,15 +87,17 @@ function sha256(value: string | Uint8Array): string {
   return createHash("sha256").update(value).digest("hex");
 }
 
-function hmac(key: string | Uint8Array, value: string): Buffer {
-  return createHmac("sha256", key).update(value, "utf8").digest();
+function hmac(key: string | Uint8Array, value: string): Uint8Array {
+  return new Uint8Array(
+    createHmac("sha256", key).update(value, "utf8").digest(),
+  );
 }
 
-function signingKey(secret: string, date: string, region: string): Buffer {
+function signingKey(secret: string, date: string, region: string): Uint8Array {
   const dateKey = hmac("AWS4" + secret, date);
-  const regionKey = createHmac("sha256", dateKey).update(region).digest();
-  const serviceKey = createHmac("sha256", regionKey).update("s3").digest();
-  return createHmac("sha256", serviceKey).update("aws4_request").digest();
+  const regionKey = hmac(dateKey, region);
+  const serviceKey = hmac(regionKey, "s3");
+  return hmac(serviceKey, "aws4_request");
 }
 
 function awsTimestamp(now: Date): { date: string; timestamp: string } {
@@ -390,7 +391,7 @@ export class EvidenceS3Storage {
       ) {
         return { allowed: false, reason: "content_not_validated" };
       }
-      const headers = revision.versionId
+      const headers: Readonly<Record<string, string>> = revision.versionId
         ? {}
         : { "if-match": revision.etag as string };
       const downloadUrl = this.presign(
@@ -414,7 +415,7 @@ export class EvidenceS3Storage {
     const query = revision?.versionId
       ? [["versionId", revision.versionId] as const]
       : [];
-    const headers =
+    const headers: Readonly<Record<string, string>> =
       revision?.etag && !revision.versionId
         ? { "if-match": revision.etag }
         : {};
@@ -461,7 +462,7 @@ export class EvidenceS3Storage {
     const query = revision.versionId
       ? [["versionId", revision.versionId] as const]
       : [];
-    const headers =
+    const headers: Readonly<Record<string, string>> =
       revision.etag && !revision.versionId ? { "if-match": revision.etag } : {};
     return this.signedRequest("GET", objectKey, query, headers);
   }
