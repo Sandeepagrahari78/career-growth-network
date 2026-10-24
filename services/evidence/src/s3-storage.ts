@@ -78,8 +78,9 @@ interface S3Revision {
 }
 
 function awsEncode(value: string): string {
-  return encodeURIComponent(value).replace(/[!'()*]/g, (character) =>
-    "%" + character.charCodeAt(0).toString(16).toUpperCase(),
+  return encodeURIComponent(value).replace(
+    /[!'()*]/g,
+    (character) => "%" + character.charCodeAt(0).toString(16).toUpperCase(),
   );
 }
 
@@ -95,9 +96,7 @@ function signingKey(secret: string, date: string, region: string): Buffer {
   const dateKey = hmac("AWS4" + secret, date);
   const regionKey = createHmac("sha256", dateKey).update(region).digest();
   const serviceKey = createHmac("sha256", regionKey).update("s3").digest();
-  return createHmac("sha256", serviceKey)
-    .update("aws4_request")
-    .digest();
+  return createHmac("sha256", serviceKey).update("aws4_request").digest();
 }
 
 function awsTimestamp(now: Date): { date: string; timestamp: string } {
@@ -245,9 +244,7 @@ function validateConfig(config: EvidenceS3StorageConfig): URL {
     throw new TypeError("Evidence S3 bucket name is invalid.");
   }
   if (
-    /[\r\n]/.test(
-      config.credentials.accessKey + config.credentials.secretKey,
-    )
+    /[\r\n]/.test(config.credentials.accessKey + config.credentials.secretKey)
   ) {
     throw new TypeError("Evidence S3 credentials are invalid.");
   }
@@ -299,9 +296,7 @@ export class EvidenceS3Storage {
       "if-none-match": "*",
       "x-amz-meta-owner-id": authorization.ownerId,
       "x-amz-meta-quarantine-state": "quarantined",
-      "x-amz-meta-declared-size-bytes": String(
-        authorization.declaredSizeBytes,
-      ),
+      "x-amz-meta-declared-size-bytes": String(authorization.declaredSizeBytes),
     } as const;
     const uploadUrl = this.presign(
       "PUT",
@@ -467,9 +462,7 @@ export class EvidenceS3Storage {
       ? [["versionId", revision.versionId] as const]
       : [];
     const headers =
-      revision.etag && !revision.versionId
-        ? { "if-match": revision.etag }
-        : {};
+      revision.etag && !revision.versionId ? { "if-match": revision.etag } : {};
     return this.signedRequest("GET", objectKey, query, headers);
   }
 
@@ -555,10 +548,7 @@ export class EvidenceS3Storage {
     const queryEntries: Array<readonly [string, string]> = [
       ...query,
       ["X-Amz-Algorithm", "AWS4-HMAC-SHA256"],
-      [
-        "X-Amz-Credential",
-        this.config.credentials.accessKey + "/" + scope,
-      ],
+      ["X-Amz-Credential", this.config.credentials.accessKey + "/" + scope],
       ["X-Amz-Date", timestamp],
       ["X-Amz-Expires", String(expiresInSeconds)],
       [

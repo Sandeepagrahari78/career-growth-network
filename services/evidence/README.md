@@ -58,7 +58,7 @@ Never send storage credentials to clients or include them in logs.
 EvidenceS3Storage.createUploadGrant calls the CGN-134 authorization helper
 before signing a PUT. It creates a random quarantine/ key that contains no
 owner or filename, and signs the content type, owner metadata, declared size,
-quarantine state and If-None-Match: * condition. The client's URL expires
+quarantine state and If-None-Match: \* condition. The client's URL expires
 within the policy's 300-second maximum and cannot replace an existing object.
 The bucket must remain private; public ACLs or anonymous reads are not allowed.
 

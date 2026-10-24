@@ -1,12 +1,6 @@
 import assert from "node:assert/strict";
 import { randomBytes, randomUUID } from "node:crypto";
-import {
-  chmod,
-  mkdtemp,
-  readFile,
-  rm,
-  writeFile,
-} from "node:fs/promises";
+import { chmod, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { execFileSync, spawnSync } from "node:child_process";
 import { createServer } from "node:net";
 import { dirname, resolve, join } from "node:path";
@@ -105,9 +99,7 @@ test(
   "SeaweedFS signed evidence uploads, validation, and pinned downloads work end to end",
   { skip: !dockerAvailable && "Docker Engine is unavailable." },
   async (t) => {
-    const workDir = await mkdtemp(
-      join(repoRoot, ".cgn", "cgn142-seaweedfs-"),
-    );
+    const workDir = await mkdtemp(join(repoRoot, ".cgn", "cgn142-seaweedfs-"));
     await chmod(workDir, 0o700);
     const endpointPort = await unusedLoopbackPort();
     const endpoint = "http://127.0.0.1:" + endpointPort;
@@ -306,8 +298,7 @@ test(
     assert.ok(downloadSignature);
     tamperedDownloadUrl.searchParams.set(
       "X-Amz-Signature",
-      (downloadSignature[0] === "0" ? "1" : "0") +
-        downloadSignature.slice(1),
+      (downloadSignature[0] === "0" ? "1" : "0") + downloadSignature.slice(1),
     );
     const deniedTamper = await fetch(tamperedDownloadUrl, {
       headers: download.headers,
