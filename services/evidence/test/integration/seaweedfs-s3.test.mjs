@@ -136,7 +136,10 @@ test(
 
     t.after(async () => {
       try {
-        dockerCompose(project, testComposeFile, ["down", "--volumes"]);
+        dockerCompose(project, testComposeFile, ["down", "--volumes"], {
+          ...process.env,
+          CGN_SEAWEEDFS_CONFIG_FILE: configPath,
+        });
       } finally {
         await rm(workDir, { recursive: true, force: true });
       }
