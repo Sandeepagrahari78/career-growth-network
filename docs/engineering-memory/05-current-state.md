@@ -1,7 +1,8 @@
 # 05 - Current Merged State
 
-Last updated: 2026-10-20 after the CGN-68 Identity OIDC merge; CGN-90, CGN-99,
-CGN-75, CGN-131, CGN-67 and CGN-68 are merged with verification evidence below.
+Last updated: 2026-10-24 after the CGN-134 merge; CGN-90, CGN-99, CGN-75,
+CGN-131, CGN-67, CGN-68, CGN-141 and CGN-134 are merged with verification
+evidence below.
 
 ## Repository
 
@@ -76,6 +77,12 @@ CGN-75, CGN-131, CGN-67 and CGN-68 are merged with verification evidence below.
 - Autoscaling/disruption contract: `cgn.autoscaling-disruption.v1`; HPA targets inherit the approved 70% CPU / 75% memory capacity triggers, while production replica bounds remain evidence-specific.
 - Workload identity contract: `cgn.workload-identity.v1`; default dedicated ServiceAccount and token automount disabled; AWS IRSA annotation rendering is opt-in, template-only and requires an approved external IAM resource.
 - Product tables and runtime DB roles are not created by infrastructure bootstrap tickets.
+
+## Evidence service state
+
+- CGN-141: Evidence owns the evidence_records PostgreSQL schema and owner-scoped repository. Records keep private visibility, unverified state and opaque object keys; this work added no route, event, scanner or cross-service database access. Merged by [PR #64](https://github.com/Sandeepagrahari78/career-growth-network/pull/64), merge SHA 58deccabc63dd24a885abb5224984e498a3c2cb2; Jira is Done.
+- CGN-134: added cgn.evidence-upload-policy.v1 and reusable authorization, post-upload inspection, fail-closed malware scan and clean-scan download gates. The contract allows PDF/JPEG/PNG up to 10 MiB, with 300/60-second URL lifetimes, private quarantine, and revision/checksum pinning. It adds no URL signer, storage integration, production scanner, route or persistence workflow. Merged by [PR #81](https://github.com/Sandeepagrahari78/career-growth-network/pull/81), merge SHA 657afbb146e7014217b9c7ca559249e209f5c742; Jira is Done.
+- CGN-142 candidate on branch CGN-142-seaweedfs-20261024: adds the Evidence-owned S3 adapter using the CGN-134 gates and CGN-89 SeaweedFS bucket. Uploads use opaque random quarantine keys, signed owner/type/size/quarantine metadata and a conditional create; server inspection hashes stored bytes and pins the inspected revision; downloads require a clean owner-authorized result and recheck the pinned revision/checksum. This candidate adds no route, event, schema or scanner implementation. Treat it as pending until PR, Main CI and exact-candidate staging evidence are recorded in its handoff.
 
 ## Product state
 
