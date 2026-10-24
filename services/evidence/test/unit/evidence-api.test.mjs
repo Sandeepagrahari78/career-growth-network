@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { EvidenceApiError, EvidenceProjectApiV1 } from "../../dist/evidence-api.js";
+import {
+  EvidenceApiError,
+  EvidenceProjectApiV1,
+} from "../../dist/evidence-api.js";
 
 const ownerId = "a2046ef2-bc0a-4f93-8ac0-517e3246c13d";
 const otherOwnerId = "e9f332df-5725-426e-9b48-8211086c970d";
@@ -83,7 +86,11 @@ function fakeRepository(initial = []) {
       ) {
         return null;
       }
-      const updated = { ...item, claimText: input.claimText, revision: item.revision + 1 };
+      const updated = {
+        ...item,
+        claimText: input.claimText,
+        revision: item.revision + 1,
+      };
       records.set(item.evidenceId, updated);
       for (const [key, value] of idempotency) {
         if (value.evidenceId === item.evidenceId) idempotency.set(key, updated);
@@ -108,7 +115,8 @@ function fakeRepository(initial = []) {
       };
       records.set(item.evidenceId, archived);
       for (const [key, value] of idempotency) {
-        if (value.evidenceId === item.evidenceId) idempotency.set(key, archived);
+        if (value.evidenceId === item.evidenceId)
+          idempotency.set(key, archived);
       }
       return archived;
     },
@@ -144,8 +152,14 @@ test("creates a private manual claim from a verified Identity account", async ()
 test("repeated create returns the same record and rejects a changed payload", async () => {
   const repository = fakeRepository();
   const api = new EvidenceProjectApiV1(repository);
-  const first = await api.createManualProjectEvidence(context(), createRequest());
-  const second = await api.createManualProjectEvidence(context(), createRequest());
+  const first = await api.createManualProjectEvidence(
+    context(),
+    createRequest(),
+  );
+  const second = await api.createManualProjectEvidence(
+    context(),
+    createRequest(),
+  );
 
   assert.equal(second.evidenceId, first.evidenceId);
   assert.equal(repository.calls.create.length, 1);
@@ -184,7 +198,10 @@ test("requires a clean same-owner validation result for an attached object", asy
   );
 
   assert.equal(result.hasValidatedPrivateObject, true);
-  assert.equal(repository.calls.create[0].objectProof.objectRevision, validation.objectRevision);
+  assert.equal(
+    repository.calls.create[0].objectProof.objectRevision,
+    validation.objectRevision,
+  );
   assert.equal("objectKey" in result, false);
 });
 
@@ -200,7 +217,11 @@ test("rejects missing, rejected, owner-mismatched and throwing object validators
   );
 
   for (const validator of [
-    { async validate() { return { state: "rejected", reason: "suspicious_content" }; } },
+    {
+      async validate() {
+        return { state: "rejected", reason: "suspicious_content" };
+      },
+    },
     {
       async validate() {
         return {
@@ -216,7 +237,11 @@ test("rejects missing, rejected, owner-mismatched and throwing object validators
         };
       },
     },
-    { async validate() { throw new Error("storage secret and provider detail"); } },
+    {
+      async validate() {
+        throw new Error("storage secret and provider detail");
+      },
+    },
   ]) {
     const repository = fakeRepository();
     const api = new EvidenceProjectApiV1(repository, validator);
@@ -249,7 +274,10 @@ test("updates claim text with optimistic concurrency and preserves provenance", 
   assert.equal(updated.revision, 2);
   assert.equal(updated.claimText, "Updated claim");
   assert.equal(updated.provenanceKind, "manual_claim");
-  assert.equal(repository.records.get(evidenceId).objectKey, "quarantine/file-a");
+  assert.equal(
+    repository.records.get(evidenceId).objectKey,
+    "quarantine/file-a",
+  );
   await assert.rejects(
     api.updateManualProjectEvidence(context(), evidenceId, {
       contract: "cgn.evidence-record-update.v1",

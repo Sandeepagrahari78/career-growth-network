@@ -189,7 +189,10 @@ test("updates only manual claim text and uses an expected revision", async () =>
   assert.equal(record?.sourceReference, null);
   assert.match(capture.statements[0].statement, /owner_id = \$2/);
   assert.match(capture.statements[0].statement, /revision = \$3/);
-  assert.match(capture.statements[0].statement, /provenance_kind = 'manual_claim'/);
+  assert.match(
+    capture.statements[0].statement,
+    /provenance_kind = 'manual_claim'/,
+  );
   assert.deepEqual(capture.statements[0].values, [
     evidenceId,
     "student-a",

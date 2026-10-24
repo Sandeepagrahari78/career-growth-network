@@ -73,10 +73,7 @@ export interface EvidenceRepositoryPort {
 }
 
 function validateEvidenceId(evidenceId: string): void {
-  if (
-    typeof evidenceId !== "string" ||
-    !UUID_PATTERN.test(evidenceId)
-  ) {
+  if (typeof evidenceId !== "string" || !UUID_PATTERN.test(evidenceId)) {
     throw new EvidenceApiError(
       400,
       "VALIDATION_ERROR",
@@ -107,12 +104,15 @@ function hasOnlyKeys(value: object, allowed: readonly string[]): boolean {
   return Object.keys(value).every((key) => allowed.includes(key));
 }
 
-function validateCreateRequest(
-  request: CreateManualEvidenceRequestV1,
-): void {
+function validateCreateRequest(request: CreateManualEvidenceRequestV1): void {
   if (
     request?.contract !== EVIDENCE_RECORD_CREATE_CONTRACT_V1 ||
-    !hasOnlyKeys(request, ["contract", "idempotencyKey", "claimText", "objectKey"]) ||
+    !hasOnlyKeys(request, [
+      "contract",
+      "idempotencyKey",
+      "claimText",
+      "objectKey",
+    ]) ||
     typeof request.idempotencyKey !== "string" ||
     !/^[A-Za-z0-9._~:-]{1,128}$/.test(request.idempotencyKey) ||
     typeof request.claimText !== "string" ||
@@ -278,8 +278,8 @@ export class EvidenceProjectApiV1 {
   ): Promise<EvidenceRecordV1> {
     const ownerId = requireOwner(context);
     validateCreateRequest(request);
-    const existing = await repositoryCall(
-      () => this.repository.findByIdempotencyKey(ownerId, request.idempotencyKey),
+    const existing = await repositoryCall(() =>
+      this.repository.findByIdempotencyKey(ownerId, request.idempotencyKey),
     );
     if (existing) {
       if (existing.archivedAt !== null) throw notFound();
@@ -347,8 +347,8 @@ export class EvidenceProjectApiV1 {
     const ownerId = requireOwner(context);
     validateUpdateRequest(request);
     validateEvidenceId(evidenceId);
-    const updated = await repositoryCall(
-      () => this.repository.updateManualClaimOwnedActive({
+    const updated = await repositoryCall(() =>
+      this.repository.updateManualClaimOwnedActive({
         ownerId,
         evidenceId,
         expectedRevision: request.expectedRevision,
@@ -374,8 +374,8 @@ export class EvidenceProjectApiV1 {
     const ownerId = requireOwner(context);
     validateArchiveRequest(request);
     validateEvidenceId(evidenceId);
-    const archived = await repositoryCall(
-      () => this.repository.archiveOwnedActive({
+    const archived = await repositoryCall(() =>
+      this.repository.archiveOwnedActive({
         ownerId,
         evidenceId,
         expectedRevision: request.expectedRevision,

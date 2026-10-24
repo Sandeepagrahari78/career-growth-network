@@ -210,7 +210,9 @@ function validateObjectProof(
     typeof proof.validatedAt !== "string" ||
     !Number.isFinite(Date.parse(proof.validatedAt))
   ) {
-    throw new TypeError("objectKey requires a valid server-side validation proof.");
+    throw new TypeError(
+      "objectKey requires a valid server-side validation proof.",
+    );
   }
 }
 

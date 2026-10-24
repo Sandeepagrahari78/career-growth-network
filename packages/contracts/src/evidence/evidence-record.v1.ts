@@ -1,5 +1,4 @@
-export const EVIDENCE_RECORD_CONTRACT_V1 =
-  "cgn.evidence-record.v1" as const;
+export const EVIDENCE_RECORD_CONTRACT_V1 = "cgn.evidence-record.v1" as const;
 export const EVIDENCE_RECORD_CREATE_CONTRACT_V1 =
   "cgn.evidence-record-create.v1" as const;
 export const EVIDENCE_RECORD_UPDATE_CONTRACT_V1 =
