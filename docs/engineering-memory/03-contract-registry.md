@@ -74,3 +74,18 @@ It currently allows only `infra/k8s/base` as the GitOps source path and requires
 ## Career Activity
 
 One meaningful career action can update Growth, Feed, Stories, Notifications and downstream opportunity projections. Do not create mobile-only or feature-specific copies of the activity model.
+
+## Gateway Auth Context Forwarding v1
+
+`cgn.gateway.auth-context-forwarding.v1` wraps the Identity-owned
+`cgn.identity.authorization-context.v1` for Gateway-to-service transport in the
+`x-cgn-auth-context-v1` header. Gateway obtains the nested context from
+Identity using the HttpOnly session cookie and never accepts a caller-supplied
+copy as input. The envelope carries no session credential and does not add
+resource-specific permissions.
+
+This transport contract does not authenticate the Gateway caller. A receiving
+service must not trust or authorize from the forwarded context until CGN-101
+service-to-service authentication is implemented and verified. Until then, the
+header is transport data only; no service consumer may treat it as proof of
+Identity or Gateway provenance.
