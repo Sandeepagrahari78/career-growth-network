@@ -148,7 +148,9 @@ function canonicalHeaders(
   }
   const names = [...normalized.keys()].sort();
   return {
-    text: names.map((name) => name + ":" + normalized.get(name) + "\n").join(""),
+    text: names
+      .map((name) => name + ":" + normalized.get(name) + "\n")
+      .join(""),
     names: names.join(";"),
   };
 }
@@ -160,7 +162,9 @@ function canonicalObjectPath(bucket: string, objectKey: string): string {
     objectKey.length > 512 ||
     objectKey.startsWith("/") ||
     objectKey.includes("\\") ||
-    objectKey.split("/").some((part) => !part || part === "." || part === "..") ||
+    objectKey
+      .split("/")
+      .some((part) => !part || part === "." || part === "..") ||
     /^(?:https?:\/\/|s3:|\/\/)/i.test(objectKey)
   ) {
     throw new TypeError("Evidence object key must be an opaque S3 key.");
@@ -240,7 +244,11 @@ function validateConfig(config: EvidenceS3StorageConfig): URL {
   ) {
     throw new TypeError("Evidence S3 bucket name is invalid.");
   }
-  if (/[\r\n]/.test(config.credentials.accessKey + config.credentials.secretKey)) {
+  if (
+    /[\r\n]/.test(
+      config.credentials.accessKey + config.credentials.secretKey,
+    )
+  ) {
     throw new TypeError("Evidence S3 credentials are invalid.");
   }
   let endpoint: URL;
@@ -349,10 +357,7 @@ export class EvidenceS3Storage {
     input: EvidenceDownloadRequest,
     policy: EvidenceUploadPolicyV1,
   ): Promise<EvidenceS3DownloadGrant> {
-    const authorization = authorizeEvidenceDownload(
-      input,
-      policy,
-    );
+    const authorization = authorizeEvidenceDownload(input, policy);
     if (!authorization.allowed) return authorization;
 
     const revision: S3Revision | null = revisionParts(
@@ -556,7 +561,10 @@ export class EvidenceS3Storage {
       ],
       ["X-Amz-Date", timestamp],
       ["X-Amz-Expires", String(expiresInSeconds)],
-      ["X-Amz-SignedHeaders", canonicalHeaders(headers, this.endpoint.host).names],
+      [
+        "X-Amz-SignedHeaders",
+        canonicalHeaders(headers, this.endpoint.host).names,
+      ],
     ];
     const queryString = canonicalQuery(queryEntries);
     const normalized = canonicalHeaders(headers, this.endpoint.host);

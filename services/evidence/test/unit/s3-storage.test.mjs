@@ -69,79 +69,88 @@ test("upload grants stay private and use opaque, expiring keys", () => {
   assert.doesNotMatch(result.uploadUrl, /student-a|secret-key-must-not-leak/);
 });
 
-test("upload grants reject cross-user, unsupported, and oversized requests", () => {
-  const storage = new EvidenceS3Storage(config);
-  assert.deepEqual(
-    storage.createUploadGrant(input({ principalId: "student-b" }), policy),
-    { allowed: false, reason: "owner_mismatch" },
-  );
-  assert.deepEqual(
-    storage.createUploadGrant(
-      input({ fileName: "proof.exe", declaredContentType: "application/pdf" }),
-      policy,
-    ),
-    { allowed: false, reason: "unsupported_file_type" },
-  );
-  assert.deepEqual(
-    storage.createUploadGrant(
-      input({ declaredSizeBytes: policy.maxFileSizeBytes + 1 }),
-      policy,
-    ),
-    { allowed: false, reason: "declared_size_exceeded" },
-  );
-  assert.deepEqual(
-    storage.createUploadGrant(input(), {
-      ...policy,
-      signedUploadUrlTtlSeconds: 301,
-    }),
-    { allowed: false, reason: "invalid_policy" },
-  );
-});
+test(
+  "upload grants reject cross-user, unsupported, and oversized requests",
+  () => {
+    const storage = new EvidenceS3Storage(config);
+    assert.deepEqual(
+      storage.createUploadGrant(input({ principalId: "student-b" }), policy),
+      { allowed: false, reason: "owner_mismatch" },
+    );
+    assert.deepEqual(
+      storage.createUploadGrant(
+        input({
+          fileName: "proof.exe",
+          declaredContentType: "application/pdf",
+        }),
+        policy,
+      ),
+      { allowed: false, reason: "unsupported_file_type" },
+    );
+    assert.deepEqual(
+      storage.createUploadGrant(
+        input({ declaredSizeBytes: policy.maxFileSizeBytes + 1 }),
+        policy,
+      ),
+      { allowed: false, reason: "declared_size_exceeded" },
+    );
+    assert.deepEqual(
+      storage.createUploadGrant(input(), {
+        ...policy,
+        signedUploadUrlTtlSeconds: 301,
+      }),
+      { allowed: false, reason: "invalid_policy" },
+    );
+  },
+);
 
-test("downloads require owner authorization and a clean pinned revision", async () => {
-  const storage = new EvidenceS3Storage(config);
-  const base = {
-    principalId: "student-a",
-    ownerId: "student-a",
-    objectKey: "quarantine/8c0ba67a-8de0-4d99-8cd8-a23bde17dc46",
-    objectVisibility: "private",
-    validation: {
-      state: "validated",
-      malwareScan: "clean",
-      objectRevision: 'etag:"revision-3"',
-      checksumSha256: "a".repeat(64),
-    },
-    now,
-  };
+test(
+  "downloads require owner authorization and a clean pinned revision",
+  async () => {
+    const storage = new EvidenceS3Storage(config);
+    const base = {
+      principalId: "student-a",
+      ownerId: "student-a",
+      objectKey: "quarantine/8c0ba67a-8de0-4d99-8cd8-a23bde17dc46",
+      objectVisibility: "private",
+      validation: {
+        state: "validated",
+        malwareScan: "clean",
+        objectRevision: 'etag:"revision-3"',
+        checksumSha256: "a".repeat(64),
+      },
+      now,
+    };
 
-  assert.deepEqual(
-    await storage.createDownloadGrant(
-      { ...base, principalId: "student-b" },
-      policy,
-    ),
-    { allowed: false, reason: "owner_mismatch" },
-  );
-  assert.deepEqual(
-    await storage.createDownloadGrant(
-      {
-        ...base,
-        validation: { ...base.validation, malwareScan: "suspicious" },
-      },
-      policy,
-    ),
-    { allowed: false, reason: "content_not_validated" },
-  );
-  assert.deepEqual(
-    await storage.createDownloadGrant(
-      {
-        ...base,
-        validation: { ...base.validation, objectRevision: "revision-3" },
-      },
-      policy,
-    ),
-    { allowed: false, reason: "content_not_validated" },
-  );
-});
+    assert.deepEqual(
+      await storage.createDownloadGrant(
+        { ...base, principalId: "student-b" },
+        policy,
+      ),
+      { allowed: false, reason: "owner_mismatch" },
+    );
+    assert.deepEqual(
+      await storage.createDownloadGrant(
+        {
+          ...base,
+          validation: { ...base.validation, malwareScan: "suspicious" },
+        },
+        policy,
+      ),
+      { allowed: false, reason: "content_not_validated" },
+    );
+    assert.deepEqual(
+      await storage.createDownloadGrant(
+        {
+          ...base,
+          validation: { ...base.validation, objectRevision: "revision-3" },
+        },
+        policy,
+      ),
+      { allowed: false, reason: "content_not_validated" },
+    );
+  },
+);
 
 test("configuration rejects unsafe S3 endpoints", () => {
   assert.throws(

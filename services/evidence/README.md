@@ -50,8 +50,9 @@ is created by CGN-134; CGN-142 wires these contracts to SeaweedFS.
 ## S3-compatible storage adapter (CGN-142)
 
 services/evidence/src/s3-storage.ts implements the provider-neutral S3 adapter.
-Configure it with an HTTPS endpoint, region, bucket and server-side bucket-scoped
-credentials. Plain HTTP is allowed only for a loopback development endpoint.
+Configure it with an HTTPS endpoint, region, bucket and server-side
+bucket-scoped credentials. Plain HTTP is allowed only for a loopback development
+endpoint.
 Never send storage credentials to clients or include them in logs.
 
 EvidenceS3Storage.createUploadGrant calls the CGN-134 authorization helper

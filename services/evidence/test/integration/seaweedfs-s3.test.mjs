@@ -21,7 +21,10 @@ import {
 import { EvidenceS3Storage } from "../../dist/s3-storage.js";
 import { validateUploadedEvidence } from "../../dist/upload-validation.js";
 
-const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../../../..");
+const repoRoot = resolve(
+  dirname(fileURLToPath(import.meta.url)),
+  "../../../..",
+);
 const composeFile = resolve(
   repoRoot,
   "infra/docker/docker-compose.seaweedfs.yml",
@@ -288,15 +291,15 @@ test(
       policy,
     );
     assert.equal(download.allowed, true);
-    assert.equal(new URL(download.downloadUrl).searchParams.get("X-Amz-Expires"), "60");
+    assert.equal(
+      new URL(download.downloadUrl).searchParams.get("X-Amz-Expires"),
+      "60",
+    );
     const bytes = await fetch(download.downloadUrl, {
       headers: download.headers,
     });
     assert.equal(bytes.status, 200);
-    assert.deepEqual(
-      new Uint8Array(await bytes.arrayBuffer()),
-      payload,
-    );
+    assert.deepEqual(new Uint8Array(await bytes.arrayBuffer()), payload);
     const tamperedDownloadUrl = new URL(download.downloadUrl);
     const downloadSignature =
       tamperedDownloadUrl.searchParams.get("X-Amz-Signature");
