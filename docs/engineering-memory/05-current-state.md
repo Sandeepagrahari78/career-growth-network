@@ -1,8 +1,8 @@
 # 05 - Current Merged State
 
-Last updated: 2026-10-24 after the CGN-134 merge; CGN-90, CGN-99, CGN-75,
-CGN-131, CGN-67, CGN-68, CGN-141 and CGN-134 are merged with verification
-evidence below.
+Last updated: 2026-10-24 after the CGN-142 Evidence storage merge; CGN-90,
+CGN-99, CGN-75, CGN-131, CGN-67, CGN-68, CGN-141, CGN-134 and CGN-142 are
+merged with verification evidence below.
 
 ## Repository
 
@@ -82,7 +82,17 @@ evidence below.
 
 - CGN-141: Evidence owns the evidence_records PostgreSQL schema and owner-scoped repository. Records keep private visibility, unverified state and opaque object keys; this work added no route, event, scanner or cross-service database access. Merged by [PR #64](https://github.com/Sandeepagrahari78/career-growth-network/pull/64), merge SHA 58deccabc63dd24a885abb5224984e498a3c2cb2; Jira is Done.
 - CGN-134: added cgn.evidence-upload-policy.v1 and reusable authorization, post-upload inspection, fail-closed malware scan and clean-scan download gates. The contract allows PDF/JPEG/PNG up to 10 MiB, with 300/60-second URL lifetimes, private quarantine, and revision/checksum pinning. It adds no URL signer, storage integration, production scanner, route or persistence workflow. Merged by [PR #81](https://github.com/Sandeepagrahari78/career-growth-network/pull/81), merge SHA 657afbb146e7014217b9c7ca559249e209f5c742; Jira is Done.
-- CGN-142 candidate on branch CGN-142-seaweedfs-20261024: adds the Evidence-owned S3 adapter using the CGN-134 gates and CGN-89 SeaweedFS bucket. Uploads use opaque random quarantine keys, signed owner/type/size/quarantine metadata and a conditional create; server inspection hashes stored bytes and pins the inspected revision; downloads require a clean owner-authorized result and recheck the pinned revision/checksum. This candidate adds no route, event, schema or scanner implementation. Treat it as pending until PR, Main CI and exact-candidate staging evidence are recorded in its handoff.
+- CGN-142: merged the Evidence-owned S3-compatible signed upload/download
+  adapter using the CGN-134 gates and CGN-89 SeaweedFS bucket. Uploads use
+  opaque random quarantine keys, signed owner/type/size/quarantine metadata
+  and a conditional create; server inspection hashes stored bytes and pins
+  the inspected revision; downloads require a clean owner-authorized result
+  and recheck the pinned revision/checksum. No route, event, schema or scanner
+  implementation was added. Merged by [PR #82](https://github.com/Sandeepagrahari78/career-growth-network/pull/82),
+  merge SHA `fa8b57b9bf7e1a06112d6dbc307b0b146d709fc7`. Exact-head PR CI
+  `40115182866`, Main CI `40115608793` attempt 2, Docker Images `40115608789`,
+  exact-merge Staging Validation `40116011581`, and Jira Delivery Sync
+  `40116055792` passed. Jira is Done.
 
 ## Product state
 
