@@ -1,9 +1,13 @@
+import type { AiPromptVersionMetadataV1 } from "./ai-prompt-registry.v1.js";
+
 /**
  * Internal provider boundary for AI orchestration. Prompt and result content
  * are private application data and must not be written to logs or telemetry.
  */
 export interface AiGenerationRequestV1 {
   prompt: string;
+  /** Present when the prompt was resolved from a versioned prompt definition. */
+  promptMetadata?: AiPromptVersionMetadataV1;
 }
 
 export interface AiGenerationResultV1 {
@@ -18,6 +22,6 @@ export interface AiProviderV1 {
 }
 
 export type AiOrchestrationErrorCodeV1 =
-  | 'AI_REQUEST_TIMEOUT'
-  | 'AI_REQUEST_CANCELLED'
-  | 'AI_PROVIDER_FAILURE';
+  | "AI_REQUEST_TIMEOUT"
+  | "AI_REQUEST_CANCELLED"
+  | "AI_PROVIDER_FAILURE";
