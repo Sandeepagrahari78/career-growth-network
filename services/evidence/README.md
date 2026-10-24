@@ -47,6 +47,39 @@ validated scan. It returns the 60-second expiry and object revision; it never
 returns a URL. No upload route, storage provider or malware-scanner integration
 is created by CGN-134; CGN-142 wires these contracts to SeaweedFS.
 
+## S3-compatible storage adapter (CGN-142)
+
+services/evidence/src/s3-storage.ts implements the provider-neutral S3 adapter.
+Configure it with an HTTPS endpoint, region, bucket and server-side
+bucket-scoped credentials. Plain HTTP is allowed only for a loopback development
+endpoint.
+Never send storage credentials to clients or include them in logs.
+
+EvidenceS3Storage.createUploadGrant calls the CGN-134 authorization helper
+before signing a PUT. It creates a random quarantine/ key that contains no
+owner or filename, and signs the content type, owner metadata, declared size,
+quarantine state and If-None-Match: \* condition. The client's URL expires
+within the policy's 300-second maximum and cannot replace an existing object.
+The bucket must remain private; public ACLs or anonymous reads are not allowed.
+
+inspectQuarantinedObject reads the object metadata from S3, confirms the
+signed owner/quarantine/declared-size metadata, then reads the same revision
+using its S3 version ID when available or a signed If-Match ETag condition
+otherwise. It computes SHA-256 from the stored bytes and returns the signature
+prefix and measured size to validateUploadedEvidence. The injected scanner
+must validate that exact revision and checksum; CGN-142 does not add a scanner
+implementation or persist a validation result.
+
+createDownloadGrant calls authorizeEvidenceDownload, verifies the owner,
+clean scan revision and SHA-256 against current S3 bytes, then signs a
+revision-pinned GET that expires within the policy's 60-second maximum. The
+Evidence service remains the authorization boundary; no route or event is
+introduced by this adapter.
+
+Run pnpm --filter @cgn/evidence test for the package tests. The SeaweedFS
+integration test starts an isolated Compose project and removes only that
+project's temporary volume and generated credentials.
+
 ## Migration
 
 Apply migrations from this directory to cgn_evidence using the service owner
