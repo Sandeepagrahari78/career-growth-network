@@ -19,6 +19,13 @@ is accessed. `createIdentityAuthRuntime()` composes the repositories, OIDC
 service and HTTP server. The host process supplies the database driver,
 connection settings and adapter.
 
+Migration `004_identity_organization_memberships.up.sql` adds Identity-owned
+account-to-organization membership state (`pending`, `approved`, `revoked`) and
+an append-only change audit table. Organization IDs are opaque references owned
+by the Recruiter domain; Identity defines no organization database or foreign
+key. Membership writes are available only through the Identity-side repository
+until a separately reviewed trusted workflow is implemented.
+
 Run repository unit tests with `pnpm --filter @cgn/identity test:unit`. The
 PostgreSQL acceptance test runs only against the disposable local/CI database
 started by `scripts/infra/postgres-local.mjs` and proves migration rollback and
@@ -62,6 +69,17 @@ role does not define delegated Admin/Operator visibility or action permissions
 (CGN-279). This ticket adds no role-grant HTTP route or service-to-service
 authentication; those grants remain limited to trusted Identity-side
 workflows. No resource-specific permission matrix is established here.
+
+The authenticated
+`GET /v1/identity/auth/organization-authorization-context?organizationId=<uuid>`
+route returns `cgn.identity.organization-authorization-context.v1`. Identity
+resolves the account from the session cookie and reads the requested membership
+and current global application roles. The response contains a recruiter role
+only when the membership is approved and the global recruiter role is active;
+pending, revoked, absent or inactive-role cases return no role. The organization
+ID is a selector, never a client-supplied privilege. The response is not a
+bearer credential, and downstream protected operations still require trusted
+service-to-service verification before using any forwarded context.
 
 ## Local Keycloak 26.8.1
 
