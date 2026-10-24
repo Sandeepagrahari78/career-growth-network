@@ -1,8 +1,8 @@
 # 05 - Current Merged State
 
-Last updated: 2026-10-25 after the CGN-102 Identity membership merge; CGN-90,
-CGN-99, CGN-75, CGN-131, CGN-67, CGN-68, CGN-102, CGN-141, CGN-134 and CGN-142 are
-merged with verification evidence below.
+Last updated: 2026-10-25 after the CGN-123 AI prompt registry merge; CGN-90,
+CGN-99, CGN-75, CGN-131, CGN-67, CGN-68, CGN-102, CGN-123, CGN-141, CGN-134 and
+CGN-142 are merged with verification evidence below.
 
 ## Repository
 
@@ -216,3 +216,25 @@ claimed; see `docs/handoffs/CGN-102.md` for the exact evidence and limitations.
 - Candidate implementation adds `@cgn/observability` with W3C Trace Context propagation, asynchronous OTLP/HTTP export, HTTP request spans, and reusable database/Kafka span helpers. `services/platform-template` initializes it from `OTEL_SERVICE_NAME` and `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` and shuts it down with Nest lifecycle hooks.
 - The implementation intentionally does not add database or Kafka driver instrumentation, a collector, or a contract. Export is disabled when no endpoint is configured; spans omit URLs, request/event bodies, credentials, database statements and user identifiers.
 - Jira CGN-95 hard prerequisites CGN-35 and CGN-36 are Done. Jira CGN-95 remains In Review until delivery review and automation complete. See `docs/handoffs/CGN-95.md` for checks and limitations.
+
+## CGN-123 AI prompt version metadata
+
+CGN-123 adds versioned prompt definition and provider metadata contracts plus
+an exact ID/version resolver in the existing AI runtime. The resolver validates
+model settings, JSON-compatible response schema, provenance and declared
+variables, returns a safe error without version fallback, and excludes prompt
+text and resolved variables from orchestration telemetry. Definitions remain
+caller-supplied and stateless; no loader, persistence, API route, provider
+credential or live model integration was added. Structured-output validation
+remains owned by downstream CGN-124.
+
+Merged by [PR #86](https://github.com/Sandeepagrahari78/career-growth-network/pull/86)
+at SHA `e54491db7e4a390737bdb174568981503e454719` (final PR head
+`455c0108ce3160a0897d8821bc1c1107f500067b`). Exact-head PR CI
+`40125656360`, Main CI `40126006125`, Docker Images `40126006188`,
+exact-merge Staging Validation `40126218225`, and final Jira Delivery Sync
+`40126264389` passed. Jira CGN-123 is Done. Staging validation was an ephemeral
+Docker health/readiness, E2E and k6 smoke; no persistent staging deployment or
+production release is claimed. The requester authorized merge without a
+separate Sandeep permission request; no GitHub approval is claimed. See
+`docs/handoffs/CGN-123.md` for local test results and limitations.
