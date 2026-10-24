@@ -3,7 +3,10 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const policy = JSON.parse(
-  readFileSync("services/evidence/config/evidence-upload-policy.v1.json", "utf8"),
+  readFileSync(
+    "services/evidence/config/evidence-upload-policy.v1.json",
+    "utf8",
+  ),
 );
 const schema = JSON.parse(
   readFileSync(

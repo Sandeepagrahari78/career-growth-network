@@ -147,7 +147,10 @@ function declaredContentRejection(
   ) {
     return "owner_mismatch";
   }
-  if (!Number.isSafeInteger(input.declaredSizeBytes) || input.declaredSizeBytes <= 0) {
+  if (
+    !Number.isSafeInteger(input.declaredSizeBytes) ||
+    input.declaredSizeBytes <= 0
+  ) {
     return "invalid_declared_size";
   }
   if (input.declaredSizeBytes > policy.maxFileSizeBytes) {
@@ -164,7 +167,9 @@ function declaredContentRejection(
   return null;
 }
 
-function rejection(reason: EvidenceUploadRejectionV1): EvidenceUploadValidationV1 {
+function rejection(
+  reason: EvidenceUploadRejectionV1,
+): EvidenceUploadValidationV1 {
   return { state: "rejected", reason };
 }
 
@@ -259,7 +264,8 @@ export async function validateUploadedEvidence(
     return rejection("invalid_upload_expiry");
   }
   const uploadExpiryMs = Date.parse(input.uploadUrlExpiresAt);
-  if (!Number.isFinite(uploadExpiryMs)) return rejection("invalid_upload_expiry");
+  if (!Number.isFinite(uploadExpiryMs))
+    return rejection("invalid_upload_expiry");
   if (!(input.now instanceof Date) || !Number.isFinite(input.now.getTime())) {
     return rejection("invalid_upload_expiry");
   }
@@ -293,7 +299,8 @@ export async function validateUploadedEvidence(
     return rejection("object_inspection_failed");
   }
   if (inspection.ownerId !== input.ownerId) return rejection("owner_mismatch");
-  if (inspection.visibility !== "private") return rejection("object_not_private");
+  if (inspection.visibility !== "private")
+    return rejection("object_not_private");
   if (inspection.quarantineState !== "quarantined") {
     return rejection("object_not_quarantined");
   }
@@ -400,7 +407,8 @@ export function authorizeEvidenceDownload(
   input: EvidenceDownloadAuthorizationInput,
   policy: EvidenceUploadPolicyV1,
 ): EvidenceDownloadAuthorizationV1 {
-  if (!isUsablePolicy(policy)) return { allowed: false, reason: "invalid_policy" };
+  if (!isUsablePolicy(policy))
+    return { allowed: false, reason: "invalid_policy" };
   if (!(input.now instanceof Date)) {
     return { allowed: false, reason: "invalid_policy" };
   }

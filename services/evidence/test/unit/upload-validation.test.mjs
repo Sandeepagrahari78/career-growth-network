@@ -107,7 +107,10 @@ test("upload authorization allows only matched PDF, JPEG and PNG extensions and 
   for (const changes of [
     { fileName: "proof.exe", declaredContentType: "application/pdf" },
     { fileName: "proof.pdf", declaredContentType: "image/png" },
-    { fileName: "proof.pdf", declaredContentType: "application/pdf; spoofed=1" },
+    {
+      fileName: "proof.pdf",
+      declaredContentType: "application/pdf; spoofed=1",
+    },
   ]) {
     assert.equal(
       authorizeEvidenceUpload(uploadInput(changes), policy).reason,
@@ -202,7 +205,9 @@ test("post-upload validation rejects spoofed signatures before invoking the scan
       fileName: "proof.pdf",
       declaredContentType: "application/pdf",
       inspectQuarantinedObject: async () =>
-        inspection({ signaturePrefix: new Uint8Array([0x89, 0x50, 0x4e, 0x47]) }),
+        inspection({
+          signaturePrefix: new Uint8Array([0x89, 0x50, 0x4e, 0x47]),
+        }),
       scanner: {
         async scan() {
           scannerCalled = true;
@@ -235,7 +240,8 @@ test("post-upload validation rejects mismatched stored MIME and object owner met
 
   const objectOwnerMismatch = await validateUploadedEvidence(
     uploadedObject({
-      inspectQuarantinedObject: async () => inspection({ ownerId: "student-b" }),
+      inspectQuarantinedObject: async () =>
+        inspection({ ownerId: "student-b" }),
     }),
     policy,
   );
@@ -261,7 +267,8 @@ test("post-upload validation rechecks measured size and rejects mismatches", asy
   const mismatched = await validateUploadedEvidence(
     uploadedObject({
       declaredSizeBytes: 4,
-      inspectQuarantinedObject: async () => inspection({ contentLengthBytes: 5 }),
+      inspectQuarantinedObject: async () =>
+        inspection({ contentLengthBytes: 5 }),
     }),
     policy,
   );
