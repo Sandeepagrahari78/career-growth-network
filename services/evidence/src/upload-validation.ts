@@ -85,7 +85,7 @@ function isUsablePolicy(policy: EvidenceUploadPolicyV1): boolean {
       return false;
     }
 
-    return file.extensions.every((extension) => {
+    return file.extensions.every((extension: unknown) => {
       if (typeof extension !== "string") return false;
       const normalized = extension.toLowerCase();
       if (
@@ -363,7 +363,7 @@ export async function validateUploadedEvidence(
     }, input.scanTimeoutMs);
   });
 
-  let verdict: "timeout" | "clean" | "suspicious" | "unavailable";
+  let verdict: "timeout" | "clean" | "suspicious" | "unavailable" | "error";
   try {
     verdict = await Promise.race([
       input.scanner
