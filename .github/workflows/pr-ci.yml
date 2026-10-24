@@ -318,7 +318,7 @@ jobs:
 
   local-postgres:
     name: PostgreSQL init migrate backup restore
-    needs: [changes, quality]
+    needs: [changes]
     if: needs.changes.outputs.postgres == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -370,9 +370,11 @@ jobs:
         if: always()
         run: node scripts/infra/postgres-local.mjs reset
 
+  # CGN-302: These change-scoped jobs consume no quality/security job artifacts.
+  # Run them in parallel; the fail-closed gate below still requires every relevant result.
   docker:
     name: Docker build and security ${{ matrix.service }}
-    needs: [changes, quality, security]
+    needs: [changes]
     if: needs.changes.outputs.dockerCount != '0'
     runs-on: ubuntu-latest
     strategy:
@@ -465,7 +467,7 @@ jobs:
 
   integration:
     name: Integration dependency stack
-    needs: [changes, quality]
+    needs: [changes]
     if: needs.changes.outputs.integration == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -512,7 +514,7 @@ jobs:
 
   e2e:
     name: End-to-end deployment smoke
-    needs: [changes, quality]
+    needs: [changes]
     if: needs.changes.outputs.e2e == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -548,7 +550,7 @@ jobs:
 
   performance-smoke:
     name: Controlled k6 performance smoke
-    needs: [changes, quality]
+    needs: [changes]
     if: needs.changes.outputs.performance == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
