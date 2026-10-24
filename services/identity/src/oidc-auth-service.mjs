@@ -16,7 +16,10 @@ import {
 import { randomBytes } from "node:crypto";
 import { URL } from "node:url";
 import { IDENTITY_AUTH_SESSION_CONTRACT } from "./identity-auth-contract.mjs";
-import { createAuthorizationContext } from "./application-authorization.mjs";
+import {
+  createAuthorizationContext,
+  createOrganizationAuthorizationContext,
+} from "./application-authorization.mjs";
 
 const LOGIN_METHODS = new Set(["email_password", "google"]);
 
@@ -92,6 +95,7 @@ export class IdentityOidcAuthService {
     transactionAndSessionRepository,
     accountRepository,
     roleRepository,
+    organizationMembershipRepository,
     now = () => new Date(),
     clientFactory,
   }) {
@@ -122,10 +126,19 @@ export class IdentityOidcAuthService {
         "Identity auth requires the Identity application-role repository.",
       );
     }
+    if (
+      typeof organizationMembershipRepository?.findMembershipStatus !==
+      "function"
+    ) {
+      throw new TypeError(
+        "Identity auth requires the Identity organization-membership repository.",
+      );
+    }
     this.config = config;
     this.repository = transactionAndSessionRepository;
     this.accountRepository = accountRepository;
     this.roleRepository = roleRepository;
+    this.organizationMembershipRepository = organizationMembershipRepository;
     this.now = now;
     this.clientFactory =
       clientFactory ??
@@ -322,6 +335,27 @@ export class IdentityOidcAuthService {
     );
     return createAuthorizationContext({
       accountId: session.accountId,
+      assignments,
+      evaluatedAt: this.now(),
+    });
+  }
+
+  async getOrganizationAuthorizationContext(sessionId, organizationId) {
+    const session = await this.getSession(sessionId);
+    if (!session) {
+      return null;
+    }
+    const [membershipStatus, assignments] = await Promise.all([
+      this.organizationMembershipRepository.findMembershipStatus(
+        session.accountId,
+        organizationId,
+      ),
+      this.roleRepository.listRoleAssignments(session.accountId),
+    ]);
+    return createOrganizationAuthorizationContext({
+      accountId: session.accountId,
+      organizationId,
+      membershipStatus,
       assignments,
       evaluatedAt: this.now(),
     });
