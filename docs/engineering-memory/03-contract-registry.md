@@ -6,6 +6,7 @@ All cross-domain contracts live under `packages/contracts` unless a ticket delib
 
 - `cgn.identity.oidc-provider-config.v1` and `cgn.identity.auth-session.v1` define provider-neutral Identity OIDC configuration and a token-free session response; secret values remain in approved environment/secret configuration.
 - `cgn.identity.authorization-context.v1` exposes Identity's current recognized active application roles for an authenticated Identity session. It does not define resource permissions, recruiter membership approval, expert verification, or delegated Admin/Operator visibility.
+- `cgn.evidence-upload-policy.v1` defines the approved private Evidence upload policy and the typed authorization, post-upload validation, scanner and download-gate results. The configured allow-list is PDF/JPEG/PNG, 10 MiB maximum, 300-second upload URL TTL and 60-second download URL TTL. Objects stay private and quarantined until actual size/signature checks and a clean scan pass; consumers must pin the scanned object revision and checksum.
 
 - `cgn.bounded-contexts.v1` — cross-domain ownership and integration-boundary contract.
 - `cgn.workspace-boundaries.v1` — monorepo package roots and allowed workspace dependency direction.

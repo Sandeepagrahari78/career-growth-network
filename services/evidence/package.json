@@ -13,6 +13,9 @@
     "test:integration": "node --test test/integration/*.test.mjs",
     "test": "pnpm test:unit && pnpm test:integration"
   },
+  "dependencies": {
+    "@cgn/contracts": "workspace:*"
+  },
   "devDependencies": {
     "@types/node": "20.13.0",
     "typescript": "5.9.3"
