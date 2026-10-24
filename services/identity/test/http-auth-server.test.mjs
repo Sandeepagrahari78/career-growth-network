@@ -17,6 +17,15 @@ const AUTHORIZATION_CONTEXT = {
   evaluatedAt: "2026-10-20T10:00:00.000Z",
   roles: ["student"],
 };
+const ORGANIZATION_ID = "88c6fa95-2cc0-42ba-bb52-f583a9781c5e";
+const ORGANIZATION_AUTHORIZATION_CONTEXT = {
+  contract: "cgn.identity.organization-authorization-context.v1",
+  accountId: SESSION.accountId,
+  organizationId: ORGANIZATION_ID,
+  evaluatedAt: "2026-10-20T10:00:00.000Z",
+  membershipStatus: "approved",
+  roles: ["recruiter"],
+};
 
 function cookieValue(headers, name) {
   const lines = headers.getSetCookie?.() ?? [headers.get("set-cookie") ?? ""];
@@ -85,6 +94,16 @@ test("auth HTTP routes set protected cookies and return token-free session views
     async getAuthorizationContext(sessionId) {
       calls.push(["getAuthorizationContext", sessionId]);
       return sessionId ? AUTHORIZATION_CONTEXT : null;
+    },
+    async getOrganizationAuthorizationContext(sessionId, organizationId) {
+      calls.push([
+        "getOrganizationAuthorizationContext",
+        sessionId,
+        organizationId,
+      ]);
+      return sessionId
+        ? { ...ORGANIZATION_AUTHORIZATION_CONTEXT, organizationId }
+        : null;
     },
     async refreshSession(sessionId) {
       calls.push(["refreshSession", sessionId]);
@@ -168,6 +187,37 @@ test("auth HTTP routes set protected cookies and return token-free session views
     calls.find(([name]) => name === "getAuthorizationContext"),
     ["getAuthorizationContext", sessionCookie],
   );
+  const organizationContext = await request(
+    `/v1/identity/auth/organization-authorization-context?organizationId=${ORGANIZATION_ID}`,
+    { headers: { cookie: `${sessionName}=${sessionCookie}` } },
+  );
+  assert.equal(organizationContext.status, 200);
+  assert.deepEqual(await organizationContext.json(), {
+    organizationAuthorizationContext: ORGANIZATION_AUTHORIZATION_CONTEXT,
+  });
+  assert.deepEqual(
+    calls.find(([name]) => name === "getOrganizationAuthorizationContext"),
+    ["getOrganizationAuthorizationContext", sessionCookie, ORGANIZATION_ID],
+  );
+  const injectedOrganizationRole = await request(
+    `/v1/identity/auth/organization-authorization-context?organizationId=${ORGANIZATION_ID}&roles=admin`,
+    { headers: { cookie: `${sessionName}=${sessionCookie}` } },
+  );
+  assert.equal(injectedOrganizationRole.status, 400);
+  const duplicateOrganizations = await request(
+    `/v1/identity/auth/organization-authorization-context?organizationId=${ORGANIZATION_ID}&organizationId=${ORGANIZATION_ID}`,
+    { headers: { cookie: `${sessionName}=${sessionCookie}` } },
+  );
+  assert.equal(duplicateOrganizations.status, 400);
+  const invalidOrganization = await request(
+    "/v1/identity/auth/organization-authorization-context?organizationId=not-a-uuid",
+    { headers: { cookie: `${sessionName}=${sessionCookie}` } },
+  );
+  assert.equal(invalidOrganization.status, 400);
+  const unauthenticatedOrganizationContext = await request(
+    `/v1/identity/auth/organization-authorization-context?organizationId=${ORGANIZATION_ID}`,
+  );
+  assert.equal(unauthenticatedOrganizationContext.status, 401);
   const unauthenticatedContext = await request(
     "/v1/identity/auth/authorization-context",
   );
@@ -247,6 +297,9 @@ test("auth HTTP errors are safe and diagnostics never include callback credentia
       return null;
     },
     async getAuthorizationContext() {
+      return null;
+    },
+    async getOrganizationAuthorizationContext() {
       return null;
     },
     async refreshSession() {
