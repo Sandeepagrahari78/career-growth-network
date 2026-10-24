@@ -12,11 +12,14 @@ const repoRoot = resolve(
   "../../../..",
 );
 const composeFile = resolve(repoRoot, "infra/docker/docker-compose.test.yml");
-const migrationFile = resolve(
-  repoRoot,
-  "services/evidence/migrations/001_evidence_records.sql",
-);
-const projectName = "cgn141-evidence-" + process.pid;
+const migrationFiles = [
+  resolve(repoRoot, "services/evidence/migrations/001_evidence_records.sql"),
+  resolve(
+    repoRoot,
+    "services/evidence/migrations/002_evidence_record_lifecycle.sql",
+  ),
+];
+const projectName = "cgn143-evidence-" + process.pid;
 const compose = ["compose", "-p", projectName, "-f", composeFile];
 const dockerAvailable =
   spawnSync("docker", ["info"], { stdio: "ignore" }).status === 0;
@@ -88,7 +91,7 @@ function makePostgresExecutor() {
 }
 
 test(
-  "Evidence schema and repository enforce private owner-scoped records in PostgreSQL",
+  "Evidence API repository enforces owner, idempotency, concurrency and archive audit in PostgreSQL",
   { skip: !dockerAvailable && "Docker daemon is unavailable" },
   async (t) => {
     try {
@@ -114,6 +117,9 @@ test(
         }
       }
       assert.ok(ready, "PostgreSQL became ready");
+      const migrations = migrationFiles
+        .map((file) => readFileSync(file, "utf8"))
+        .join("\n");
       runDocker(
         [
           ...compose,
@@ -131,25 +137,68 @@ test(
           "-f",
           "-",
         ],
-        readFileSync(migrationFile, "utf8"),
+        migrations,
       );
 
       const repository = new EvidenceRepository(makePostgresExecutor());
       const owned = await repository.create({
         ownerId: "identity-subject-a",
+        idempotencyKey: "manual-1",
         provenanceKind: "manual_claim",
         claimText: "Completed a private project",
-        objectKey: "objects/evidence-a",
+      });
+      const replay = await repository.create({
+        ownerId: "identity-subject-a",
+        idempotencyKey: "manual-1",
+        provenanceKind: "manual_claim",
+        claimText: "Completed a private project",
       });
       const other = await repository.create({
         ownerId: "identity-subject-b",
+        idempotencyKey: "observed-1",
         provenanceKind: "observed_source",
         sourceReference: "github:repo/project/commit/abc123",
-        objectKey: "objects/evidence-b",
+      });
+      const attached = await repository.create({
+        ownerId: "identity-subject-a",
+        idempotencyKey: "manual-with-file-1",
+        provenanceKind: "manual_claim",
+        claimText: "Built a private project",
+        objectKey: "quarantine/evidence-a",
+        objectProof: {
+          objectRevision: "etag:revision-1",
+          checksumSha256: "a".repeat(64),
+          contentType: "application/pdf",
+          sizeBytes: 128,
+          validatedAt: new Date().toISOString(),
+        },
       });
 
       assert.equal(owned.visibility, "private");
       assert.equal(owned.verificationState, "unverified");
+      assert.equal(replay.evidenceId, owned.evidenceId);
+      assert.equal(attached.objectRevision, "etag:revision-1");
+      assert.equal(attached.objectChecksumSha256, "a".repeat(64));
+      await assert.rejects(
+        repository.create({
+          ownerId: "identity-subject-a",
+          idempotencyKey: "manual-1",
+          provenanceKind: "manual_claim",
+          claimText: "Different payload",
+        }),
+        /idempotency key was already used/,
+      );
+      await assert.rejects(
+        repository.create({
+          ownerId: "identity-subject-a",
+          idempotencyKey: "invalid-object",
+          provenanceKind: "manual_claim",
+          claimText: "No proof",
+          objectKey: "quarantine/unvalidated",
+        }),
+        /server-side validation proof/,
+      );
+
       assert.equal(
         (
           await repository.findOwnedActive(
@@ -176,13 +225,41 @@ test(
         other.evidenceId,
       );
 
+      const updated = await repository.updateManualClaimOwnedActive({
+        ownerId: "identity-subject-a",
+        evidenceId: owned.evidenceId,
+        expectedRevision: 1,
+        claimText: "Updated project description",
+      });
+      assert.equal(updated?.revision, 2);
+      assert.equal(updated?.provenanceKind, "manual_claim");
+      assert.equal(updated?.claimText, "Updated project description");
       assert.equal(
-        await repository.archiveOwnedActive(
-          "identity-subject-a",
-          owned.evidenceId,
-        ),
-        true,
+        await repository.updateManualClaimOwnedActive({
+          ownerId: "identity-subject-a",
+          evidenceId: owned.evidenceId,
+          expectedRevision: 1,
+          claimText: "Stale edit",
+        }),
+        null,
       );
+      assert.equal(
+        await repository.updateManualClaimOwnedActive({
+          ownerId: "identity-subject-b",
+          evidenceId: owned.evidenceId,
+          expectedRevision: 2,
+          claimText: "Cross-owner edit",
+        }),
+        null,
+      );
+
+      const archived = await repository.archiveOwnedActive({
+        ownerId: "identity-subject-a",
+        evidenceId: owned.evidenceId,
+        expectedRevision: 2,
+      });
+      assert.equal(archived?.revision, 3);
+      assert.notEqual(archived?.archivedAt, null);
       assert.equal(
         await repository.findOwnedActive(
           "identity-subject-a",
@@ -190,19 +267,15 @@ test(
         ),
         null,
       );
-      assert.equal(
-        await repository.archiveOwnedActive(
-          "identity-subject-b",
-          other.evidenceId,
-        ),
-        true,
-      );
-      assert.equal(
-        await repository.findOwnedActive(
-          "identity-subject-b",
-          other.evidenceId,
-        ),
-        null,
+
+      assert.deepEqual(
+        psql(
+          "SELECT action || ':' || revision FROM evidence_record_audit " +
+            "WHERE evidence_id = '" +
+            owned.evidenceId +
+            "' ORDER BY audit_id",
+        ).split(/\r?\n/),
+        ["created:1", "updated:2", "archived:3"],
       );
 
       assert.throws(() =>

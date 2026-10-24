@@ -4,6 +4,7 @@ All cross-domain contracts live under `packages/contracts` unless a ticket delib
 
 ## Canonical contracts
 
+- `cgn.evidence-record.v1` and its create, update, archive and archived-tombstone request/result contracts define the private Evidence record projection and manual project evidence lifecycle. Create is idempotent per owner/key; update and archive use expected revisions; provenance and attached-object identity are immutable. The application API consumes server-resolved Identity authorization context and clean `cgn.evidence-upload-policy.v1` validation. It creates no HTTP route or event.
 - `cgn.identity.oidc-provider-config.v1` and `cgn.identity.auth-session.v1` define provider-neutral Identity OIDC configuration and a token-free session response; secret values remain in approved environment/secret configuration.
 - `cgn.identity.authorization-context.v1` exposes Identity's current recognized active application roles for an authenticated Identity session. It does not define resource permissions, recruiter membership approval, expert verification, or delegated Admin/Operator visibility.
 - `cgn.identity.organization-authorization-context.v1` returns the session account's Identity-owned membership state for one requested organization and includes the recruiter role only when that membership is approved and the global recruiter role is active. It is not a bearer credential or proof of Gateway identity; clients and downstream services must not trust a copied response as authorization proof.
