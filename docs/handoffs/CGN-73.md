@@ -99,3 +99,5 @@ Updated `docs/engineering-memory/03-contract-registry.md` with the new envelope 
 - Remaining delivery gates: exact-head GitHub PR CI after push and an answer to Jira comment [10302](https://sandeepagrahari1.atlassian.net/browse/CGN-73?focusedCommentId=10302). Keep CGN-73 In Review; do not mark it Done or merge this PR.
 - Next agent: inspect the exact pushed PR head and all required CI jobs, obtain the owner decision for comment 10302 and the required technical/security review, then leave merge authorization to Sandeep. Do not merge automatically.
 - Rollback: revert the review-fix commit through the existing PR; no data or migration rollback is needed.
+
+- Security follow-up on 2026-10-28: the exact-head PR CI OSV scan found qs@6.16.0 (GHSA-6pq8-jhm2-2vcw), inherited through the existing Nest/Express dependency chain. Updated only the lockfile to qs@6.16.1, the fixed version. Frozen install and Gateway build/unit/integration checks pass on the new resolution (10 unit, 7 integration); the OSV workflow must rerun after this commit.
