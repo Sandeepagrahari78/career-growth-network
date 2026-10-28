@@ -1,11 +1,11 @@
 # Handoff - CGN-73
 
 - Ticket: CGN-73 - Create API Gateway BFF service with auth context propagation
-- Branch: `CGN-73-pr74-review-20261028` (updates the existing PR source branch)
-- Base branch: `main` at `e091ba85a8a618497783bb325456940c7ee8afe7`
-- PR: [#74](https://github.com/Sandeepagrahari78/career-growth-network/pull/74) - open; technical review and merge authorization pending
-- Jira: Sandeep-owned; live status is In Review. Do not transition it to Done until the post-merge delivery gates pass
-- Date: 2026-10-21
+- Branch: `CGN-73-api-gateway-bff-20261021` (PR source); post-merge docs follow-up on `CGN-73-postmerge-memory-20261028`
+- Base branch: `main`; candidate was synchronized from `e091ba85a8a618497783bb325456940c7ee8afe7` and merged at `78f3a63f4f7f4bb8db8729384dc3beb368effc2d`
+- PR: [#74](https://github.com/Sandeepagrahari78/career-growth-network/pull/74) - merged at `78f3a63f4f7f4bb8db8729384dc3beb368effc2d`; final candidate `26265cf0ad712a15874548af72b0c506392cd19b`
+- Jira: Sandeep-owned; live status is Done after final Jira Delivery Sync run `40721359385`
+- Date: 2026-10-28 (post-merge update)
 
 ## What changed
 
@@ -64,11 +64,11 @@ No database, migration, secret, event, or deployment-manifest changes. Runtime c
 - Identity and business-service origins must be supplied by the runtime owner; no deployment alias is assumed or provisioned here.
 - Browser cookie/CSRF policy and service-specific authorization remain outside CGN-73; review them before enabling state-changing browser routes.
 - Successful upstream status/body are relayed with a restricted response-header set. CGN-74 remains responsible for the owning error-handling contract and policy.
-- The PR is open and no reviews have been submitted. Its latest CI results are for older heads and remain red on the now-fixed clock-sensitive assertions; the current head must receive a fresh complete PR CI run, including Docker build/security acceptance, and technical/security review before merge.
+- PR #74 is merged. Final-head PR CI, Main CI, Docker Images, Helm validation, exact-merge Staging Validation and final Jira Delivery Sync all passed. GitHub has no APPROVED review object; Sandeep's explicit merge authorization was used after review. The exact run IDs are recorded below.
 
 ## Exact next step for next agent
 
-Keep PR #74 open while fresh exact-head CI runs. Obtain a clean PR CI result, technical/security review, Sandeep's explicit merge authorization, and a Jira answer to comment 10302. After merge, verify exact-merge Main CI, staging validation and Jira delivery sync show CGN-73 Done before starting dependent CGN-74. Recheck live Jira Rank and ownership before selecting another ticket: CGN-102 is ranked after CGN-101. Do not bypass CGN-122, CGN-141 or CGN-95 review gates.
+PR #74 is merged and the exact-candidate Main CI, Helm, Docker, Staging Validation and Jira Delivery Sync passed. Jira CGN-73 is Done. The next agent must start from current main and recheck live Jira ownership/blockers before CGN-74; keep protected downstream operations closed until CGN-101 service-to-service authentication is implemented and verified. Do not claim a persistent staging deployment or production release.
 
 ## Rollback note
 
@@ -76,7 +76,7 @@ Revert the CGN-73 merge commit through a reviewed GitHub PR. This change adds no
 
 ## Engineering Memory updated
 
-Updated `docs/engineering-memory/03-contract-registry.md` with the new envelope and the CGN-101 consumer trust gate. `05-current-state.md` remains merged-state-only and must be updated after CGN-73 actually merges; no unmerged work is represented as current main state.
+PR #74 updated `docs/engineering-memory/03-contract-registry.md` with the forwarding envelope and CGN-101 trust gate. This post-merge follow-up updates `docs/engineering-memory/05-current-state.md` plus the module and project-flow guides to reflect merged behavior.
 
 ## Docker regression correction — 2026-10-22
 
@@ -96,8 +96,18 @@ Updated `docs/engineering-memory/03-contract-registry.md` with the new envelope 
 - Windows checkout limitation: repository-wide `format:check` flags 231 existing files because the workflow expects LF while this checkout has CRLF. The changed-file formatting check passes. The probes, autoscaling, and workload-identity validators fail their existing LF-sensitive text assertions on CRLF; `test:contracts` passes 190/193 with only the CGN-45/60/61 validators failing for the same reason. Linux PR CI is authoritative for these checks.
 - Local Gateway Docker smoke is blocked: even with Docker config access, Docker Desktop's `//./pipe/dockerDesktopLinuxEngine` does not exist. Exact-head GitHub PR CI run 40718444339 passed Docker acceptance and source/container security scans.
 - No new contract version or contract shape, event, database migration, runtime configuration, or deployment behavior was added. The contract barrel merge only preserves main's Identity export alongside the existing Gateway contract export.
-- Remaining delivery gates: an owner decision on Jira comment [10302](https://sandeepagrahari1.atlassian.net/browse/CGN-73?focusedCommentId=10302). The required independent technical/security approval also remains outstanding. PR CI run 40718444339 and Local Helm validation run 40718444212 passed. Keep CGN-73 In Review; do not mark it Done or merge this PR.
-- Next agent: inspect the exact pushed PR head and all required CI jobs, obtain the owner decision for comment 10302 and the required technical/security review, then leave merge authorization to Sandeep. Do not merge automatically.
+- Post-merge delivery gates passed: final-head PR CI `40719287224` and PR Local Helm `40719287168`; Main CI `40720211850`, Docker Images `40720212110`, Main Local Helm `40720211708`, exact-merge Staging Validation `40721241209`, and final Jira Delivery Sync `40721359385`. Jira CGN-73 is Done. Jira comment 10302 remains in history; the current reviewed-merge policy required no separate acceptance comment. No production deployment occurred.
+- Next agent: start from current main, recheck live Jira before CGN-74, and keep protected downstream operations closed until CGN-101 trusted service-to-service authentication is implemented and verified. No production deployment is authorized by this handoff.
 - Rollback: revert the review-fix commit through the existing PR; no data or migration rollback is needed.
 
 - Security follow-up on 2026-10-28: the exact-head PR CI OSV scan found qs@6.16.0 (GHSA-6pq8-jhm2-2vcw), inherited through the existing Nest/Express dependency chain. Updated only the lockfile to qs@6.16.1, the fixed version. Frozen install and Gateway build/unit/integration checks pass on the new resolution (10 unit, 7 integration); the exact-head OSV scan reran and passed in PR CI run 40718444339.
+
+
+## Post-merge verification - 2026-10-28
+
+- PR #74 merged at `78f3a63f4f7f4bb8db8729384dc3beb368effc2d` from final head `26265cf0ad712a15874548af72b0c506392cd19b`.
+- PR CI `40719287224` and PR Local Helm `40719287168` passed on the final candidate.
+- Main CI `40720211850`, Docker Images `40720212110`, Main Local Helm `40720211708`, exact-merge Staging Validation `40721241209`, and final Jira Delivery Sync `40721359385` passed.
+- Jira CGN-73 is Done. Comment 10302 remains as historical context; current delivery policy uses Sandeep's explicit merge authorization and delivery evidence, with no separate acceptance comment required.
+- No persistent staging deployment or production release was performed. CGN-101 remains the security prerequisite before protected downstream routes can be enabled.
+\r\n- Post-merge docs follow-up is on branch \u0060CGN-73-postmerge-memory-20261028\u0060 and updates \u006005-current-state.md\u0060, \u0060MODULE_DEPENDENCIES.md\u0060 and the Gateway status sentence in \u0060PROJECT_FLOW.md\u0060.\r\n- \u0060pnpm memory:check\u0060 passed; CRLF-aware \u0060git diff --check\u0060 passed. No implementation tests were rerun because this follow-up changes documentation only; exact-head PR and post-merge checks above validate the merged implementation.\r\n- Fresh context was generated from main; the live Jira status/owner/dependencies were verified through the connected Jira integration because local CGN_JIRA credentials were not available.\r\n

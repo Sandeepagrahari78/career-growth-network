@@ -14,7 +14,7 @@ This is a *navigation guide*. Authoritative ownership rules: `packages/contracts
 | Network | `services/network/` | social connections and block truth | Package skeleton; product APIs pending Jira |
 | Communities | `services/community/` | membership, discussions | Package skeleton; product APIs pending Jira |
 | Messaging | `services/messaging/` | message state, *not* block policy | Package skeleton; product APIs pending Jira |
-| Gateway | `services/gateway/` | API composition, not business truth | Package skeleton; product APIs pending Jira |
+| Gateway | `services/gateway/` | API composition, not business truth | CGN-73 implements a versioned BFF with fixed-origin allowlisting and Identity context forwarding; no downstream consumers are enabled by default, and protected operations remain closed until CGN-101 |
 | Web/mobile | `apps/web/`, `apps/mobile/` | frontend shells | Workspace skeletons, not completed UI |
 | Opportunities / Admin | Jira owning tickets; no service path approved from this map | catalog, matching and privacy-safe projections | **Planned**; do not invent path/API on CGN-220 |
 | Shared contracts | `packages/contracts/` | boundary/versioned API-event contracts | Architecture contracts and shared schema package exist |
