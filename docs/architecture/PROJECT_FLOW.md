@@ -43,7 +43,7 @@ flowchart TB
     GR -. "approved read / event contract" .-> OPP
 ```
 
-**Important:** Dotted relationships are architectural policy and contract intentions, *not evidence that code or Kafka topics already exist*. Services in `services/` apart from `health-demo` are presently workspace package skeletons until the corresponding feature tickets land. The repository has no `services/opportunities` implementation at the time this map was authored. No service may read another service's database directly.
+**Important:** Dotted relationships are architectural policy and contract intentions, *not evidence that code or Kafka topics already exist*. Most services in `services/` remain workspace package skeletons until their owning feature tickets land. CGN-73 implements `services/gateway/` as a versioned BFF with fixed-origin routing and Identity context forwarding; downstream routes default closed and protected operations remain untrusted until CGN-101 verifies service-to-service authentication. The repository has no `services/opportunities` implementation at the time this map was authored. No service may read another service's database directly.
 
 ## Delivery and verification
 

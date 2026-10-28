@@ -1,8 +1,8 @@
 # 05 - Current Merged State
 
-Last updated: 2026-10-25 after the CGN-123 AI prompt registry merge; CGN-90,
+Last updated: 2026-10-28 after the CGN-73 API Gateway BFF merge; CGN-90,
 CGN-99, CGN-75, CGN-131, CGN-67, CGN-68, CGN-102, CGN-123, CGN-141, CGN-134 and
-CGN-142 are merged with verification evidence below.
+CGN-142 and CGN-73 are merged with verification evidence below.
 
 ## Repository
 
@@ -238,3 +238,13 @@ Docker health/readiness, E2E and k6 smoke; no persistent staging deployment or
 production release is claimed. The requester authorized merge without a
 separate Sandeep permission request; no GitHub approval is claimed. See
 `docs/handoffs/CGN-123.md` for local test results and limitations.
+
+## CGN-73 API Gateway BFF
+
+CGN-73 adds the NestJS Gateway/BFF in `services/gateway/`. It composes versioned `/v1/{service}/...` requests only for configured fixed HTTP(S) upstreams. Gateway obtains Identity authorization context through Identity's existing endpoint after Identity validates the session, then forwards it in the versioned `cgn.gateway.auth-context-forwarding.v1` contract (`x-cgn-auth-context-v1`). Identity remains the source of account and role truth. Gateway adds no business persistence, cross-service database reads, or events.
+
+Routing rejects literal, encoded, and nested-encoded traversal before URL normalization and verifies the canonical service alias against the raw route. Each upstream response is bounded to 5 MiB; oversized streams are cancelled and return a safe 502. Upstream routing defaults to empty, and production rejects non-empty routing until CGN-101 establishes trusted service-to-service authentication. Consumers must fail closed for protected operations until that transport is verified.
+
+Merged by [PR #74](https://github.com/Sandeepagrahari78/career-growth-network/pull/74) at merge SHA `78f3a63f4f7f4bb8db8729384dc3beb368effc2d` (final PR head `26265cf0ad712a15874548af72b0c506392cd19b`). PR CI `40719287224`, PR Local Helm `40719287168`, Main CI `40720211850`, Docker Images `40720212110`, Main Local Helm `40720211708`, exact-merge Staging Validation `40721241209`, and final Jira Delivery Sync `40721359385` passed. Jira CGN-73 is Done. GitHub has no APPROVED review object; Sandeep explicitly authorized the merge after review. Staging validation was an exact-candidate smoke; no persistent staging deployment or production release is claimed.
+
+The lockfile resolves `qs@6.16.1` after the synchronized-main OSV scan flagged vulnerable `6.16.0`; the final exact-head source security scan passed. CGN-101 remains required before protected downstream routes can be enabled.
